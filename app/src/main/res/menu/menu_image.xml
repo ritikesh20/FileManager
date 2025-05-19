@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menuImage_search"
+        android:title="@string/search"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/menuImage_ChangeView"
+        android:title="@string/changeview"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/menuImage_SortBy"
+        android:icon="@drawable/loadingarrow"
+        android:title="@string/sort_by" />
+
+    <item
+        android:id="@+id/menu_SizeSL"
+        android:icon="@drawable/loadingarrow"
+        android:title="Size S - L" />
+
+    <item
+        android:id="@+id/menu_SizeLS"
+        android:icon="@drawable/loadingarrow"
+        android:title="Size L - S" />
+
+</menu>

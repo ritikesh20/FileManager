@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">FileManager</string>
+    <string name="imageview">imageView</string>
+    <string name="search">Search</string>
+    <string name="changeview">ChangeView</string>
+    <string name="sort_by">Sort by</string>
+
+    <item name="PhotoCount" type="id" />
+</resources>

@@ -5,6 +5,7 @@
     <item
         android:id="@+id/menuImage_search"
         android:title="@string/search"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="ifRoom" />
 
     <item
@@ -18,13 +19,28 @@
         android:title="@string/sort_by" />
 
     <item
+        android:id="@+id/menu_NDF"
+        android:title="@string/newest_date_first" />
+
+    <item
+        android:id="@+id/menu_ODF"
+        android:title="@string/old_date_first" />
+
+    <item
         android:id="@+id/menu_SizeSL"
-        android:icon="@drawable/loadingarrow"
-        android:title="Size S - L" />
+        android:title="@string/size_s_l" />
 
     <item
         android:id="@+id/menu_SizeLS"
-        android:icon="@drawable/loadingarrow"
-        android:title="Size L - S" />
+        android:title="@string/size_l_s" />
+
+    <item
+        android:id="@+id/menuNameAZ"
+        android:title="@string/name_a_z" />
+
+    <item
+        android:id="@+id/menuNameZA"
+        android:title="@string/name_z_a" />
+
 
 </menu>

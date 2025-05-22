@@ -16,30 +16,50 @@ import java.util.List;
 
 public class ImageFA extends AbstractItem<ImageFA, ImageFA.ViewHolder> {
 
-    private Uri imageUri;
-    private String imageSize;
+    final Uri imageUri;
+    String imageName;
+    final String imageSize;
+    String imageDate;
 
-    public ImageFA(Uri imageUri, String imageSize) {
+    public ImageFA(Uri imageUri, String imageName, String imageSize, String imageDate) {
         this.imageUri = imageUri;
+        this.imageName = imageName;
         this.imageSize = imageSize;
+        this.imageDate = imageDate;
     }
 
     public Uri getImageUri() {
         return imageUri;
     }
 
+    public String getImageName() {
+        return imageName;
+    }
+
+    public void setImageName(String imageName) {
+        this.imageName = imageName;
+    }
+
     public String getImageSize() {
         return imageSize;
     }
 
+    public String getImageDate() {
+        return imageDate;
+    }
+
+    public void setImageDate(String imageDate) {
+        this.imageDate = imageDate;
+    }
+
     @Override
     public int getType() {
-        return 0;
+        return R.id.PhotoCount;
     }
 
     @Override
     public int getLayoutRes() {
-        return R.layout.gridimage_item;
+        return R.layout.listimage_item;
     }
 
     @NonNull
@@ -49,29 +69,40 @@ public class ImageFA extends AbstractItem<ImageFA, ImageFA.ViewHolder> {
     }
 
     static class ViewHolder extends FastAdapter.ViewHolder<ImageFA> {
-        ImageView imageView;
-        TextView imageSizeText;
+        private final ImageView imageView;
+        private final TextView imageLvNameTv, imageSizeText, imageLvDateTv;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            imageView = itemView.findViewById(R.id.imageView);
-            imageSizeText = itemView.findViewById(R.id.tvImageSize);
+
+            imageView = itemView.findViewById(R.id.lvImage);
+            imageLvNameTv = itemView.findViewById(R.id.lvName);
+            imageSizeText = itemView.findViewById(R.id.lvSize);
+            imageLvDateTv = itemView.findViewById(R.id.lvDOP);
+
         }
 
         @Override
         public void bindView(ImageFA item, List<Object> payloads) {
+
             Glide.with(itemView.getContext())
                     .load(item.getImageUri())
                     .centerCrop()
                     .into(imageView);
 
+            imageLvNameTv.setText(item.getImageName());
             imageSizeText.setText(item.getImageSize());
+            imageLvDateTv.setText(item.getImageDate());
         }
 
         @Override
         public void unbindView(ImageFA item) {
+
             imageView.setImageDrawable(null);
+            imageLvNameTv.setText(null);
             imageSizeText.setText(null);
+            imageLvDateTv.setText(null);
+
         }
     }
 }

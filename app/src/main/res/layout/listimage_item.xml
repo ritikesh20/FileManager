@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="110dp">
 
     <LinearLayout
         android:id="@+id/linearLayout4"
@@ -14,7 +14,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/glImage"
+            android:id="@+id/lvImage"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_marginStart="20dp"
@@ -29,13 +29,14 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/glName"
+                android:id="@+id/lvName"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
                 android:layout_marginStart="10dp"
                 android:text="Screenshot12334"
+                android:maxLines="1"
                 android:textColor="@color/black"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -44,17 +45,21 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/glSize"
-                    android:layout_width="100dp"
+                    android:id="@+id/lvSize"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="133 kb" />
 
                 <TextView
-                    android:id="@+id/glDOP"
-                    android:layout_width="100dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=" 4 days Ago"
-                    />
+                    android:text=", " />
+
+                <TextView
+                    android:id="@+id/lvDOP"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="4 days Ago" />
 
 
             </LinearLayout>
@@ -65,8 +70,8 @@
         <ImageView
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:padding="5dp"
             android:layout_marginTop="25dp"
+            android:padding="10dp"
             android:src="@drawable/dots" />
     </LinearLayout>
 

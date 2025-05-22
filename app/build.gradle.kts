@@ -41,14 +41,18 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 
-    implementation("com.mikepenz:fastadapter:3.3.1") // working
+    implementation("com.mikepenz:fastadapter:3.3.1")
 
-    implementation ("com.github.bumptech.glide:glide:4.16.0")
-    annotationProcessor ("com.github.bumptech.glide:compiler:4.16.0")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 
     implementation("com.mikepenz:iconics-views:3.2.5")
     implementation("com.mikepenz:materialize:1.2.0@aar")
     implementation("com.mikepenz:google-material-typeface:3.0.1.3.original@aar")
     implementation("com.mikepenz:community-material-typeface:2.7.94.1")
+
+
+    implementation ("com.davemorrissey.labs:subsampling-scale-image-view:3.10.0")
+
 
 }

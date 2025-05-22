@@ -4,6 +4,16 @@
     <string name="search">Search</string>
     <string name="changeview">ChangeView</string>
     <string name="sort_by">Sort by</string>
+    <string name="size_s_l">Size S - L</string>
+    <string name="size_l_s">Size L - S</string>
+    <string name="newest_date_first">Newest Date first</string>
+    <string name="old_date_first">Old Date first</string>
+    <string name="name_a_z">Name A - Z</string>
+    <string name="name_z_a">Name Z - A</string>
+    <string name="dashboard">Dashboard</string>
 
     <item name="PhotoCount" type="id" />
+    <item name="fastadapter_image_fa_item_id" type="id" />
+    <item name="file_item_id" type="id" />
+
 </resources>

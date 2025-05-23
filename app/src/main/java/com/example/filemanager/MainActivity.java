@@ -5,21 +5,29 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.filemanager.imagexview.ImageGalleryActivity;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsDrawable;
 
 public class MainActivity extends AppCompatActivity {
 
     CardView btnCVInternalStorage;
-    Button btnImageView;
+    CardView btnImageView;
+
+    Toolbar homeToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +35,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         btnCVInternalStorage = findViewById(R.id.cardViewInternalStorage);
+        homeToolbar = findViewById(R.id.toolbarHome);
+
+        setSupportActionBar(homeToolbar);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("Dashboard");
+        }
 
         btnImageView = findViewById(R.id.btnShowGallery);
 
@@ -72,6 +87,36 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 111);
 
         }
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuInflater menuInflater = getMenuInflater();
+
+        menuInflater.inflate(R.menu.menu_home, menu);
+
+        menu.findItem(R.id.homeSearch).setIcon(new IconicsDrawable(this, GoogleMaterial.Icon.gmd_search).actionBar());
+        menu.findItem(R.id.homeRefresh).setIcon(new IconicsDrawable(this, GoogleMaterial.Icon.gmd_refresh).actionBar());
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        int id = item.getItemId();
+
+        if (id == R.id.homeSearch) {
+            Toast.makeText(this, "Searching Feature Coming Soon", Toast.LENGTH_SHORT).show();
+        } else if (id == R.id.homePremium) {
+            Toast.makeText(this, "Searching Feature Coming Soon", Toast.LENGTH_SHORT).show();
+        } else if (id == R.id.homeRefresh) {
+            Toast.makeText(this, "Searching Feature Coming Soon", Toast.LENGTH_SHORT).show();
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
 }

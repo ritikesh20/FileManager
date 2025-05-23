@@ -7,12 +7,16 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.bumptech.glide.Glide;
+import com.example.filemanager.InternalStorageActivity;
 import com.example.filemanager.R;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.items.AbstractItem;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 
 public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
@@ -44,19 +48,23 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
 
     @Override
     public int getLayoutRes() {
-        return R.layout.internal_storage_items;
+        return InternalStorageActivity.isGridView ? R.layout.istore_grid_item : R.layout.internal_storage_items;
     }
 
     public static class ViewHolder extends FastAdapter.ViewHolder<ISAdapter> {
 
         TextView fileName;
         ImageView fileImage;
+        TextView fileDate;
+        TextView fileSize;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
             fileName = itemView.findViewById(R.id.file_name_text_view);
             fileImage = itemView.findViewById(R.id.file_icon_image);
+            fileDate = itemView.findViewById(R.id.tvModifierData);
+            fileSize = itemView.findViewById(R.id.tvSize);
 
         }
 
@@ -64,31 +72,50 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
         public void bindView(ISAdapter item, List<Object> payloads) {
 
             fileName.setText(item.getFile().getName());
+            long sizeInBytes = item.file.length();
+            String convertedSize;
+            long reSize;
 
             if (item.getFile().isDirectory()) {
                 fileImage.setImageResource(R.drawable.openfolder);
+                fileSize.setVisibility(View.GONE);
+
             } else {
                 String name = item.getFile().getName().toLowerCase();
                 if (name.endsWith(".mp3") || name.endsWith(".wav")) {
                     fileImage.setImageResource(R.drawable.musicicons);
                 } else if (name.endsWith(".jpg") || name.endsWith(".png") || name.endsWith(".jpeg")) {
-//                    fileImage.setImageResource(R.drawable.img);
-                    Glide.with(itemView.getContext())
-                            .load(item.getFile())
-                            .error(R.drawable.img)
-                            .into(fileImage);
+                    Glide.with(itemView.getContext()).load(item.getFile()).error(R.drawable.img).into(fileImage);
                 } else if (name.endsWith(".apk")) {
                     fileImage.setImageResource(R.drawable.apkicons);
                 } else if (name.endsWith(".mp4")) {
-                    Glide.with(itemView.getContext())
-                            .load(item.getFile())
-                            .error(R.drawable.img)
-                            .into(fileImage);
-//                    fileImage.setImageResource(R.drawable.videoicons);
+                    Glide.with(itemView.getContext()).load(item.getFile()).error(R.drawable.img).into(fileImage);
                 } else {
                     fileImage.setImageResource(R.drawable.newdocument);
                 }
             }
+
+            long lastModifiedData = item.file.lastModified();
+            SimpleDateFormat date = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
+            String setDate = date.format(new Date(lastModifiedData));
+
+            fileDate.setText(setDate);
+
+            if (sizeInBytes < 1024) {
+                convertedSize = sizeInBytes + " B";
+            } else if (sizeInBytes < 1024 * 1024) {
+                reSize = sizeInBytes / 1024;
+                convertedSize = reSize + " KB";
+            } else if (sizeInBytes < 1024 * 1024 * 1014) {
+                reSize = sizeInBytes / (1024 * 1024);
+                convertedSize = reSize + " MB";
+            } else {
+                reSize = sizeInBytes / (1024 * 1024 * 1024);
+                convertedSize = reSize + " GB";
+            }
+
+            fileSize.setText(convertedSize);
+
         }
 
         @Override
@@ -98,3 +125,6 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
         }
     }
 }
+
+/*
+ */

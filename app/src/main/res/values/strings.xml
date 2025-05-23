@@ -11,6 +11,13 @@
     <string name="name_a_z">Name A - Z</string>
     <string name="name_z_a">Name Z - A</string>
     <string name="dashboard">Dashboard</string>
+    <string name="next">next</string>
+    <string name="internal_storage">Internal Storage</string>
+    <string name="no_files_found">No FILES Found</string>
+    <string name="change_view">Change View</string>
+    <string name="premium">Premium</string>
+    <string name="refresh">Refresh</string>
+    <string name="UsedStorage">32.76 GB Used of 50.54 GB</string>
 
     <item name="PhotoCount" type="id" />
     <item name="fastadapter_image_fa_item_id" type="id" />

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/isSearch"
+        android:title="@string/search"
+        app:showAsAction="ifRoom"
+        />
+
+    <item
+        android:id="@+id/isHome"
+        android:title="Home"
+        app:showAsAction="ifRoom"
+        />
+
+
+
+    <item
+        android:id="@+id/isChangeView"
+        android:title="@string/change_view" />
+
+
+</menu>

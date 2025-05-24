@@ -11,7 +11,7 @@
         android:id="@+id/toolbarInternalStorage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
+        android:background="#E2DDEF"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -19,35 +19,26 @@
         app:subtitle="12 file 4 folder"
         app:title="Internal Storage">
 
-
     </androidx.appcompat.widget.Toolbar>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvHistoryPathName"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
+    <HorizontalScrollView
+        android:id="@+id/horizontalView"
+        android:layout_width="412dp"
+        android:layout_height="25dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbarInternalStorage">
 
-    </androidx.recyclerview.widget.RecyclerView>
-
-    <HorizontalScrollView
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/rvHistoryPathName">
-
         <LinearLayout
-            android:id="@+id/pathLayout"
+            android:id="@+id/pathBar"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="horizontal">
 
+
         </LinearLayout>
+
     </HorizontalScrollView>
 
     <com.google.android.material.divider.MaterialDivider
@@ -56,19 +47,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/rvHistoryPathName" />
+        app:layout_constraintTop_toBottomOf="@id/horizontalView" />
 
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvInternalStorage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/rvHistoryPathName"
-        android:layout_marginTop="57dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/rvHistoryPathName" />
+        app:layout_constraintTop_toBottomOf="@+id/horizontalView" />
 
     <TextView
         android:id="@+id/tvNoFile"
@@ -84,3 +73,6 @@
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+

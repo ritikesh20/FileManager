@@ -1,12 +1,15 @@
 package com.example.filemanager;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,7 +22,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.filemanager.adapter.ISAdapter;
-import com.example.filemanager.imagexview.pathxhistory.PathHistoryAdapter;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.adapters.ItemAdapter;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
@@ -41,13 +43,11 @@ public class InternalStorageActivity extends AppCompatActivity {
     private ItemAdapter<ISAdapter> itemAdapter;
     private FastAdapter<ISAdapter> fastAdapter;
 
-    private RecyclerView recyclerViewHistoryPath;
-    ItemAdapter<PathHistoryAdapter> itemAdapterHistory;
-    FastAdapter<PathHistoryAdapter> fastAdapterHistory;
-    List<PathHistoryAdapter> historyPathList;
+//    private RecyclerView recyclerViewHistoryPath;
     Toolbar inStorageToolbar;
 
-    List<String> pathList = new ArrayList<>();
+    LinearLayout pathBar;
+    List<String> pathList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,15 +55,13 @@ public class InternalStorageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_internal_storage);
 
         inStorageToolbar = findViewById(R.id.toolbarInternalStorage);
+        pathBar = findViewById(R.id.pathBar);
 
         recyclerView = findViewById(R.id.rvInternalStorage);
         noFileText = findViewById(R.id.tvNoFile);
 
         itemAdapter = new ItemAdapter<>();
         fastAdapter = FastAdapter.with(itemAdapter);
-
-//        TextView tvFileCount = findViewById(R.id.countFile);
-//        TextView tvFolderCount = findViewById(R.id.countFolder);
 
         setSupportActionBar(inStorageToolbar);
 
@@ -72,19 +70,16 @@ public class InternalStorageActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        ArrayList<String> list = new ArrayList<>();
-
-
-        recyclerViewHistoryPath = findViewById(R.id.rvHistoryPathName);
-        itemAdapterHistory = new ItemAdapter<>();
-        fastAdapterHistory = FastAdapter.with(itemAdapterHistory);
-        historyPathList = new ArrayList<>();
-
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        recyclerViewHistoryPath.setLayoutManager(linearLayoutManager);
-
-
         String path = getIntent().getStringExtra("path");
+
+        pathList = getIntent().getStringArrayListExtra("pathList");
+
+        if (pathList == null) {
+            pathList = new ArrayList<>();
+            addToPathBar();
+        } else {
+            updatePathBar();
+        }
 
         assert path != null;
         File root = new File(path);
@@ -106,11 +101,16 @@ public class InternalStorageActivity extends AppCompatActivity {
         for (File file : filesAndFolders) {
             items.add(new ISAdapter(file));
             if (file.isDirectory()) {
+
                 folderCount++;
             } else {
                 fileCount++;
             }
         }
+
+
+
+
         String subTitle = folderCount + " Folder " + fileCount + " File";
         Objects.requireNonNull(getSupportActionBar()).setSubtitle(subTitle);
 
@@ -120,25 +120,26 @@ public class InternalStorageActivity extends AppCompatActivity {
 
             if (clickedFile.isDirectory()) {
 
-                historyPathList.add(new PathHistoryAdapter(clickedFile.getName()));
-                itemAdapterHistory.setNewList(historyPathList);
+                ArrayList<String> updatedPathList = new ArrayList<>(pathList);
+                updatedPathList.add(clickedFile.getName());
 
                 Intent intent = new Intent(this, InternalStorageActivity.class);
                 intent.putExtra("path", clickedFile.getAbsolutePath());
+                intent.putStringArrayListExtra("pathList", updatedPathList);
                 startActivity(intent);
 
-            } else {
+            }
+            else {
                 openWith(clickedFile);
             }
 
             return true;
         });
 
-        recyclerViewHistoryPath.setAdapter(fastAdapterHistory);
-        itemAdapterHistory.setNewList(historyPathList);
 
         recyclerView.setAdapter(fastAdapter);
         itemAdapter.set(items);
+
 
     }
 
@@ -147,6 +148,7 @@ public class InternalStorageActivity extends AppCompatActivity {
     }
 
     void openWith(File clickedFile) {
+
         if (clickedFile.isFile()) {
 
             String mine = URLConnection.guessContentTypeFromName(clickedFile.getName());
@@ -211,6 +213,42 @@ public class InternalStorageActivity extends AppCompatActivity {
 
     }
 
+
+    void addToPathBar() {
+        pathList.add("Internal Storage");
+        updatePathBar();
+    }
+
+    void updatePathBar() {
+
+        pathBar.removeAllViews();
+
+        for (int i = 0; i < pathList.size(); i++) {
+
+            String folder = pathList.get(i);
+            TextView textView = new TextView(this);
+            textView.setPadding(10, 0, 0, 0);
+
+            textView.setText(folder);
+            textView.setTextSize(18);
+
+            pathBar.addView(textView);
+
+            if (i != pathList.size() - 1) {
+
+                ImageView arrow = new ImageView(this);
+                arrow.setImageResource(R.drawable.next);
+                pathBar.addView(arrow);
+
+            }
+            ImageView imageView = new ImageView(this);
+            imageView.setImageResource(R.drawable.crown);
+            pathBar.addView(imageView);
+
+        }
+    }
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -240,9 +278,7 @@ public class InternalStorageActivity extends AppCompatActivity {
             fastAdapter.notifyAdapterDataSetChanged();
             recreate();
             return true;
-        }
-
-        else if (id == R.id.isHome){
+        } else if (id == R.id.isHome) {
             Intent intent = new Intent(InternalStorageActivity.this, MainActivity.class);
             startActivity(intent);
         } else if (id == R.id.isSearch) {
@@ -251,6 +287,8 @@ public class InternalStorageActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
 }
 
 

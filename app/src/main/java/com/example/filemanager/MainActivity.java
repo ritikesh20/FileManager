@@ -47,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
 
         btnImageView.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, ImageGalleryActivity.class);
-
             startActivity(intent);
         });
 
@@ -80,12 +79,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void requestPermission() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        ) {
             Toast.makeText(this, "Give the Permission", Toast.LENGTH_SHORT).show();
         } else {
-
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 111);
-
         }
     }
 
@@ -111,9 +109,13 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.homeSearch) {
             Toast.makeText(this, "Searching Feature Coming Soon", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.homePremium) {
-            Toast.makeText(this, "Searching Feature Coming Soon", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Premium Feature Coming Soon", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.homeRefresh) {
-            Toast.makeText(this, "Searching Feature Coming Soon", Toast.LENGTH_SHORT).show();
+
+            Intent intent = new Intent(this, MainActivity.class);
+            Toast.makeText(this, "Refreshing", Toast.LENGTH_SHORT).show();
+            startActivity(intent);
+
         }
 
         return super.onOptionsItemSelected(item);

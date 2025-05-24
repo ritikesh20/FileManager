@@ -22,5 +22,6 @@
     <item name="PhotoCount" type="id" />
     <item name="fastadapter_image_fa_item_id" type="id" />
     <item name="file_item_id" type="id" />
+    <item name="filePathCount" type="id" />
 
 </resources>

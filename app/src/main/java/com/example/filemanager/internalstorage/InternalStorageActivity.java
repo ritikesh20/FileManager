@@ -1,4 +1,4 @@
-package com.example.filemanager;
+package com.example.filemanager.internalstorage;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -23,7 +23,8 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.filemanager.adapter.ISAdapter;
+import com.example.filemanager.MainActivity;
+import com.example.filemanager.R;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.adapters.ItemAdapter;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
@@ -33,7 +34,6 @@ import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -147,7 +147,6 @@ public class InternalStorageActivity extends AppCompatActivity {
         for (File file : filesAndFolders) {
             items.add(new ISAdapter(file));
             if (file.isDirectory()) {
-
                 folderCount++;
             } else {
                 fileCount++;
@@ -227,7 +226,8 @@ public class InternalStorageActivity extends AppCompatActivity {
                     Toast.makeText(this, "Cannot play audio", Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
                 }
-            } else if (mine != null && mine.startsWith("image")) {
+            }
+            else if (mine != null && mine.startsWith("image")) {
                 try {
                     Uri imageUri = FileProvider.getUriForFile(
                             this,
@@ -244,7 +244,8 @@ public class InternalStorageActivity extends AppCompatActivity {
                     Toast.makeText(this, "Cannot open image" + e.getMessage(), Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
                 }
-            } else if (mine != null && mine.startsWith("application/pdf")) {
+            }
+            else if (mine != null && mine.startsWith("application/pdf")) {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setDataAndType(Uri.fromFile(clickedFile), "application/pdf");
                 intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
@@ -273,6 +274,8 @@ public class InternalStorageActivity extends AppCompatActivity {
 
 
     }
+
+
 
 
     @Override
@@ -438,54 +441,3 @@ public class InternalStorageActivity extends AppCompatActivity {
 }
 
 
-
-/*
-
-pathBar = findViewById(R.id.pathBar);
-pathList = getIntent().getStringArrayListExtra("pathList");
-if (pathList == null) {
-            pathList = new ArrayList<>();
-//            addToPathBar();
-        } else {
-//            updatePathBar();
-        }
-
-
-LinearLayout pathBar;
-    List<String> pathList;
-
-        void addToPathBar() {
-        pathList.add("Internal Storage");
-//        updatePathBar();
-    }
-
-    void updatePathBar() {
-
-//        ArrayList<String> updatedPathList = new ArrayList<>(pathList);
-//        updatedPathList.add(clickedFile.getName());
-//        intent.putStringArrayListExtra("pathList", updatedPathList);
-        pathBar.removeAllViews();
-
-        for (int i = 0; i < pathList.size(); i++) {
-
-            String folder = pathList.get(i);
-            TextView textView = new TextView(this);
-            textView.setPadding(10, 0, 0, 0);
-
-            textView.setText(folder);
-            textView.setTextSize(18);
-
-            pathBar.addView(textView);
-
-            if (i != pathList.size() - 1) {
-
-                ImageView arrow = new ImageView(this);
-                arrow.setImageResource(R.drawable.next);
-                pathBar.addView(arrow);
-
-            }
-
-        }
-    }
-
- */

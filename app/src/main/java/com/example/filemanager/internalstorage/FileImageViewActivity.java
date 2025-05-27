@@ -1,20 +1,13 @@
-package com.example.filemanager;
+package com.example.filemanager.internalstorage;
 
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
-import com.bumptech.glide.Glide;
-
-import java.io.File;
+import com.example.filemanager.R;
 
 public class FileImageViewActivity extends AppCompatActivity {
 

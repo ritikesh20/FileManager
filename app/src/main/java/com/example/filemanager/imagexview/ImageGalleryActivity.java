@@ -44,7 +44,6 @@ public class ImageGalleryActivity extends AppCompatActivity {
     List<ImageFA> imageList;
     private Toolbar toolbar;
 
-    //    boolean isListView = false;
     private static final int REQUEST_PERMISSION_CODE = 101;
 
     @Override
@@ -66,8 +65,7 @@ public class ImageGalleryActivity extends AppCompatActivity {
         }
 
         recyclerViewSetUp();
-        checkPermissionImage();
-
+        loadImage();
         fullImage();
     }
 
@@ -131,6 +129,7 @@ public class ImageGalleryActivity extends AppCompatActivity {
         );
 
         if (cursor != null) {
+
             int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID);
             int nameCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME);
             int dataCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_TAKEN);

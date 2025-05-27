@@ -1,4 +1,4 @@
-package com.example.filemanager;
+package com.example.filemanager.internalstorage;
 
 import android.view.View;
 import android.widget.ImageView;
@@ -6,6 +6,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
+import com.example.filemanager.R;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.items.AbstractItem;
 

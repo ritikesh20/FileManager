@@ -1,4 +1,4 @@
-package com.example.filemanager.adapter;
+package com.example.filemanager.internalstorage;
 
 import android.view.View;
 import android.widget.ImageView;
@@ -7,7 +7,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.bumptech.glide.Glide;
-import com.example.filemanager.InternalStorageActivity;
 import com.example.filemanager.R;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.items.AbstractItem;
@@ -82,14 +81,18 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
 
             } else {
                 String name = item.getFile().getName().toLowerCase();
-                if (name.endsWith(".mp3") || name.endsWith(".wav")) {
+
+                if (name.endsWith(".mp3") || name.endsWith(".wav") || name.endsWith(".mp4")) {
                     fileImage.setImageResource(R.drawable.musicicons);
-                } else if (name.endsWith(".jpg") || name.endsWith(".png") || name.endsWith(".jpeg")) {
+//                    Glide.with(itemView.getContext()).load(item.getFile()).error(R.drawable.img).into(fileImage);
+                }
+                else if (name.endsWith(".jpg") || name.endsWith(".png") || name.endsWith(".jpeg")) {
                     Glide.with(itemView.getContext()).load(item.getFile()).error(R.drawable.img).into(fileImage);
                 } else if (name.endsWith(".apk")) {
-                    fileImage.setImageResource(R.drawable.apkicons);
-                } else if (name.endsWith(".mp4")) {
-                    Glide.with(itemView.getContext()).load(item.getFile()).error(R.drawable.img).into(fileImage);
+//                    fileImage.setImageResource(R.drawable.apkicons);
+                    Glide.with(itemView.getContext()).load(item.getFile()).error(R.drawable.apkicons).into(fileImage);
+                } else if (name.endsWith(".pdf")) {
+                    Glide.with(itemView.getContext()).load(item.getFile()).error(R.drawable.newdocument).into(fileImage);
                 } else {
                     fileImage.setImageResource(R.drawable.newdocument);
                 }

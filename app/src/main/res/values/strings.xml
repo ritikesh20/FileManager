@@ -21,10 +21,17 @@
 
     <string name="open">Open Drawer</string>
     <string name="close">Close Drawer</string>
+    <string name="musicicon">musicIcon</string>
+    <string name="_15_may_2024">15-May-2024</string>
+    <string name="_200_kb">200 KB</string>
+    <string name="detailsbutton">detailsButton</string>
 
     <item name="PhotoCount" type="id" />
     <item name="fastadapter_image_fa_item_id" type="id" />
     <item name="file_item_id" type="id" />
     <item name="filePathCount" type="id" />
+
+    <item name="musicCount" type="id" />
+
 
 </resources>

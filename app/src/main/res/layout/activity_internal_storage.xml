@@ -16,39 +16,30 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:subtitle="12 file 4 folder"
+        app:subtitle="0 file 0 folder"
         app:title="Internal Storage">
 
     </androidx.appcompat.widget.Toolbar>
 
-    <HorizontalScrollView
-        android:id="@+id/horizontalView"
-        android:layout_width="412dp"
-        android:layout_height="25dp"
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvPathHistory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbarInternalStorage">
-
-        <LinearLayout
-            android:id="@+id/pathBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-
-        </LinearLayout>
-
-    </HorizontalScrollView>
+        app:layout_constraintTop_toBottomOf="@id/toolbarInternalStorage" />
 
     <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/horizontalDivider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/horizontalView" />
-
+        app:layout_constraintTop_toBottomOf="@id/rvPathHistory"
+        />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvInternalStorage"
@@ -57,7 +48,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/horizontalView" />
+        app:layout_constraintTop_toBottomOf="@+id/horizontalDivider" />
+
+
+
+
+
+
+
+
+
+
+
 
     <TextView
         android:id="@+id/tvNoFile"

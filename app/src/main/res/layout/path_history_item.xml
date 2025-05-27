@@ -8,16 +8,17 @@
 
     <TextView
         android:id="@+id/pathHistoryName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:gravity="center"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="2dp"
         android:text="@string/internal_storage"
         android:textSize="14sp"
         android:textStyle="bold"
-        android:layout_marginBottom="5dp"/>
+        />
 
     <ImageView
+        android:id="@+id/ivNext"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_marginStart="10dp"

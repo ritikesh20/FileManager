@@ -5,20 +5,56 @@
     <item
         android:id="@+id/isSearch"
         android:title="@string/search"
-        app:showAsAction="ifRoom"
-        />
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/isHome"
         android:title="Home"
-        app:showAsAction="ifRoom"
-        />
+        app:showAsAction="ifRoom" />
 
+    <item
+        android:id="@+id/isSorting"
+        android:title="Sorting" />
+    <item
+        android:id="@+id/isCreateFolder"
+        android:title="Create New Folder" />
 
+    <item
+        android:id="@+id/isCreateFile"
+        android:title="Create New File" />
 
     <item
         android:id="@+id/isChangeView"
         android:title="@string/change_view" />
+
+    <item
+        android:id="@+id/isAdvance"
+        android:title="Advance Setting">
+        <menu>
+
+            <item
+                android:id="@+id/isShowFileSize"
+                android:title="Show File Size" />
+
+            <item
+                android:id="@+id/isShowFolderSize"
+                android:title="Show FolderSize Size" />
+
+            <item
+                android:id="@+id/isShowFullName"
+                android:title="Show full name of files" />
+
+            <item
+                android:id="@+id/isHiddenFile"
+                android:title="Show Hidden File and Folder" />
+        </menu>
+
+
+    </item>
+
+    <item
+        android:id="@+id/isClose"
+        android:title="Close" />
 
 
 </menu>

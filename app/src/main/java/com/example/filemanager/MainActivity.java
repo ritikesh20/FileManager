@@ -1,6 +1,5 @@
 package com.example.filemanager;
 
-import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -12,36 +11,60 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.filemanager.imagexview.ImageGalleryActivity;
+import com.google.android.material.navigation.NavigationView;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
 public class MainActivity extends AppCompatActivity {
 
+    DrawerLayout homeDrawerLayout;
+
+    NavigationView navigationView;
+
     CardView btnCVInternalStorage;
     CardView btnImageView;
 
-    Toolbar homeToolbar;
+    private static final int REQUEST_CODE_STORAGE_PERMISSION = 100;
+    private static final int REQUEST_CODE_MANAGE_ALL_FILES_ACCESS_PERMISSION = 101;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        btnCVInternalStorage = findViewById(R.id.cardViewInternalStorage);
-        homeToolbar = findViewById(R.id.toolbarHome);
+        Toolbar homeToolbar = findViewById(R.id.toolbarHome);
+        homeDrawerLayout = findViewById(R.id.homeDreawerLayout);
+        navigationView = findViewById(R.id.home_nav_DL);
 
         setSupportActionBar(homeToolbar);
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle("Dashboard");
         }
+
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this,
+                homeDrawerLayout,
+                homeToolbar,
+                R.string.open,
+                R.string.close
+        );
+
+        toggle.setDrawerIndicatorEnabled(true);
+        homeDrawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
+        btnCVInternalStorage = findViewById(R.id.cardViewInternalStorage);
 
         btnImageView = findViewById(R.id.btnShowGallery);
 
@@ -67,11 +90,10 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
     }
 
     private boolean checkPermission() {
-        int result = ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int result = ContextCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if (result == PackageManager.PERMISSION_GRANTED) {
             return true;
         }
@@ -79,11 +101,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void requestPermission() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
         ) {
             Toast.makeText(this, "Give the Permission", Toast.LENGTH_SHORT).show();
         } else {
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 111);
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 111);
         }
     }
 
@@ -120,78 +142,4 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
 }
-
-
-
-
-
-
-
-
-
-
-
-/*
-            btnCVInternalStorage.setOnClickListener(v -> {
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                if (Environment.isExternalStorageManager()) {
-                    openFileListActivity();
-                } else {
-
-                    try {
-
-                        Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-                        intent.setData(Uri.parse("package:" + getPackageName()));
-                        startActivity(intent);
-
-                    } catch (Exception e) {
-                        Intent intent = new Intent();
-                        intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-                        startActivity(intent);
-                    }
-                }
-            } else {
-                if (checkPermission()) {
-                    openFileListActivity();
-                } else {
-                    requestPermission();
-                }
-            }
-        });
-
-    private boolean checkPermission() {
-        int result = ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        return result == PackageManager.PERMISSION_GRANTED;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == 111) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                openFileListActivity();
-            } else {
-                Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show();
-            }
-        }
-
-    }
-
-    private void requestPermission() {
-        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 111);
-    }
-
-    private void openFileListActivity() {
-
-        Intent intent = new Intent(MainActivity.this, FileListActivity.class);
-        String path = Environment.getExternalStorageDirectory().getPath();
-        intent.putExtra("path", path);
-        startActivity(intent);
-
-    }
-
- */

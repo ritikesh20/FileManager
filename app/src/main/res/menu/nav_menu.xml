@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <item
+        android:id="@+id/nav_home"
+        android:title="Home"
+        />
+
+    <item
+        android:id="@+id/nav_internalStorage"
+        android:title="InternalStorage"
+        />
+
+
+    <item
+        android:id="@+id/nav_Favourites"
+        android:title="Favourites"
+        />
+
+
+
+    <item
+        android:id="@+id/nav_image"
+        android:title="Photo"
+        />
+
+
+
+
+</menu>

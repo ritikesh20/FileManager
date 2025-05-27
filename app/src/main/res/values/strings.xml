@@ -19,6 +19,9 @@
     <string name="refresh">Refresh</string>
     <string name="UsedStorage">32.76 GB Used of 50.54 GB</string>
 
+    <string name="open">Open Drawer</string>
+    <string name="close">Close Drawer</string>
+
     <item name="PhotoCount" type="id" />
     <item name="fastadapter_image_fa_item_id" type="id" />
     <item name="file_item_id" type="id" />

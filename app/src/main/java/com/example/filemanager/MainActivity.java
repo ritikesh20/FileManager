@@ -1,13 +1,8 @@
 package com.example.filemanager;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -18,12 +13,13 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.example.filemanager.document.DocumentActivity;
 import com.example.filemanager.imagexview.ImageGalleryActivity;
 import com.example.filemanager.internalstorage.InternalStorageActivity;
+import com.example.filemanager.music.MusicActivity;
+import com.example.filemanager.videolist.VideoActivity;
 import com.google.android.material.navigation.NavigationView;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
@@ -36,11 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
     NavigationView navigationView;
 
-    CardView btnCVInternalStorage;
-    CardView btnImageView;
-    CardView btnCVDownload;
-
-    CardView btnShowAudioFile;
+    CardView btnCVInternalStorage, btnImageView, btnCVDownload, btnVideo, btnShowAudioFile, btnCVDocument, btnCVRecentFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +65,9 @@ public class MainActivity extends AppCompatActivity {
         btnCVDownload = findViewById(R.id.btnDownload);
         btnShowAudioFile = findViewById(R.id.btnShowAudioFile);
         btnImageView = findViewById(R.id.btnShowGallery);
+        btnVideo = findViewById(R.id.btnShowVideo);
+        btnCVDocument = findViewById(R.id.btnShowDocument);
+        btnCVRecentFile = findViewById(R.id.btnShowRecentFile);
 
         btnImageView.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, ImageGalleryActivity.class);
@@ -81,80 +76,45 @@ public class MainActivity extends AppCompatActivity {
 
         btnCVInternalStorage.setOnClickListener(v -> {
 
-            if (checkPermission()) {
-
-                String path = Environment.getExternalStorageDirectory().getPath();
-                Intent intent = new Intent(MainActivity.this, InternalStorageActivity.class);
-                intent.putExtra("path", path);
-                startActivity(intent);
-
-            } else {
-                requestPermission();
-            }
+            String path = Environment.getExternalStorageDirectory().getPath();
+            Intent intent = new Intent(MainActivity.this, InternalStorageActivity.class);
+            intent.putExtra("path", path);
+            startActivity(intent);
 
         });
 
         btnCVDownload.setOnClickListener(v -> {
 
-            if (checkPermission()) {
+            File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
 
-                File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            String path = downloadDir.getPath();
 
-                String path = downloadDir.getPath();
+            Intent intent = new Intent(MainActivity.this, InternalStorageActivity.class);
+            intent.putExtra("path", path);
+            startActivity(intent);
 
-                Intent intent = new Intent(MainActivity.this, InternalStorageActivity.class);
-                intent.putExtra("path", path);
-                startActivity(intent);
-
-            } else {
-
-                requestPermission();
-
-            }
         });
 
         btnShowAudioFile.setOnClickListener(v -> {
-            if (checkPermission()){
-                startActivity(new Intent(this, MusicActivity.class));
-            }
-            else {
-                Toast.makeText(this, "No Permission Granted", Toast.LENGTH_SHORT).show();
-            }
+
+            startActivity(new Intent(this, MusicActivity.class));
+        });
+
+        btnVideo.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, VideoActivity.class);
+            startActivity(intent);
+        });
+
+        btnCVDocument.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, DocumentActivity.class);
+            startActivity(intent);
+        });
+
+        btnCVRecentFile.setOnClickListener(v -> {
+            Toast.makeText(this, "Coming soon....", Toast.LENGTH_SHORT).show();
         });
 
     }
-
-    private boolean checkPermission() {
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            return Environment.isExternalStorageManager();
-        } else {
-            int result = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            return result == PackageManager.PERMISSION_GRANTED;
-        }
-
-    }
-
-    private void requestPermission() {
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-
-            try {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-                intent.setData(Uri.parse("package:" + getPackageName()));
-                startActivity(intent);
-            } catch (Exception e) {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-                startActivity(intent);
-            }
-
-        } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 111);
-        }
-
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -188,5 +148,6 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 
 }

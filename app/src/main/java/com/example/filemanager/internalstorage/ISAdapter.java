@@ -36,7 +36,7 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
 
     @NonNull
     @Override
-    public ViewHolder getViewHolder(View v) {
+    public ViewHolder getViewHolder(@NonNull View v) {
         return new ViewHolder(v);
     }
 
@@ -68,7 +68,7 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
         }
 
         @Override
-        public void bindView(ISAdapter item, List<Object> payloads) {
+        public void bindView(ISAdapter item, @NonNull List<Object> payloads) {
 
             fileName.setText(item.getFile().getName());
             long sizeInBytes = item.file.length();
@@ -82,17 +82,16 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
             } else {
                 String name = item.getFile().getName().toLowerCase();
 
-                if (name.endsWith(".mp3") || name.endsWith(".wav") || name.endsWith(".mp4")) {
+                if (name.endsWith(".mp3") || name.endsWith(".wav")) {
                     fileImage.setImageResource(R.drawable.musicicons);
-//                    Glide.with(itemView.getContext()).load(item.getFile()).error(R.drawable.img).into(fileImage);
-                }
-                else if (name.endsWith(".jpg") || name.endsWith(".png") || name.endsWith(".jpeg")) {
+                } else if (name.endsWith(".mp4")) {
+                    Glide.with(itemView.getContext()).load(item.getFile()).error(R.drawable.videoicons).into(fileImage);
+                } else if (name.endsWith(".jpg") || name.endsWith(".png") || name.endsWith(".jpeg")) {
                     Glide.with(itemView.getContext()).load(item.getFile()).error(R.drawable.img).into(fileImage);
                 } else if (name.endsWith(".apk")) {
-//                    fileImage.setImageResource(R.drawable.apkicons);
                     Glide.with(itemView.getContext()).load(item.getFile()).error(R.drawable.apkicons).into(fileImage);
                 } else if (name.endsWith(".pdf")) {
-                    Glide.with(itemView.getContext()).load(item.getFile()).error(R.drawable.newdocument).into(fileImage);
+                    Glide.with(itemView.getContext()).load(item.getFile()).error(R.drawable.pdficons).into(fileImage);
                 } else {
                     fileImage.setImageResource(R.drawable.newdocument);
                 }
@@ -122,12 +121,13 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
         }
 
         @Override
-        public void unbindView(ISAdapter item) {
+        public void unbindView(@NonNull ISAdapter item) {
             fileImage.setImageDrawable(null);
             fileName.setText(null);
+            fileDate.setText(null);
+            fileSize.setText(null);
+
         }
     }
 }
 
-/*
- */

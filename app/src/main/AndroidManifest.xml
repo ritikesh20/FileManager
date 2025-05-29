@@ -23,7 +23,13 @@
         android:theme="@style/Theme.FileManager"
         tools:targetApi="31">
         <activity
-            android:name=".MusicActivity"
+            android:name=".document.DocumentActivity"
+            android:exported="false" />
+        <activity
+            android:name=".videolist.VideoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".music.MusicActivity"
             android:exported="false" />
         <activity
             android:name=".DownloadActivity"
@@ -54,7 +60,7 @@
             android:exported="false" />
         <activity
             android:name=".MainActivity"
-            android:exported="false"></activity>
+            android:exported="false" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

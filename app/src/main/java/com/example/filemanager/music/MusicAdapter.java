@@ -1,4 +1,4 @@
-package com.example.filemanager;
+package com.example.filemanager.music;
 
 import android.view.View;
 import android.widget.ImageView;
@@ -6,6 +6,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
+import com.bumptech.glide.Glide;
+import com.example.filemanager.R;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.items.AbstractItem;
 
@@ -69,7 +71,26 @@ public class MusicAdapter extends AbstractItem<MusicAdapter, MusicAdapter.ViewHo
             SimpleDateFormat date = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
             String setDate = date.format(new Date(lastModifiedData));
 
-            musicIcon.setImageResource(R.drawable.musicicons);
+            String name = item.getFile().getName().toLowerCase();
+            if (name.endsWith(".mp4")) {
+                Glide.with(itemView.getContext()).load(item.getFile()).error(R.drawable.videoicons).into(musicIcon);
+
+//                Bitmap thumbnail = ThumbnailUtils.createVideoThumbnail(
+//                        item.getFile().getPath(),
+//                        MediaStore.Images.Thumbnails.MINI_KIND
+//                );
+//
+//                if (thumbnail != null) {
+//                    musicIcon.setImageBitmap(thumbnail);
+//                } else {
+//                    musicIcon.setImageResource(R.drawable.videoicons);
+//                }
+
+
+            } else if (name.endsWith(".mp3")) {
+                musicIcon.setImageResource(R.drawable.musicicons);
+            }
+
             musicName.setText(item.file.getName());
             musicDate.setText(setDate);
 

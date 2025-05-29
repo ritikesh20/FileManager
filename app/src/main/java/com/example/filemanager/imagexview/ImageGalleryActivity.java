@@ -149,16 +149,10 @@ public class ImageGalleryActivity extends AppCompatActivity {
 
                 String imageDate = DateFormat.format("dd MMM yyyy, hh:mm a", new Date(dateTaken)).toString();
 
-                imageList.add(new ImageFA(
-
-                        contentUri,
-                        name,
-                        imageSize,
-                        imageDate
-
-                ));
+                imageList.add(new ImageFA(contentUri, name, imageSize, imageDate));
 
             }
+
             cursor.close();
         }
 

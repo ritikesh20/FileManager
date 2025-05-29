@@ -1,16 +1,21 @@
-package com.example.filemanager;
+package com.example.filemanager.music;
 
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.filemanager.R;
 import com.mikepenz.fastadapter.FastAdapter;
+import com.mikepenz.fastadapter.IAdapter;
 import com.mikepenz.fastadapter.adapters.ItemAdapter;
+import com.mikepenz.fastadapter.listeners.OnClickListener;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -38,6 +43,14 @@ public class MusicActivity extends AppCompatActivity {
 
         rvMusic.setAdapter(fastAdapterMusic);
 
+        fastAdapterMusic.withOnClickListener(new OnClickListener<MusicAdapter>() {
+            @Override
+            public boolean onClick(View v, IAdapter<MusicAdapter> adapter, MusicAdapter item, int position) {
+                Toast.makeText(MusicActivity.this, "This is a Music File", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        });
+
     }
 
     private void loadAudioFiles() {
@@ -51,7 +64,6 @@ public class MusicActivity extends AppCompatActivity {
                 MediaStore.Audio.Media.TITLE,
                 MediaStore.Audio.Media.DATA,
                 MediaStore.Audio.Media.DISPLAY_NAME
-
         };
 
         Cursor cursor = getContentResolver().query(
@@ -72,6 +84,7 @@ public class MusicActivity extends AppCompatActivity {
                     musicList.add(new MusicAdapter(file));
                 }
             }
+
             cursor.close();
         }
         itemAdapterMusic.setNewList(musicList);

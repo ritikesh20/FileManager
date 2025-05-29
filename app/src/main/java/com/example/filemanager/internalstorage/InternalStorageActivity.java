@@ -38,7 +38,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
-
 public class InternalStorageActivity extends AppCompatActivity {
 
     RecyclerView recyclerPathHistory;
@@ -53,7 +52,6 @@ public class InternalStorageActivity extends AppCompatActivity {
     public static boolean isGridView = false;
 
     private RecyclerView recyclerView;
-    private TextView noFileText;
     private ItemAdapter<ISAdapter> itemAdapter;
     private FastAdapter<ISAdapter> fastAdapter;
 
@@ -74,7 +72,7 @@ public class InternalStorageActivity extends AppCompatActivity {
         inStorageToolbar = findViewById(R.id.toolbarInternalStorage);
 
         recyclerView = findViewById(R.id.rvInternalStorage);
-        noFileText = findViewById(R.id.tvNoFile);
+        TextView noFileText = findViewById(R.id.tvNoFile);
 
         itemAdapter = new ItemAdapter<>();
         fastAdapter = FastAdapter.with(itemAdapter);
@@ -112,7 +110,6 @@ public class InternalStorageActivity extends AppCompatActivity {
                 newPathList.add(itemAdapterPathHistory.getAdapterItem(i).getPathName());
             }
 
-            // Build absolute path
             StringBuilder fullPath = new StringBuilder(Environment.getExternalStorageDirectory().getAbsolutePath());
             for (int i = 1; i < newPathList.size(); i++) {
                 fullPath.append("/").append(newPathList.get(i));
@@ -223,17 +220,12 @@ public class InternalStorageActivity extends AppCompatActivity {
                     this.startActivity(intent);
 
                 } catch (Exception e) {
-                    Toast.makeText(this, "Cannot play audio", Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
+                    Toast.makeText(this, "Cannot play audio " + e.getMessage(), Toast.LENGTH_SHORT).show();
+
                 }
-            }
-            else if (mine != null && mine.startsWith("image")) {
+            } else if (mine != null && mine.startsWith("image")) {
                 try {
-                    Uri imageUri = FileProvider.getUriForFile(
-                            this,
-                            this.getPackageName() + ".provider",
-                            clickedFile
-                    );
+                    Uri imageUri = FileProvider.getUriForFile(this, this.getPackageName() + ".provider", clickedFile);
 
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setDataAndType(imageUri, "image/*");
@@ -241,21 +233,24 @@ public class InternalStorageActivity extends AppCompatActivity {
                     this.startActivity(intent);
 
                 } catch (Exception e) {
-                    Toast.makeText(this, "Cannot open image" + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
+                    Toast.makeText(this, "Cannot open image " + e.getMessage(), Toast.LENGTH_SHORT).show();
+
                 }
-            }
-            else if (mine != null && mine.startsWith("application/pdf")) {
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(Uri.fromFile(clickedFile), "application/pdf");
-                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+            } else if (mine != null && mine.startsWith("application/pdf")) {
+
                 try {
-                    startActivity(intent);
+                    Uri appPdfUri = FileProvider.getUriForFile(this, this.getPackageName() + ".provider", clickedFile);
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setDataAndType(appPdfUri, "application/pdf");
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                    this.startActivity(intent);
+
                 } catch (Exception e) {
                     Toast.makeText(this, "No Pdf Reader Installed", Toast.LENGTH_SHORT).show();
                 }
             } else if (mine != null && mine.startsWith("video/")) {
                 try {
+
                     Uri videoUri = FileProvider.getUriForFile(this, this.getPackageName() + ".provider", clickedFile);
 
                     Intent videoIntent = new Intent(Intent.ACTION_VIEW);
@@ -265,17 +260,13 @@ public class InternalStorageActivity extends AppCompatActivity {
 
                 } catch (Exception e) {
                     Toast.makeText(this, "NO Video Player" + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
                 }
             } else {
                 Toast.makeText(this, "Unsupported File " + mine, Toast.LENGTH_SHORT).show();
             }
         }
 
-
     }
-
-
 
 
     @Override
@@ -333,16 +324,13 @@ public class InternalStorageActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        // If we are at root, finish normally
         if (pathList == null || pathList.size() <= 1) {
             super.onBackPressed();
             return;
         }
 
-        // Remove the last folder from path list
         pathList.remove(pathList.size() - 1);
 
-        // Get parent folder path
         String currentPath = getIntent().getStringExtra("path");
         if (currentPath != null) {
             File currentFolder = new File(currentPath);
@@ -353,7 +341,7 @@ public class InternalStorageActivity extends AppCompatActivity {
                 intent.putExtra("path", parentFolder.getAbsolutePath());
                 intent.putStringArrayListExtra("pathList", pathList);
                 startActivity(intent);
-                finish(); // close current activity to prevent stacking
+                finish();
             } else {
                 super.onBackPressed();
             }
@@ -412,22 +400,19 @@ public class InternalStorageActivity extends AppCompatActivity {
 
         Comparator<ISAdapter> comparator = null;
 
-        if (sortingOption == R.id.rBtnName){
+        if (sortingOption == R.id.rBtnName) {
             comparator = Comparator.comparing(name1 -> name1.getFile().getName().toLowerCase());
-        }
-        else if (sortingOption == R.id.rBtnLastDate) {
+        } else if (sortingOption == R.id.rBtnLastDate) {
             comparator = Comparator.comparing(date1 -> date1.getFile().lastModified());
-        }
-        else if (sortingOption == R.id.rBtnSize){
+        } else if (sortingOption == R.id.rBtnSize) {
             comparator = Comparator.comparing(size1 -> size1.getFile().length());
         }
 
-        if (comparator != null){
-            if (!isAscending){
+        if (comparator != null) {
+            if (!isAscending) {
                 comparator = comparator.reversed();
             }
 
-//            Collections.sort(items,comparator);
             items.sort(comparator);
             itemAdapter.setNewList(items);
             fastAdapter.notifyAdapterDataSetChanged();

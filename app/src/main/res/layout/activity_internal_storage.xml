@@ -10,7 +10,7 @@
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbarInternalStorage"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?attr/actionBarSize"
         android:background="#E2DDEF"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -21,6 +21,19 @@
 
     </androidx.appcompat.widget.Toolbar>
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbarSelected"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:title="0 Selected"
+        android:visibility="gone"
+        app:subtitle="5 mb"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbarInternalStorage"
+        />
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvPathHistory"
@@ -29,7 +42,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbarInternalStorage" />
+        app:layout_constraintTop_toBottomOf="@id/toolbarSelected" />
 
     <com.google.android.material.divider.MaterialDivider
         android:id="@+id/horizontalDivider"
@@ -38,8 +51,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/rvPathHistory"
-        />
+        app:layout_constraintTop_toBottomOf="@id/rvPathHistory" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvInternalStorage"
@@ -49,17 +61,6 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/horizontalDivider" />
-
-
-
-
-
-
-
-
-
-
-
 
     <TextView
         android:id="@+id/tvNoFile"

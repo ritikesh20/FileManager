@@ -21,16 +21,13 @@ public class DocumentAdapter extends AbstractItem<DocumentAdapter, DocumentAdapt
     String docDate;
     String size;
 
-    public DocumentAdapter(Uri uri, String name, String mineTypes, String docDate, String size) {
+    public DocumentAdapter(Uri uri, String name, String mineTypes,String docDate, String size) {
         this.uri = uri;
         this.name = name;
         this.mineTypes = mineTypes;
         this.docDate = docDate;
         this.size = size;
     }
-
-
-
 
     @NonNull
     @Override
@@ -68,9 +65,11 @@ public class DocumentAdapter extends AbstractItem<DocumentAdapter, DocumentAdapt
 
             if (item.mineTypes.equals("application/pdf")) {
                 documentIcons.setImageResource(R.drawable.pdf);
-            } else if (item.mineTypes.endsWith("text/plain")) {
+            }
+            else if (item.mineTypes.endsWith("text/plain")) {
                 documentIcons.setImageResource(R.drawable.txtfile);
-            } else {
+            }
+            else {
                 documentIcons.setImageResource(R.drawable.newdocument);
             }
 

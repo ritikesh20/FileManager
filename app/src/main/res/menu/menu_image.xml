@@ -9,38 +9,31 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/menuImage_ChangeView"
-        android:title="@string/changeview"
-        app:showAsAction="always" />
+        android:id="@+id/menuImage_Home"
+        android:title="Home"
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/menuImage_SortBy"
-        android:icon="@drawable/loadingarrow"
         android:title="@string/sort_by" />
 
     <item
-        android:id="@+id/menu_NDF"
-        android:title="@string/newest_date_first" />
+        android:id="@+id/menuImage_ChangeView"
+        android:title="@string/changeview"
+         />
 
     <item
-        android:id="@+id/menu_ODF"
-        android:title="@string/old_date_first" />
+        android:id="@+id/menuImage_SetHome"
+        android:title="Set as home screen" />
+
 
     <item
-        android:id="@+id/menu_SizeSL"
-        android:title="@string/size_s_l" />
+        android:id="@+id/menuImage_AdvanceSetting"
+        android:title="Advance Setting"
+         />
 
     <item
-        android:id="@+id/menu_SizeLS"
-        android:title="@string/size_l_s" />
-
-    <item
-        android:id="@+id/menuNameAZ"
-        android:title="@string/name_a_z" />
-
-    <item
-        android:id="@+id/menuNameZA"
-        android:title="@string/name_z_a" />
-
+        android:id="@+id/menuImage_Closed"
+        android:title="Closed" />
 
 </menu>

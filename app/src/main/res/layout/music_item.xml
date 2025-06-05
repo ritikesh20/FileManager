@@ -66,12 +66,13 @@
 
             </LinearLayout>
 
-            <ImageView
+            <ImageButton
                 android:id="@+id/btnMusicDot"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:contentDescription="@string/detailsbutton"
+                android:background="@android:color/transparent"
                 android:padding="10dp"
+                android:scaleType="fitCenter"
                 android:src="@drawable/dots" />
 
 
@@ -81,8 +82,7 @@
         <com.google.android.material.divider.MaterialDivider
             android:layout_width="match_parent"
             android:layout_height="2dp"
-            android:layout_marginStart="75dp"
-             />
+            android:layout_marginStart="75dp" />
     </LinearLayout>
 
 

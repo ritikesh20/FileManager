@@ -1,6 +1,7 @@
 package com.example.filemanager.internalstorage;
 
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -56,6 +57,7 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
         ImageView fileImage;
         TextView fileDate;
         TextView fileSize;
+        ImageButton btnFileInfo;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -64,7 +66,7 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
             fileImage = itemView.findViewById(R.id.file_icon_image);
             fileDate = itemView.findViewById(R.id.tvModifierData);
             fileSize = itemView.findViewById(R.id.tvSize);
-
+            btnFileInfo = itemView.findViewById(R.id.btnFileDetails);
         }
 
         @Override
@@ -75,27 +77,35 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
             String convertedSize;
             long reSize;
 
-            if (item.getFile().isDirectory()) {
-                fileImage.setImageResource(R.drawable.openfolder);
-                fileSize.setVisibility(View.GONE);
 
+            if (itemView.isSelected()) {
+                fileImage.setImageResource(R.drawable.check);
             } else {
-                String name = item.getFile().getName().toLowerCase();
+                if (item.getFile().isDirectory()) {
+                    fileImage.setImageResource(R.drawable.openfolder);
+                    fileSize.setVisibility(View.GONE);
 
-                if (name.endsWith(".mp3") || name.endsWith(".wav")) {
-                    fileImage.setImageResource(R.drawable.musicicons);
-                } else if (name.endsWith(".mp4")) {
-                    Glide.with(itemView.getContext()).load(item.getFile()).error(R.drawable.videoicons).into(fileImage);
-                } else if (name.endsWith(".jpg") || name.endsWith(".png") || name.endsWith(".jpeg")) {
-                    Glide.with(itemView.getContext()).load(item.getFile()).error(R.drawable.img).into(fileImage);
-                } else if (name.endsWith(".apk")) {
-                    Glide.with(itemView.getContext()).load(item.getFile()).error(R.drawable.apkicons).into(fileImage);
-                } else if (name.endsWith(".pdf")) {
-                    Glide.with(itemView.getContext()).load(item.getFile()).error(R.drawable.pdficons).into(fileImage);
                 } else {
-                    fileImage.setImageResource(R.drawable.newdocument);
+
+                    String name = item.getFile().getName().toLowerCase();
+
+                    if (name.endsWith(".mp3") || name.endsWith(".wav")) {
+                        fileImage.setImageResource(R.drawable.musicicons);
+                    } else if (name.endsWith(".mp4")) {
+                        Glide.with(itemView.getContext()).load(item.getFile()).error(R.drawable.videoicons).into(fileImage);
+                    } else if (name.endsWith(".jpg") || name.endsWith(".png") || name.endsWith(".jpeg")) {
+                        Glide.with(itemView.getContext()).load(item.getFile()).error(R.drawable.img).into(fileImage);
+                    } else if (name.endsWith(".apk")) {
+                        Glide.with(itemView.getContext()).load(item.getFile()).error(R.drawable.apkicons).into(fileImage);
+                    } else if (name.endsWith(".pdf")) {
+                        Glide.with(itemView.getContext()).load(item.getFile()).error(R.drawable.pdficons).into(fileImage);
+                    } else {
+                        fileImage.setImageResource(R.drawable.newdocument);
+                    }
                 }
+
             }
+
 
             long lastModifiedData = item.file.lastModified();
             SimpleDateFormat date = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
@@ -118,10 +128,19 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
 
             fileSize.setText(convertedSize);
 
+            btnFileInfo.setOnClickListener(v -> {
+
+                if (itemView.getContext() instanceof InternalStorageActivity) {
+                    ((InternalStorageActivity) itemView.getContext()).showBottomSheetIS(item.getFile());
+                }
+
+            });
+
         }
 
         @Override
         public void unbindView(@NonNull ISAdapter item) {
+
             fileImage.setImageDrawable(null);
             fileName.setText(null);
             fileDate.setText(null);

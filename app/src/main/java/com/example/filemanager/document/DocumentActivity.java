@@ -2,6 +2,7 @@ package com.example.filemanager.document;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -21,7 +22,6 @@ import com.mikepenz.fastadapter.adapters.ItemAdapter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 public class DocumentActivity extends AppCompatActivity {
 
@@ -52,7 +52,6 @@ public class DocumentActivity extends AppCompatActivity {
 
         fastAdapterDocument = FastAdapter.with(itemAdapterDocument);
 
-
         recyclerViewDocument.setAdapter(fastAdapterDocument);
 
         loadDocument();
@@ -60,6 +59,8 @@ public class DocumentActivity extends AppCompatActivity {
     }
 
     void loadDocument() {
+
+        long sumSize = 0;
 
         List<DocumentAdapter> documentList = new ArrayList<>();
 
@@ -72,10 +73,11 @@ public class DocumentActivity extends AppCompatActivity {
         }
 
         String[] projection = {
+
                 MediaStore.Files.FileColumns._ID,
                 MediaStore.Files.FileColumns.DISPLAY_NAME,
                 MediaStore.Files.FileColumns.MIME_TYPE,
-                MediaStore.Files.FileColumns.DATE_TAKEN,
+                MediaStore.Files.FileColumns.DATE_ADDED,
                 MediaStore.Files.FileColumns.SIZE
 
         };
@@ -93,30 +95,46 @@ public class DocumentActivity extends AppCompatActivity {
         ContentResolver contentResolver = getContentResolver();
 
         Cursor cursor = contentResolver.query(
-                documentUri, projection, selection, selectionArgs, MediaStore.Files.FileColumns.DATE_ADDED + " DESC"
+                documentUri,
+                projection,
+                selection,
+                selectionArgs,
+                MediaStore.Files.FileColumns.DATE_ADDED + " DESC"
         );
 
         if (cursor != null) {
 
+            int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID);
+            int nameColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME);
+            int mimeColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.MIME_TYPE);
+            int docDateColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_ADDED);
+            int sizeColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE);
+
             while (cursor.moveToNext()) {
-                long id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID));
-                String name = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME));
-                String mime = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.MIME_TYPE));
-                String docDate = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_TAKEN));
-                long size = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE));
+
+                long id = cursor.getLong(idColumn);
+                String name = cursor.getString(nameColumn);
+                String mime = cursor.getString(mimeColumn);
+                long dateTaken = cursor.getLong(docDateColumn) * 1000L; // Convert seconds to milliseconds
+                long sizeInBytes = cursor.getLong(sizeColumn);
+
+                sumSize = sumSize + sizeInBytes;
 
                 Uri document = ContentUris.withAppendedId(documentUri, id);
 
-                String docDateConvertor = DateFormat.format("dd-MMM-yyy", new Date(docDate)).toString();
+                String docDateConvertor = DateFormat.format("dd MMM yyyy", new Date(dateTaken)).toString();
 
-                String sizeConvertor = docSizeCalculator(size);
+                String sizeConvertor = docSizeCalculator(sizeInBytes);
 
-                documentList.add(new DocumentAdapter(document, name, mime, docDateConvertor , sizeConvertor));
+                documentList.add(new DocumentAdapter(document, name, mime, docDateConvertor, sizeConvertor));
 
             }
-
+            String ans = docSizeCalculator(sumSize);
+            toolbarDocument.setSubtitle(ans + "My Size");
             cursor.close();
-            
+
+
+
         }
 
         itemAdapterDocument.setNewList(documentList);
@@ -124,14 +142,30 @@ public class DocumentActivity extends AppCompatActivity {
     }
 
     private String docSizeCalculator(long bytes) {
-        double kb = bytes / 1024.0;
-        double mb = kb / 1024.0;
-        if (mb >= 1) {
-            return String.format(Locale.getDefault(), "%.2f MB", mb);
+//        double kb = bytes / 1024.0;
+//        double mb = kb / 1024.0;
+//        double gb = mb / 1014.0;
+//
+//        if (mb >= 1) {
+//            return String.format(Locale.getDefault(), "%.2f MB", mb);
+//        }
+//        else if (gb > 1) {
+//            return String.format(Locale.getDefault(), "%.2f GB", gb);
+//        }
+//        else {
+//            return String.format(Locale.getDefault(), "%.2f", kb);
+//        }
+        float kb = bytes / 1024f;
+        float mb = kb / 1024f;
+        float gb = mb / 1024f;
+
+        if (gb >= 1) {
+            return String.format("%.2f GB", gb);
+        } else if (mb >= 1) {
+            return String.format("%.2f MB", mb);
         } else {
-            return String.format(Locale.getDefault(), "%.2f", kb);
+            return String.format("%.2f KB", kb);
         }
+
     }
-
-
 }

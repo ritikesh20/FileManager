@@ -7,35 +7,40 @@
     android:orientation="vertical"
     android:padding="10dp">
 
+
     <LinearLayout
         android:id="@+id/linearLayout5"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="9dp"
+        android:layout_marginTop="2dp"
         android:layout_marginEnd="9dp"
+        android:gravity="center|start"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5">
 
         <ImageView
             android:id="@+id/file_icon_image"
             android:layout_width="36dp"
-            android:layout_height="36dp"
+            android:layout_height="match_parent"
             android:layout_marginStart="10dp"
             tools:src="@drawable/openfolder" />
 
         <LinearLayout
-            android:layout_width="280dp"
+            android:layout_width="250dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/file_name_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
+
                 android:layout_toEndOf="@id/file_icon_image"
                 android:maxLines="1"
                 tools:text="Documents" />
@@ -49,7 +54,6 @@
                     android:id="@+id/tvModifierData"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
                     android:text="15-May-2024" />
 
                 <TextView
@@ -62,11 +66,17 @@
 
         </LinearLayout>
 
-        <ImageView
+        <ImageButton
+            android:id="@+id/btnFileDetails"
             android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:padding="10dp"
-            android:src="@drawable/dots" />
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/btnfileinfo"
+            android:padding="5dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/dots"
+
+            />
 
 
     </LinearLayout>

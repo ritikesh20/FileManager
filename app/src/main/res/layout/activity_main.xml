@@ -5,6 +5,7 @@
     android:id="@+id/homeDreawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:backgroundTint="@color/white"
     tools:context=".MainActivity">
 
     <LinearLayout
@@ -48,19 +49,207 @@
                         android:orientation="horizontal">
 
                         <ImageView
-                            android:layout_width="100dp"
+                            android:layout_width="80dp"
                             android:layout_height="100dp"
                             android:layout_marginStart="10dp"
                             android:contentDescription="@string/storageinfo"
                             android:src="@drawable/storagegraph" />
 
-                        <TextView
+                        <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="15dp"
-                            android:text="@string/coming_soon"
-                            android:textSize="28sp"
-                            android:textStyle="bold" />
+                            android:layout_height="match_parent">
+
+                            <ProgressBar
+                                android:id="@+id/pbFileSize"
+                                android:layout_width="100dp"
+                                android:layout_height="100dp"
+                                android:visibility="gone"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintVertical_bias="0.5" />
+
+                            <androidx.appcompat.widget.LinearLayoutCompat
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintHorizontal_bias="0.5"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintVertical_bias="0.5">
+
+                                <!--                        audio file-->
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="30dp"
+                                    android:gravity="center|start"
+                                    android:orientation="horizontal">
+
+                                    <ImageView
+                                        android:layout_width="30dp"
+                                        android:layout_height="match_parent"
+                                        android:padding="10dp"
+                                        android:src="@drawable/recordbutton" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="fill_parent"
+                                        android:gravity="center"
+                                        android:text="Audio"
+                                        android:textSize="12sp" />
+
+                                    <TextView
+                                        android:id="@+id/tvAudioFileSize"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="fill_parent"
+                                        android:layout_marginStart="20dp"
+                                        android:gravity="center"
+                                        android:text="100.56 MB "
+                                        android:textSize="12sp" />
+
+                                    <ImageView
+                                        android:layout_width="30dp"
+                                        android:layout_height="match_parent"
+                                        android:padding="10dp"
+                                        android:src="@drawable/recordbutton" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="fill_parent"
+                                        android:gravity="center"
+                                        android:text="Video"
+                                        android:textSize="12sp" />
+
+                                    <TextView
+                                        android:id="@+id/tvVideoFileSize"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="fill_parent"
+                                        android:layout_marginStart="20dp"
+                                        android:gravity="center"
+                                        android:text="100.64 GB"
+                                        android:textSize="12sp" />
+
+                                </LinearLayout>
+
+                                <!--                        image files Apps-->
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="30dp"
+                                    android:layout_marginTop="10dp"
+                                    android:gravity="center|start"
+                                    android:orientation="horizontal">
+
+                                    <ImageView
+                                        android:layout_width="30dp"
+                                        android:layout_height="match_parent"
+                                        android:padding="10dp"
+                                        android:src="@drawable/recordbutton" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="fill_parent"
+                                        android:gravity="center"
+                                        android:text="Image"
+                                        android:textSize="12sp" />
+
+                                    <TextView
+                                        android:id="@+id/tvImageFileSize"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="fill_parent"
+                                        android:layout_marginStart="20dp"
+                                        android:gravity="center"
+                                        android:text="100.45 MB"
+                                        android:textSize="12sp" />
+
+                                    <ImageView
+                                        android:layout_width="30dp"
+                                        android:layout_height="match_parent"
+                                        android:padding="10dp"
+                                        android:src="@drawable/recordbutton" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="fill_parent"
+                                        android:gravity="center"
+                                        android:text="Apps"
+                                        android:textSize="12sp" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="fill_parent"
+                                        android:layout_marginStart="20dp"
+                                        android:gravity="center"
+                                        android:text="93.35 MB"
+                                        android:textSize="12sp" />
+
+                                </LinearLayout>
+
+                                <!--                        Apk Doc files-->
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="30dp"
+                                    android:layout_marginTop="10dp"
+                                    android:gravity="center|start"
+                                    android:orientation="horizontal">
+
+                                    <ImageView
+                                        android:layout_width="30dp"
+                                        android:layout_height="match_parent"
+                                        android:padding="10dp"
+                                        android:src="@drawable/recordbutton" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="fill_parent"
+                                        android:gravity="center"
+                                        android:text="APK   "
+                                        android:textSize="12sp" />
+
+                                    <TextView
+                                        android:id="@+id/tvApkFileSize"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="fill_parent"
+                                        android:layout_marginStart="20dp"
+                                        android:gravity="center"
+                                        android:text="100.45 Mb"
+                                        android:textSize="12sp" />
+
+                                    <ImageView
+                                        android:layout_width="30dp"
+
+                                        android:layout_height="match_parent"
+                                        android:padding="10dp"
+                                        android:src="@drawable/recordbutton" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="fill_parent"
+                                        android:gravity="center"
+                                        android:text="Doc"
+                                        android:textSize="12sp" />
+
+                                    <TextView
+                                        android:id="@+id/tvDocFileSize"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="fill_parent"
+                                        android:layout_marginStart="20dp"
+                                        android:gravity="center"
+                                        android:text="500.76 GB"
+                                        android:textSize="12sp" />
+
+                                </LinearLayout>
+
+
+                            </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
                     </LinearLayout>
 
 
@@ -375,7 +564,7 @@
 
                         </LinearLayout>
 
-<!--                        Pdf && Recent Files-->
+                        <!--                        Pdf && Recent Files-->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="70dp"
@@ -473,9 +662,6 @@
                     </LinearLayout>
 
 
-
-
-
                 </androidx.cardview.widget.CardView>
 
                 <!--        internal Storage -->
@@ -521,11 +707,14 @@
                                     android:textStyle="bold" />
 
                                 <TextView
+                                    android:id="@+id/tvInternalStorage"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="80dp"
                                     android:gravity="center"
-                                    android:text="Available 17.90 GB" />
+                                    android:text="Available 17.90 GB"
+
+                                    />
 
                             </LinearLayout>
 
@@ -533,7 +722,9 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="1dp" />
 
+
                             <TextView
+                                android:id="@+id/tvStorageUsedTotal"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="60dp"

@@ -16,16 +16,37 @@ import java.util.List;
 
 public class ImageFA extends AbstractItem<ImageFA, ImageFA.ViewHolder> {
 
-    final Uri imageUri;
+    Uri imageUri;
     String imageName;
-    final String imageSize;
-    String imageDate;
+    String imageSize; // for ui
+    String imageDate; // for ui
+    long sizeInByte; // for sorting
+    long photoDate; // for sorting
 
-    public ImageFA(Uri imageUri, String imageName, String imageSize, String imageDate) {
+    public ImageFA(Uri imageUri, String imageName, String imageSize, String imageDate, long sizeInByte, long photoDate) {
         this.imageUri = imageUri;
         this.imageName = imageName;
         this.imageSize = imageSize;
         this.imageDate = imageDate;
+        this.sizeInByte = sizeInByte;
+        this.photoDate = photoDate;
+
+    }
+
+    public long getSizeInByte() {
+        return sizeInByte;
+    }
+
+    public void setSizeInByte(long sizeInByte) {
+        this.sizeInByte = sizeInByte;
+    }
+
+    public long getPhotoDate() {
+        return photoDate;
+    }
+
+    public void setPhotoDate(long photoDate) {
+        this.photoDate = photoDate;
     }
 
     public Uri getImageUri() {
@@ -36,20 +57,12 @@ public class ImageFA extends AbstractItem<ImageFA, ImageFA.ViewHolder> {
         return imageName;
     }
 
-    public void setImageName(String imageName) {
-        this.imageName = imageName;
-    }
-
     public String getImageSize() {
         return imageSize;
     }
 
     public String getImageDate() {
         return imageDate;
-    }
-
-    public void setImageDate(String imageDate) {
-        this.imageDate = imageDate;
     }
 
     @Override

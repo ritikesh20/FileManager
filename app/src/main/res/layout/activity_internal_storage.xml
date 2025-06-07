@@ -19,20 +19,38 @@
         app:subtitle="0 file 0 folder"
         app:title="Internal Storage">
 
+        <ImageView
+            android:id="@+id/btnIconPast"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="20dp"
+            android:padding="5dp"
+            android:src="@drawable/paste"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/btnIconCancel"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="5dp"
+            android:padding="5dp"
+            android:src="@drawable/cancel"
+            android:visibility="gone"
+             />
+
     </androidx.appcompat.widget.Toolbar>
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbarSelected"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:title="0 Selected"
         android:visibility="gone"
-        app:subtitle="5 mb"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbarInternalStorage"
-        />
+        app:subtitle="5 mb"
+        app:title="0 Selected" />
 
 
     <androidx.recyclerview.widget.RecyclerView

@@ -4,55 +4,44 @@
 
     <item
         android:id="@+id/isSearch"
-        android:title="@string/search"
         android:icon="@drawable/searchblack"
-        app:showAsAction="ifRoom" />
+        android:title="@string/search"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/isHome"
-        android:title="Home"
         android:icon="@drawable/home"
+        android:title="Home"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/isSorting"
         android:title="Sorting" />
+
+    <item
+        android:id="@+id/isCut"
+        android:title="Cut" />
+
+    <item
+        android:id="@+id/isCancel"
+        android:title="Cancel" />
+
+    <item
+        android:id="@+id/isCopy"
+        android:title="Copy" />
+
+    <item
+        android:id="@+id/isPast"
+        android:title="Past"
+        />
+
     <item
         android:id="@+id/isCreateFolder"
         android:title="Create New Folder" />
 
     <item
-        android:id="@+id/isCreateFile"
-        android:title="Create New File" />
-
-    <item
         android:id="@+id/isChangeView"
         android:title="@string/change_view" />
-
-    <item
-        android:id="@+id/isAdvance"
-        android:title="Advance Setting">
-        <menu>
-
-            <item
-                android:id="@+id/isShowFileSize"
-                android:title="Show File Size" />
-
-            <item
-                android:id="@+id/isShowFolderSize"
-                android:title="Show FolderSize Size" />
-
-            <item
-                android:id="@+id/isShowFullName"
-                android:title="Show full name of files" />
-
-            <item
-                android:id="@+id/isHiddenFile"
-                android:title="Show Hidden File and Folder" />
-        </menu>
-
-
-    </item>
 
     <item
         android:id="@+id/isClose"

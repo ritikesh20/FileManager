@@ -26,8 +26,7 @@ public class MusicAdapter extends AbstractItem<MusicAdapter, MusicAdapter.ViewHo
 
     File file;
 
-    public MusicAdapter() {
-    }
+    public MusicAdapter() {}
 
     public MusicAdapter(File file) {
         this.file = file;

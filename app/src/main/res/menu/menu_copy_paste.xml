@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_paste"
+        android:title="@string/paste"
+        android:icon="@drawable/copy"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_cancel"
+        android:title="Cancel"
+        android:icon="@drawable/crown"
+        app:showAsAction="always" />
+</menu>

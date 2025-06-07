@@ -19,6 +19,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.example.filemanager.DemoPage.HomeActivity;
 import com.example.filemanager.document.DocumentActivity;
 import com.example.filemanager.imagexview.ImageGalleryActivity;
 import com.example.filemanager.internalstorage.InternalStorageActivity;
@@ -71,10 +72,6 @@ public class MainActivity extends AppCompatActivity {
         tvImageSize = findViewById(R.id.tvImageFileSize);
         tvApkSize = findViewById(R.id.tvApkFileSize);
         tvDocSize = findViewById(R.id.tvDocFileSize);
-
-
-
-
 
         Toolbar homeToolbar = findViewById(R.id.toolbarHome);
         homeDrawerLayout = findViewById(R.id.homeDreawerLayout);
@@ -135,7 +132,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         btnShowAudioFile.setOnClickListener(v -> {
-
             startActivity(new Intent(this, MusicActivity.class));
         });
 
@@ -187,9 +183,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
-
-
 
     }
 
@@ -294,9 +287,15 @@ public class MainActivity extends AppCompatActivity {
 
         if (id == R.id.homeSearch) {
             Toast.makeText(this, "Searching Feature Coming Soon", Toast.LENGTH_SHORT).show();
-        } else if (id == R.id.homePremium) {
+        }
+        else if (id == R.id.homePremium) {
+            String path = Environment.getExternalStorageDirectory().getPath();
+            Intent intent = new Intent(this, HomeActivity.class);
+            intent.putExtra("path", path);
+            startActivity(intent);
             Toast.makeText(this, "Premium Feature Coming Soon", Toast.LENGTH_SHORT).show();
-        } else if (id == R.id.homeRefresh) {
+        }
+        else if (id == R.id.homeRefresh) {
 
             Intent intent = new Intent(this, MainActivity.class);
             Toast.makeText(this, "Refreshing", Toast.LENGTH_SHORT).show();

@@ -270,16 +270,17 @@ public class MusicActivity extends AppCompatActivity {
 
         });
 
-        btnShare.setOnClickListener(v -> {
-
-            Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".provider", file);
-            Intent shareIntent = new Intent(Intent.ACTION_VIEW);
-            shareIntent.setType(getMimeType(file));
-            shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivity(shareIntent);
-
-        });
+        // RR error
+//        btnShare.setOnClickListener(v -> {
+//
+//            Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".provider", file);
+//            Intent shareIntent = new Intent(Intent.ACTION_VIEW);
+//            shareIntent.setType(getMimeType(file));
+//            shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+//            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//            startActivity(shareIntent);
+//
+//        });
 
 
         btnDelete.setOnClickListener(v -> {

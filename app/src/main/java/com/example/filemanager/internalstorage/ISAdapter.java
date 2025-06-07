@@ -59,6 +59,7 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
         TextView fileSize;
         ImageButton btnFileInfo;
 
+
         public ViewHolder(View itemView) {
             super(itemView);
 
@@ -81,12 +82,12 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
             if (itemView.isSelected()) {
                 fileImage.setImageResource(R.drawable.check);
             } else {
+
                 if (item.getFile().isDirectory()) {
                     fileImage.setImageResource(R.drawable.openfolder);
                     fileSize.setVisibility(View.GONE);
 
                 } else {
-
                     String name = item.getFile().getName().toLowerCase();
 
                     if (name.endsWith(".mp3") || name.endsWith(".wav")) {
@@ -105,7 +106,6 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
                 }
 
             }
-
 
             long lastModifiedData = item.file.lastModified();
             SimpleDateFormat date = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());

@@ -5,22 +5,39 @@ import java.util.List;
 
 public class ClipboardHelper {
 
-    private static final ArrayList<String> copiedFiles = new ArrayList<>();
+    private static final ArrayList<String> filePaths = new ArrayList<>();
+
+    private static boolean isCutOperation = false;
+
+
 
     public static void copyFiles(List<String> files) {
-        copiedFiles.clear();
-        copiedFiles.addAll(files);
+        filePaths.clear();
+        filePaths.addAll(files);
+        isCutOperation = false;
     }
 
-    public static ArrayList<String> getCopiedFiles() {
-        return copiedFiles;
+    public static void cutFiles(List<String> files) {
+        filePaths.clear();
+        filePaths.addAll(files);
+        isCutOperation = true;
+    }
+
+
+    public static ArrayList<String> getFilePaths() {
+        return filePaths;
+    }
+
+    public static boolean isCut() {
+        return isCutOperation;
     }
 
     public static boolean isEmpty() {
-        return copiedFiles.isEmpty();
+        return filePaths.isEmpty();
     }
 
     public static void clear() {
-        copiedFiles.clear();
+        filePaths.clear();
+        isCutOperation = false;
     }
 }

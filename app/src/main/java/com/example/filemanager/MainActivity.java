@@ -28,7 +28,6 @@ import com.example.filemanager.videolist.VideoActivity;
 import com.google.android.material.navigation.NavigationView;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
-import com.mikepenz.iconics.view.IconicsImageView;
 
 import java.io.File;
 import java.util.Locale;
@@ -56,7 +55,6 @@ public class MainActivity extends AppCompatActivity {
     TextView tvImageSize;
     TextView tvApkSize;
     TextView tvDocSize;
-
 
     ProgressBar pbFileLong;
 
@@ -149,9 +147,11 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Coming soon....", Toast.LENGTH_SHORT).show();
         });
 
+        // pb == progress bar
         pbFileLong.setVisibility(View.VISIBLE);
 
         ExecutorService executorService = Executors.newSingleThreadExecutor();
+
         executorService.execute(new Runnable() {
             @Override
             public void run() {
@@ -225,11 +225,10 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        for (File file : files){
-            if (file.isDirectory()){
+        for (File file : files) {
+            if (file.isDirectory()) {
                 calFileSize(file);
-            }
-            else {
+            } else {
                 String name = file.getName().toLowerCase(Locale.ROOT);
                 long size = file.length();
 
@@ -287,15 +286,13 @@ public class MainActivity extends AppCompatActivity {
 
         if (id == R.id.homeSearch) {
             Toast.makeText(this, "Searching Feature Coming Soon", Toast.LENGTH_SHORT).show();
-        }
-        else if (id == R.id.homePremium) {
+        } else if (id == R.id.homePremium) {
             String path = Environment.getExternalStorageDirectory().getPath();
             Intent intent = new Intent(this, HomeActivity.class);
             intent.putExtra("path", path);
             startActivity(intent);
             Toast.makeText(this, "Premium Feature Coming Soon", Toast.LENGTH_SHORT).show();
-        }
-        else if (id == R.id.homeRefresh) {
+        } else if (id == R.id.homeRefresh) {
 
             Intent intent = new Intent(this, MainActivity.class);
             Toast.makeText(this, "Refreshing", Toast.LENGTH_SHORT).show();

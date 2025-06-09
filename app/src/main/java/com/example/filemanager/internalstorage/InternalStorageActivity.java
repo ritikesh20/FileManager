@@ -2,6 +2,7 @@ package com.example.filemanager.internalstorage;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -21,14 +22,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.example.filemanager.MainActivity;
 import com.example.filemanager.R;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -39,21 +38,30 @@ import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import de.hdodenhof.circleimageview.CircleImageView;
-
 public class InternalStorageActivity extends AppCompatActivity {
+
+    //    private SharedPreferences sharedPreferences;
+    private static final String Sorting_PREF_NAME = "SortingPrefs";
+    private static final String Sorting_KEY_SORTING = "sorting_by";
+
+//    private List<File> currentFileX = new ArrayList<>();
 
     private RecyclerView recyclerPathHistory;
     private ItemAdapter<PathHistoryAdapter> itemAdapterPathHistory;
@@ -64,8 +72,10 @@ public class InternalStorageActivity extends AppCompatActivity {
     private int selectedSortingOption = R.id.rBtnName;
     String sortingBy;
     Menu mainMenu;
+
     int fileCount = 0;
     int folderCount = 0;
+
     private List<ISAdapter> items;
     public static boolean isGridView = false;
 
@@ -86,9 +96,14 @@ public class InternalStorageActivity extends AppCompatActivity {
 
     ImageView btnIVPaste;
     ImageView btnIvCancel;
-
+    private File currentDirectory;
     private Toolbar toolbarSelected;
     private Toolbar inStorageToolbar;
+
+    File[] filesAndFolders;
+
+    List<File> folders = new ArrayList<>();
+    List<File> files = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,6 +129,11 @@ public class InternalStorageActivity extends AppCompatActivity {
         inStorageToolbar = findViewById(R.id.toolbarInternalStorage);
         toolbarSelected = findViewById(R.id.toolbarSelected);
 
+        items = new ArrayList<>();
+
+        folders = new ArrayList<>();
+        files = new ArrayList<>();
+
         setSupportActionBar(inStorageToolbar);
 
         if (getSupportActionBar() != null) {
@@ -132,10 +152,20 @@ public class InternalStorageActivity extends AppCompatActivity {
         selectExtension.withMultiSelect(true);
         selectExtension.withSelectWithItemUpdate(true);
 
-        fileLoading();
+//        fileLoading();
+        String path = getIntent().getStringExtra("path");
 
-//        btnIVPaste.setImageResource(R.drawable.paste);
-//        btnIvCancel.setImageResource(R.drawable.cancel);
+        if (path == null) {
+            path = Environment.getExternalStorageDirectory().getAbsolutePath();
+        }
+
+        fileLoading(path);
+
+//        sharedPreferences = getSharedPreferences(Sorting_PREF_NAME, MODE_PRIVATE);
+//        sortingBy = sharedPreferences.getString(Sorting_KEY_SORTING, "AZ");
+
+        btnIVPaste.setImageResource(R.drawable.paste);
+        btnIvCancel.setImageResource(R.drawable.cancel);
 
         itemAdapterPathHistory.setNewList(buildPathSistoryList(pathList));
 
@@ -168,6 +198,7 @@ public class InternalStorageActivity extends AppCompatActivity {
 
             inStorageToolbar.setVisibility(View.GONE);
             toolbarSelected.setVisibility(View.VISIBLE);
+
             selectExtension.toggleSelection(position);
 
             selectExtension.withSelectionListener((item, selected) -> {
@@ -178,11 +209,7 @@ public class InternalStorageActivity extends AppCompatActivity {
                     toolbarSelected.setTitle(count + " Selected");
                     toolbarSelected.setSubtitle(getSelectedFileSize());
 
-//                inStorageToolbar.setTitle(count + " Selected");
-//                inStorageToolbar.setSubtitle(getSelectedFileSize());
-
                 } else {
-//                toolbarSelected.setTitle("0 Selected");
 
                     toolbarSelected.setVisibility(View.GONE);
                     inStorageToolbar.setVisibility(View.VISIBLE);
@@ -200,19 +227,16 @@ public class InternalStorageActivity extends AppCompatActivity {
         internalStorageToolbar();
 
         toolbarSelected.inflateMenu(R.menu.selected_menu);
+
         toolbarSelection();
 
     }
 
-    void fileLoading() {
 
-        String path = getIntent().getStringExtra("path");
-
-        if (path == null) {
-            path = Environment.getExternalStorageDirectory().getAbsolutePath();
-        }
-
+    void fileLoading(String path) {
         currentPath = path;
+
+        currentDirectory = new File(path);
 
         pathList = getIntent().getStringArrayListExtra("pathList");
 
@@ -221,37 +245,50 @@ public class InternalStorageActivity extends AppCompatActivity {
             pathList.add("Internal Storage");
         }
 
-        String finalPath = path;
+        //String finalPath = path;
         executorService.execute(() -> {
 
-            File root = new File(finalPath);
-            File[] filesAndFolders = root.listFiles();
+            //            if (filesAndFolders != null) {
+//                Arrays.sort(filesAndFolders, (f1, f2) -> {
+//                    if (f1.isDirectory() && !f2.isDirectory()) return -1;
+//                    if (!f1.isDirectory() && f2.isDirectory()) return 1;
+//                    return Long.compare(f2.lastModified(), f1.lastModified());
+//                });
+//            }
 
+            File root = new File(path);
+            filesAndFolders = root.listFiles();
 
-            List<ISAdapter> tempItems = new ArrayList<>();
+            // loading file with sorting
+            sortItemsWith("NewestDate");
 
-            if (filesAndFolders != null) {
-
-                for (File file : filesAndFolders) {
-
-                    if (file.getName().startsWith(".")) {
-                        continue;
-                    }
-
-                    if (file.isDirectory()) {
-                        folderCount++;
-                    } else if (!file.isDirectory()) {
-                        fileCount++;
-                    }
-
-                    tempItems.add(new ISAdapter(file));
-
-                }
-            }
-
-
-            int finalFolderCount = folderCount;
-            int finalFileCount = fileCount;
+//            boolean firstFolderShown = false;
+//            boolean firstFileShown = false;
+//            assert filesAndFolders != null;
+//            for (File file : filesAndFolders) {
+//                if (!file.getName().startsWith(".")) {
+//
+//                    boolean showHeader = false;
+//                    String headerTxt = "";
+//
+//                    if (file.isDirectory() && !firstFolderShown) {
+//                        showHeader = true;
+//                        headerTxt = "DIRECTORIES";
+//                        firstFolderShown = true;
+//                    } else if (!file.isDirectory() && !firstFileShown) {
+//                        showHeader = true;
+//                        headerTxt = "FILES";
+//                        firstFileShown = true;
+//                    }
+//
+//                    ISAdapter isAdapter = new ISAdapter(file, showHeader, headerTxt);
+//
+//                    items.add(isAdapter);
+//
+//                }
+//            }
+//            int finalFolderCount = folderCount;
+//            int finalFileCount = fileCount;
 
             handler.post(() -> {
 
@@ -262,11 +299,11 @@ public class InternalStorageActivity extends AppCompatActivity {
 
                 noFileText.setVisibility(View.INVISIBLE);
                 setLayout();
+//                sortingBy = sharedPreferences.getString(Sorting_KEY_SORTING, "az");
 
-                items = tempItems;
+//                inStorageToolbar.setSubtitle(finalFolderCount + " Folder " + finalFileCount + " File");
 
-                inStorageToolbar.setSubtitle(finalFolderCount + " Folder " + finalFileCount + " File");
-
+//                newSorting("az");
                 recyclerView.setAdapter(fastAdapter);
                 itemAdapter.set(items);
 
@@ -282,14 +319,14 @@ public class InternalStorageActivity extends AppCompatActivity {
                         ArrayList<String> newPathList = new ArrayList<>(pathList);
                         newPathList.add(clickedFile.getName());
 
-                        Intent intent = new Intent(this, InternalStorageActivity.class);
-                        intent.putExtra("path", clickedFile.getAbsolutePath());
+                        Intent intent = new Intent(this, InternalStorageActivity.class); // recall file Loading
+                        intent.putExtra("path", clickedFile.getAbsolutePath()); //
                         intent.putStringArrayListExtra("pathList", newPathList);
 
                         startActivity(intent);
 
                     } else {
-//                        openWith(clickedFile);
+                        openWith(clickedFile);
                     }
                     return true;
                 });
@@ -299,6 +336,104 @@ public class InternalStorageActivity extends AppCompatActivity {
         });
     }
 
+    private void sorting() {
+
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
+        View view = LayoutInflater.from(this).inflate(R.layout.bottomsheet_items, null);
+        bottomSheetDialog.setContentView(view);
+
+        RadioGroup btnSortingType = view.findViewById(R.id.btnRGImageSorting);
+
+        // Mapping RadioButton IDs to sorting keys
+        Map<Integer, String> sortMap = new HashMap<>();
+        sortMap.put(R.id.rbBtnNDF, "NewestDate");
+        sortMap.put(R.id.rbBtnODF, "OldestDate");
+        sortMap.put(R.id.rbBtnLargeFirst, "LargerSize");
+        sortMap.put(R.id.rbBtnSmallestFirst, "SmallerSize");
+        sortMap.put(R.id.nameAZ, "az");
+        sortMap.put(R.id.nameZA, "za");
+
+        btnSortingType.setOnCheckedChangeListener((group, checkedId) -> {
+            String sortKey = sortMap.get(checkedId);
+            if (sortKey == null) {
+                Toast.makeText(InternalStorageActivity.this, "Null Key", Toast.LENGTH_SHORT).show();
+            } else if (sortKey != null) {
+                sortItemsWith(sortKey);
+                Toast.makeText(InternalStorageActivity.this, "Hello Hello", Toast.LENGTH_SHORT).show();
+//                itemAdapter.setNewList(items);
+
+
+                fastAdapter.notifyAdapterDataSetChanged();
+            }
+        });
+
+        bottomSheetDialog.show();
+    }
+
+    void sortItemsWith(String sortingBy) {
+        Arrays.sort(filesAndFolders, (f1, f2) -> {
+
+            if (f1.isDirectory() && !f2.isDirectory()) return -1;
+            if (!f1.isDirectory() && f2.isDirectory()) return 1;
+
+            switch (sortingBy) {
+                case "NewestDate":
+                    return Long.compare(f2.lastModified(), f1.lastModified());
+                case "OldestDate":
+                    return Long.compare(f1.lastModified(), f2.lastModified());
+                case "LargerSize":
+                    return Long.compare(f2.length(), f1.length());
+                case "SmallerSize":
+                    return Long.compare(f1.length(), f2.length());
+                case "za":
+                    return f2.getName().compareToIgnoreCase(f1.getName());
+                case "az":
+                default:
+                    return f1.getName().compareToIgnoreCase(f2.getName());
+            }
+        });
+
+        items.clear();
+
+        boolean firstFolderShown = false;
+        boolean firstFileShown = false;
+
+        folderCount = 0;
+        fileCount = 0;
+
+        // loading internal storage file here
+        for (File file : filesAndFolders) {
+            if (!file.getName().startsWith(".")) {
+                boolean showHeader = false;
+                String headerTxt = "";
+
+                if (file.isDirectory()) {
+                    folderCount++;
+                    if (!firstFolderShown) {
+                        showHeader = true;
+                        headerTxt = "DIRECTORIES";
+                        firstFolderShown = true;
+                    }
+                } else {
+                    fileCount++;
+                    if (!firstFileShown) {
+                        showHeader = true;
+                        headerTxt = "FILES";
+                        firstFileShown = true;
+                    }
+                }
+
+                items.add(new ISAdapter(file, showHeader, headerTxt));
+            }
+        }
+
+        handler.post(() -> {
+            itemAdapter.setNewList(items);
+            inStorageToolbar.setSubtitle(folderCount + " Folder " + fileCount + " File");
+        });
+
+    }
+
     void internalStorageToolbar() {
 
         inStorageToolbar.setOnMenuItemClickListener(item -> {
@@ -306,6 +441,7 @@ public class InternalStorageActivity extends AppCompatActivity {
             int id = item.getItemId();
 
             if (id == android.R.id.home) {
+                Toast.makeText(context, "Go back", Toast.LENGTH_SHORT).show();
                 onBackPressed();
                 return true;
             } else if (id == R.id.isChangeView) {
@@ -321,15 +457,77 @@ public class InternalStorageActivity extends AppCompatActivity {
 
                 return true;
 
+            } else if (id == R.id.isCreateFolder) {
+                createFolder();
+                return true;
             } else if (id == R.id.isSearch) {
 
                 Toast.makeText(this, "Searching Feature coming soon", Toast.LENGTH_SHORT).show();
-            } else if (id == R.id.isSorting) {
-                sortingIS();
+            } else if (id == R.id.isCutPast) {
+                pasteFiles(currentDirectory);
+
+            } else if (id == R.id.isCut) {
+
+                List<String> selectedPaths = new ArrayList<>();
+                for (ISAdapter itemCut : selectExtension.getSelectedItems()) {
+                    selectedPaths.add(itemCut.getFile().getAbsolutePath());
+                }
+                ClipboardHelper.cutFiles(selectedPaths);
+                Toast.makeText(this, "Cut " + selectedPaths.size(), Toast.LENGTH_SHORT).show();
+
+                btnIVPaste.setVisibility(View.VISIBLE);
+                btnIvCancel.setVisibility(View.VISIBLE);
+
                 return true;
+
+            } else if (id == R.id.isSorting) {
+//                sortingIS();
+                sorting();
+                return true;
+            } else if (id == R.id.isChangeView) {
+
+
             } else if (id == R.id.isCopy) {
 
                 List<String> selectedPaths = new ArrayList<>();
+
+                for (ISAdapter file : selectExtension.getSelectedItems()) {
+                    selectedPaths.add(file.getFile().getAbsolutePath());
+                }
+
+                ClipboardHelper.copyFiles(selectedPaths);
+
+                if (!selectedPaths.isEmpty()) {
+                    ClipboardHelper.copyFiles(selectedPaths);
+                    Toast.makeText(this, "Files copied!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "No file selected to copy", Toast.LENGTH_SHORT).show();
+                }
+
+                btnIVPaste.setVisibility(View.VISIBLE);
+                btnIvCancel.setVisibility(View.VISIBLE);
+
+                return true;
+            } else if (id == R.id.isClose) {
+
+                deleteSelectedFilesDirectly();
+                return true;
+            }
+
+            return false;
+        });
+    }
+
+    void toolbarSelection() {
+
+        toolbarSelected.setOnMenuItemClickListener(item -> {
+
+            int id = item.getItemId();
+
+            if (id == R.id.selCopy) {
+
+                List<String> selectedPaths = new ArrayList<>();
+
                 for (ISAdapter file : selectExtension.getSelectedItems()) {
                     selectedPaths.add(file.getFile().getAbsolutePath());
                 }
@@ -341,58 +539,71 @@ public class InternalStorageActivity extends AppCompatActivity {
                     Toast.makeText(this, "No file selected to copy", Toast.LENGTH_SHORT).show();
                 }
 
-                Toast.makeText(this, "Files copied!", Toast.LENGTH_SHORT).show();
-                return true;
-            } else if (id == R.id.isPast) {
+                btnIVPaste.setVisibility(View.VISIBLE);
+                btnIvCancel.setVisibility(View.VISIBLE);
 
-                if (ClipboardHelper.isEmpty()) {
-                    Toast.makeText(this, "No files to paste", Toast.LENGTH_SHORT).show();
-                    return true;
-                }
-
-                if (currentPath == null) {
-                    Toast.makeText(this, "No destination path found", Toast.LENGTH_SHORT).show();
-                    return true;
-                }
-
-                List<String> copiedFiles = ClipboardHelper.getCopiedFiles();
-
-                executorService.execute(() -> {
-                    for (String filePath : copiedFiles) {
-                        File source = new File(filePath);
-                        File destination = getNonConflictingFile(new File(currentPath, source.getName()));
-
-                        try {
-                            if (source.isDirectory()) {
-                                copyDirectory(source, destination);
-                            } else {
-                                Files.copy(source.toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                            }
-                        } catch (IOException e) {
-                            handler.post(() -> Toast.makeText(this, "Paste failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
-                            e.printStackTrace();
-                        }
-                    }
-
-                    handler.post(() -> {
-                        Toast.makeText(this, "Paste successful!", Toast.LENGTH_SHORT).show();
-                        fileLoading(); // Refresh UI
-                        ClipboardHelper.clear(); // Optional: clear after paste
-                    });
-                });
+                toolbarSelected.setVisibility(View.GONE);
+                inStorageToolbar.setVisibility(View.VISIBLE);
 
 
-                Toast.makeText(this, "Paste successful!", Toast.LENGTH_SHORT).show();
-
-                itemAdapter.setNewList(new ArrayList<>());
-                fileLoading(); // Refresh the current directory
                 return true;
 
+            } else if (id == R.id.selDelete) {
 
+//                for (ISAdapter file : selectExtension.getSelectedItems()) {
+//                    File fileToDelete = new File(file.getFile().getAbsolutePath());
+//                    if (fileToDelete.exists()) {
+//                        if (fileToDelete.delete()) {
+//                            Toast.makeText(this, "File deleted!", Toast.LENGTH_SHORT).show();
+//                        } else {
+//                            Toast.makeText(this, "Delete failed!", Toast.LENGTH_SHORT).show();
+//                        }
+//                    }
+//                }
+                deleteSelectedFilesDirectly();
+                toolbarSelected.setVisibility(View.GONE);
+                inStorageToolbar.setVisibility(View.VISIBLE);
+                recreate();
+                Toast.makeText(context, "Delete File", Toast.LENGTH_SHORT).show();
+                return true;
+
+            } else if (id == R.id.selAll) {
+                if (!isAllSelected) {
+                    selectExtension.select();
+
+                } else {
+                    selectExtension.deselect();
+                }
+                isAllSelected = !isAllSelected;
+
+                return true;
+            } else if (id == R.id.selCopy2) {
+                return true;
+            } else if (id == R.id.selMove) {
+                List<String> selectedPaths = new ArrayList<>();
+                for (ISAdapter itemCut : selectExtension.getSelectedItems()) {
+                    selectedPaths.add(itemCut.getFile().getAbsolutePath());
+                }
+                ClipboardHelper.cutFiles(selectedPaths);
+                Toast.makeText(this, "Cut " + selectedPaths.size(), Toast.LENGTH_SHORT).show();
+
+
+                toolbarSelected.setVisibility(View.GONE);
+                inStorageToolbar.setVisibility(View.VISIBLE);
+
+                return true;
+            } else if (id == R.id.selSelect) {
+
+                Toast.makeText(context, "Delete File", Toast.LENGTH_SHORT).show();
+                return true;
+            } else if (id == R.id.selProperties) {
+                Toast.makeText(context, "Delete File", Toast.LENGTH_SHORT).show();
+                return true;
             }
 
             return false;
         });
+
     }
 
     void newPasting() {
@@ -424,25 +635,55 @@ public class InternalStorageActivity extends AppCompatActivity {
 
     }
 
-    private void copyDirectory(File source, File destination) throws IOException {
-        if (!destination.exists()) {
-            destination.mkdirs();
+    private void pasteFiles(File destinationDir) {
+
+        if (ClipboardHelper.isEmpty()) {
+            Toast.makeText(this, "No files to paste", Toast.LENGTH_SHORT).show();
+            return;
         }
 
-        File[] files = source.listFiles();
-        if (files != null) {
-            for (File file : files) {
-                File newDest = new File(destination, file.getName());
-                if (file.isDirectory()) {
-                    copyDirectory(file, newDest);
+        for (String path : ClipboardHelper.getFilePaths()) {
+            File source = new File(path);
+            File dest = new File(destinationDir, source.getName());
+
+            if (dest.exists()) {
+                dest = getNonConflictingFile(dest);
+            }
+
+            boolean success = false;
+
+            if (ClipboardHelper.isCut()) {
+                success = source.renameTo(dest);
+                if (!success) {
+                    success = moveFileManually(source, dest);
+                }
+            } else {
+                if (source.isDirectory()) {
+                    try {
+                        copyDirectory(source, dest);
+                        success = true;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 } else {
-                    Files.copy(file.toPath(), newDest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    success = copyFile(source, dest);
                 }
             }
+
+            if (!success) {
+                Toast.makeText(this, "Failed: " + source.getName(), Toast.LENGTH_SHORT).show();
+            }
         }
+
+        ClipboardHelper.clear();
+        itemAdapter.setNewList(new ArrayList<>());
+        recreate();
+//        fileLoading();
+
     }
 
     private File getNonConflictingFile(File file) {
+
         if (!file.exists()) return file;
 
         String name = file.getName();
@@ -450,7 +691,7 @@ public class InternalStorageActivity extends AppCompatActivity {
         String extension = "";
 
         int dotIndex = name.lastIndexOf('.');
-        if (dotIndex != -1) {
+        if (dotIndex != -1 && file.isFile()) {
             baseName = name.substring(0, dotIndex);
             extension = name.substring(dotIndex);
         } else {
@@ -466,78 +707,56 @@ public class InternalStorageActivity extends AppCompatActivity {
         } while (newFile.exists());
 
         return newFile;
+
     }
 
-    void toolbarSelection() {
+    private boolean copyFile(File source, File dest) {
 
-        toolbarSelected.setOnMenuItemClickListener(item -> {
-
-            int id = item.getItemId();
-
-            if (id == R.id.selCopy) {
-
-                List<String> selectedPaths = new ArrayList<>();
-
-                for (ISAdapter file : selectExtension.getSelectedItems()) {
-                    selectedPaths.add(file.getFile().getAbsolutePath());
-                }
-
-                if (!selectedPaths.isEmpty()) {
-                    ClipboardHelper.copyFiles(selectedPaths);
-                    Toast.makeText(this, "Files copied!", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(this, "No file selected to copy", Toast.LENGTH_SHORT).show();
-                }
-
-                toolbarSelected.setVisibility(View.GONE);
-                inStorageToolbar.setVisibility(View.VISIBLE);
-
-
-                return true;
-
-            } else if (id == R.id.selDelete) {
-
-                for (ISAdapter file : selectExtension.getSelectedItems()) {
-                    File fileToDelete = new File(file.getFile().getAbsolutePath());
-                    if (fileToDelete.exists()) {
-                        if (fileToDelete.delete()) {
-                            Toast.makeText(this, "File deleted!", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(this, "Delete failed!", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }
-                toolbarSelected.setVisibility(View.GONE);
-                inStorageToolbar.setVisibility(View.VISIBLE);
-                recreate();
-                Toast.makeText(context, "Delete File", Toast.LENGTH_SHORT).show();
-                return true;
+        try {
+            FileInputStream in = new FileInputStream(source);
+            FileOutputStream out = new FileOutputStream(dest);
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = in.read(buffer)) > 0) {
+                out.write(buffer, 0, len);
             }
-            else if (id == R.id.selAll) {
-                if (!isAllSelected) {
-                    selectExtension.select();
-
-                } else {
-                    selectExtension.deselect();
-                }
-                isAllSelected = !isAllSelected;
-
-                return true;
-            } else if (id == R.id.selCopy2) {
-
-                return true;
-            } else if (id == R.id.selSelect) {
-
-                Toast.makeText(context, "Delete File", Toast.LENGTH_SHORT).show();
-                return true;
-            } else if (id == R.id.selProperties) {
-                Toast.makeText(context, "Delete File", Toast.LENGTH_SHORT).show();
-                return true;
-            }
-
+            in.close();
+            out.close();
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
             return false;
-        });
+        }
+    }
 
+    private boolean moveFileManually(File source, File dest) {
+        boolean copied = copyFile(source, dest);
+        if (copied) {
+            return source.delete();
+        }
+        return false;
+    }
+
+    private void copyDirectory(File source, File destination) throws IOException {
+        if (!destination.exists()) {
+            destination.mkdirs();
+        }
+
+        File[] files = source.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                File newDest = new File(destination, file.getName());
+                if (newDest.exists()) {
+                    newDest = getNonConflictingFile(newDest);
+                }
+
+                if (file.isDirectory()) {
+                    copyDirectory(file, newDest);
+                } else {
+                    Files.copy(file.toPath(), newDest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                }
+            }
+        }
     }
 
     void setLayout() {
@@ -561,14 +780,18 @@ public class InternalStorageActivity extends AppCompatActivity {
 
         if (clickedFile.isFile()) {
 
+            // MINE = Multipurpose Internet Mail Extensions
+
             String mine = URLConnection.guessContentTypeFromName(clickedFile.getName());
 
             if (mine != null && mine.startsWith("audio")) {
                 try {
+
                     Uri audioUri = FileProvider.getUriForFile(this, this.getPackageName() + ".provider", clickedFile);
 
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setDataAndType(audioUri, "audio/*");
+
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     this.startActivity(intent);
 
@@ -614,9 +837,9 @@ public class InternalStorageActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     Toast.makeText(this, "NO Video Player" + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
-            } else {
-                Toast.makeText(this, "Unsupported File " + mine, Toast.LENGTH_SHORT).show();
             }
+
+
         }
 
     }
@@ -631,13 +854,12 @@ public class InternalStorageActivity extends AppCompatActivity {
             Method method = menu.getClass().getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE);
             method.setAccessible(true);
             method.invoke(menu, true);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Toast.makeText(this, "Error " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
 
-
-        menu.findItem(R.id.isPast).setIcon(new IconicsDrawable(this, GoogleMaterial.Icon.gmd_content_paste).actionBar());
+        menu.findItem(R.id.isCut).setIcon(new IconicsDrawable(this, GoogleMaterial.Icon.gmd_content_cut).actionBar());
+        menu.findItem(R.id.isCutPast).setIcon(new IconicsDrawable(this, GoogleMaterial.Icon.gmd_content_paste).actionBar());
         menu.findItem(R.id.isSearch).setIcon(new IconicsDrawable(this, GoogleMaterial.Icon.gmd_search).actionBar());
         menu.findItem(R.id.isHome).setIcon(new IconicsDrawable(this, GoogleMaterial.Icon.gmd_home).actionBar());
         menu.findItem(R.id.isSorting).setIcon(new IconicsDrawable(this, GoogleMaterial.Icon.gmd_sort).actionBar());
@@ -742,204 +964,6 @@ public class InternalStorageActivity extends AppCompatActivity {
 
     }
 
-    private void sortingIS() {
-
-        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
-        View view = LayoutInflater.from(this).inflate(R.layout.bottomsheet_items, null);
-        bottomSheetDialog.setContentView(view);
-
-        sortingBy = "NewestDate";
-        RadioGroup btnSortingType = view.findViewById(R.id.btnRGImageSorting);
-
-        btnSortingType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-
-                if (checkedId == R.id.rbBtnNDF) {
-                    sortingBy = "NewestDate";
-                } else if (checkedId == R.id.rbBtnODF) {
-                    sortingBy = "OldestDate";
-                } else if (checkedId == R.id.rbBtnLargeFirst) {
-                    sortingBy = "LargerSize";
-                } else if (checkedId == R.id.rbBtnSmallestFirst) {
-                    sortingBy = "SmallerSize";
-                } else if (checkedId == R.id.nameAZ) {
-                    sortingBy = "az";
-                } else if (checkedId == R.id.nameZA) {
-                    sortingBy = "za";
-                }
-
-                newSorting(sortingBy);
-                handler.post(() -> itemAdapter.setNewList(items));
-                fastAdapter.notifyAdapterDataSetChanged();
-            }
-        });
-
-        bottomSheetDialog.show();
-    }
-
-    void newSorting(String sortingBy) {
-
-        Collections.sort(items, (f1, f2) -> {
-            boolean isDir1 = f1.getFile().isDirectory();
-            boolean isDir2 = f2.getFile().isDirectory();
-
-            if (isDir1 && !isDir2) return -1;
-            if (!isDir1 && isDir2) return 1;
-
-            switch (sortingBy) {
-                case "NewestDate":
-                    return Long.compare(f2.getFile().lastModified(), f1.getFile().lastModified());
-                case "OldestDate":
-                    return Long.compare(f1.getFile().lastModified(), f2.getFile().lastModified());
-                case "LargerSize":
-                    return Long.compare(f2.getFile().length(), f1.getFile().length());
-                case "SmallerSize":
-                    return Long.compare(f1.getFile().length(), f2.getFile().length());
-                case "za":
-                    return f2.getFile().getName().compareToIgnoreCase(f1.getFile().getName());
-                case "az":
-                default:
-                    return f1.getFile().getName().compareToIgnoreCase(f2.getFile().getName());
-            }
-        });
-    }
-
-    void showBottomSheetIS(File file) {
-
-        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
-
-        View view = LayoutInflater.from(this).inflate(R.layout.bottomsheet_info_item, null);
-
-        bottomSheetDialog.setContentView(view);
-
-
-        long sizeInBytes = file.length();
-        String convertedSize;
-
-        LinearLayoutCompat btnCopy;
-        LinearLayoutCompat btnMove;
-        LinearLayoutCompat btnSafeBox;
-        LinearLayoutCompat btnRename;
-        LinearLayoutCompat btnDelete;
-        LinearLayoutCompat btnOpenWith;
-        LinearLayoutCompat btnShare;
-
-        CircleImageView filePreviewIcon;
-
-        filePreviewIcon = view.findViewById(R.id.previewFileCIV);
-
-        btnCopy = view.findViewById(R.id.btnFileCopy);
-        btnMove = view.findViewById(R.id.btnFileMove);
-        btnSafeBox = view.findViewById(R.id.btnFileSaveBox);
-
-        btnRename = view.findViewById(R.id.btnFileRename);
-        btnOpenWith = view.findViewById(R.id.btnFileOpenWith);
-        btnShare = view.findViewById(R.id.btnFileShare);
-        btnDelete = view.findViewById(R.id.btnFileDelete);
-
-        TextView tvFileName = view.findViewById(R.id.tvRenameFileName);
-        TextView tvFileSize = view.findViewById(R.id.tvFileSize);
-
-        tvFileName.setText(file.getName());
-
-        long reSize;
-
-
-        if (sizeInBytes < 1024) {
-            convertedSize = sizeInBytes + " B";
-        } else if (sizeInBytes < 1024 * 1024) {
-            reSize = sizeInBytes / 1024;
-            convertedSize = reSize + " KB";
-        } else if (sizeInBytes < 1024 * 1024 * 1014) {
-            reSize = sizeInBytes / (1024 * 1024);
-            convertedSize = reSize + " MB";
-        } else {
-            reSize = sizeInBytes / (1024 * 1024 * 1024);
-            convertedSize = reSize + " GB";
-        }
-
-        tvFileSize.setText(convertedSize);
-
-        btnRename.setOnClickListener(v -> {
-            showRenameDialog(file);
-            Toast.makeText(this, "File Rename", Toast.LENGTH_SHORT).show();
-        });
-
-        // for shows icons on bottom sheet
-
-        if (file.isDirectory()) {
-            filePreviewIcon.setImageResource(R.drawable.openfolder);
-        } else {
-            String name = file.getName().toLowerCase();
-
-            if (name.endsWith(".jpg") || name.endsWith(".png") || name.endsWith(".jpeg")) {
-                Glide.with(this).load(file).into(filePreviewIcon);
-            } else if (name.endsWith(".mp3")) {
-                filePreviewIcon.setImageResource(R.drawable.musicicons);
-            } else if (name.endsWith(".mp4") || name.endsWith(".avi")) {
-                Glide.with(this).load(file).into(filePreviewIcon);
-            } else if (name.endsWith("apk")) {
-                filePreviewIcon.setImageResource(R.drawable.apkicons);
-            } else if (name.endsWith(".txt")) {
-                filePreviewIcon.setImageResource(R.drawable.txtfile);
-            } else {
-                filePreviewIcon.setImageResource(R.drawable.newdocument);
-            }
-        }
-
-        btnCopy.setOnClickListener(v -> {
-            List<String> selectedPaths = new ArrayList<>();
-
-            for (ISAdapter files : selectExtension.getSelectedItems()) {
-                selectedPaths.add(files.getFile().getAbsolutePath());
-            }
-
-            if (!selectedPaths.isEmpty()) {
-                ClipboardHelper.copyFiles(selectedPaths);
-                Toast.makeText(this, "Files copied!", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, "No file selected to copy", Toast.LENGTH_SHORT).show();
-            }
-
-        });
-
-        btnOpenWith.setOnClickListener(v -> {
-
-            Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".provider", file);
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setDataAndType(uri, getMimeType(file));
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivity(Intent.createChooser(intent, "Open with"));
-
-        });
-
-        btnShare.setOnClickListener(v -> {
-
-            Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".provider", file);
-            Intent shareIntent = new Intent(Intent.ACTION_VIEW);
-            shareIntent.setType(getMimeType(file));
-            shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivity(shareIntent);
-
-        });
-
-
-        btnDelete.setOnClickListener(v -> {
-
-            if (file.delete()) {
-                Toast.makeText(this, file.getName() + " Delete File", Toast.LENGTH_SHORT).show();
-                recreate();
-            }
-
-        });
-
-
-        bottomSheetDialog.show();
-
-    }
-
     private String getMimeType(File file) {
         String ext = MimeTypeMap.getFileExtensionFromUrl(file.getAbsolutePath());
         return MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext);
@@ -989,13 +1013,16 @@ public class InternalStorageActivity extends AppCompatActivity {
     }
 
     private String getSelectedFileSize() {
+
         long sumSize = 0;
 
         for (Integer selectedItem : selectExtension.getSelections()) {
             ISAdapter itemSize = itemAdapter.getAdapterItem(selectedItem);
             sumSize += itemSize.getFile().length();
         }
+
         return calFileSize(sumSize);
+
     }
 
     String calFileSize(long sizeInBytes) {
@@ -1012,6 +1039,203 @@ public class InternalStorageActivity extends AppCompatActivity {
 
     }
 
+    private void deleteSelectedFilesDirectly() {
+        List<ISAdapter> selectedItems = new ArrayList<>(selectExtension.getSelectedItems());
+
+        if (selectedItems.isEmpty()) {
+            Toast.makeText(this, "No files selected", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        for (ISAdapter file : selectedItems) {
+            File fileToDelete = new File(file.getFile().getAbsolutePath());
+            if (fileToDelete.exists()) {
+                if (fileToDelete.isDirectory()) {
+                    deleteRecursively(fileToDelete); // in case it's a folder
+                } else {
+                    if (fileToDelete.delete()) {
+                        Toast.makeText(this, "File deleted!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(this, "Delete failed!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        }
+
+        // Clear selection and update UI
+        selectExtension.deselect();
+        ClipboardHelper.clear(); // Optional
+
+        recreate(); // recreate current activity to refresh everything
+        Toast.makeText(this, "Delete File", Toast.LENGTH_SHORT).show();
+    }
+
+    private boolean deleteRecursively(File file) {
+        if (file.isDirectory()) {
+            File[] files = file.listFiles();
+            if (files != null) {
+                for (File child : files) {
+                    deleteRecursively(child);
+                }
+            }
+        }
+        return file.delete();
+    }
+
+    void createFolder() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Enter Folder Name");
+
+        EditText editText = new EditText(this);
+        builder.setView(editText);
+
+
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                String myFolderName = editText.getText().toString().trim();
+
+                if (!myFolderName.isEmpty()) {
+                    File myFolder = new File(currentPath, myFolderName);
+
+                    if (!myFolder.exists()) {
+                        boolean created = myFolder.mkdirs();
+                        if (created) {
+                            Toast.makeText(InternalStorageActivity.this, "Folder Created", Toast.LENGTH_SHORT).show();
+                            recreate();  // Refresh UI
+                        } else {
+                            Toast.makeText(InternalStorageActivity.this, "Failed to create folder", Toast.LENGTH_LONG).show();
+                        }
+                    } else {
+                        Toast.makeText(InternalStorageActivity.this, "Folder already exists", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(InternalStorageActivity.this, "Folder name can't be empty", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        builder.setNegativeButton("Cancel", null);
+
+        builder.show();
+
+    }
+
+//    private void createxxFolder() {
+//
+//        File myFolder = new File(currentPath, "MyMessi");
+//
+//        if (!myFolder.exists()) {
+//            boolean created = myFolder.mkdirs(); // mkdirs: creates full path if needed
+//
+//            if (created) {
+//
+//                Toast.makeText(this, "Folder created at: " + myFolder.getPath(), Toast.LENGTH_LONG).show();
+//                fileLoading();
+//            } else {
+//                Toast.makeText(this, "Failed to create folder", Toast.LENGTH_LONG).show();
+//            }
+//        } else {
+//            Toast.makeText(this, "Folder already exists", Toast.LENGTH_LONG).show();
+//        }
+//    }
+
+
+    void myIsPasting() {
+//        if (ClipboardHelper.isEmpty()) {
+//            Toast.makeText(this, "No files to paste", Toast.LENGTH_SHORT).show();
+//            return true;
+//        }
+//
+//        if (currentPath == null) {
+//            Toast.makeText(this, "No destination path found", Toast.LENGTH_SHORT).show();
+//            return true;
+//        }
+//
+//        List<String> copiedFiles = ClipboardHelper.getFilePaths();
+//
+//        executorService.execute(() -> {
+//
+//            for (String filePath : copiedFiles) {
+//                File source = new File(filePath);
+//                File destination = getNonConflictingFile(new File(currentPath, source.getName()));
+//
+//                try {
+//                    if (source.isDirectory()) {
+//                        copyDirectory(source, destination);
+//                    } else {
+//                        Files.copy(source.toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
+//                    }
+//                } catch (IOException e) {
+//                    handler.post(() -> Toast.makeText(this, "Paste failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//            handler.post(() -> {
+//                Toast.makeText(this, "Paste successful!", Toast.LENGTH_SHORT).show();
+//                fileLoading(); // Refresh UI
+//                ClipboardHelper.clear(); // Optional: clear after paste
+//            });
+//        });
+//
+//
+//        Toast.makeText(this, "Paste successful!", Toast.LENGTH_SHORT).show();
+//
+//        itemAdapter.setNewList(new ArrayList<>());
+//        fileLoading(); // Refresh the current directory
+//        return true;
+
+    }
+
+
+    void xCopyRename() {
+//        private void copyDirectory(File source, File destination) throws IOException {
+//            if (!destination.exists()) {
+//                destination.mkdirs();
+//            }
+//
+//            File[] files = source.listFiles();
+//            if (files != null) {
+//                for (File file : files) {
+//                    File newDest = new File(destination, file.getName());
+//                    if (file.isDirectory()) {
+//                        copyDirectory(file, newDest);
+//                    } else {
+//                        Files.copy(file.toPath(), newDest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+//                    }
+//                }
+//            }
+//        }
+//
+//        private File getNonConflictingFile(File file) {
+//            if (!file.exists()) return file;
+//
+//            String name = file.getName();
+//            String baseName;
+//            String extension = "";
+//
+//            int dotIndex = name.lastIndexOf('.');
+//            if (dotIndex != -1) {
+//                baseName = name.substring(0, dotIndex);
+//                extension = name.substring(dotIndex);
+//            } else {
+//                baseName = name;
+//            }
+//
+//            int index = 1;
+//            File newFile;
+//            do {
+//                String newName = baseName + "(" + index + ")" + extension;
+//                newFile = new File(file.getParent(), newName);
+//                index++;
+//            } while (newFile.exists());
+//
+//            return newFile;
+//        }
+    }
 
 }
 

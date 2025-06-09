@@ -35,9 +35,6 @@
             android:name=".music.MusicActivity"
             android:exported="false" />
         <activity
-            android:name=".DownloadActivity"
-            android:exported="false" />
-        <activity
             android:name=".internalstorage.SplashXScreenXActivity"
             android:exported="true">
             <intent-filter>

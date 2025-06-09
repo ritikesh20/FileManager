@@ -1,7 +1,6 @@
 package com.example.filemanager.internalstorage;
 
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,13 +17,24 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-
 public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
 
-    File file;
+    private File file;
+    private final boolean isHeader;
+    private String headerTitle;
 
-    public ISAdapter(File file) {
+    public ISAdapter(File file, boolean isHeader, String headerTitle) {
         this.file = file;
+        this.isHeader = isHeader;
+        this.headerTitle = headerTitle;
+    }
+
+    public boolean isHeader() {
+        return isHeader;
+    }
+
+    public String getHeaderTitle() {
+        return headerTitle;
     }
 
     public File getFile() {
@@ -56,9 +66,9 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
         TextView fileName;
         ImageView fileImage;
         TextView fileDate;
+        TextView tvHeaderText;
         TextView fileSize;
-        ImageButton btnFileInfo;
-
+        ImageView btnFileInfo;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -68,21 +78,28 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
             fileDate = itemView.findViewById(R.id.tvModifierData);
             fileSize = itemView.findViewById(R.id.tvSize);
             btnFileInfo = itemView.findViewById(R.id.btnFileDetails);
+            tvHeaderText = itemView.findViewById(R.id.textHeader);
         }
 
         @Override
         public void bindView(ISAdapter item, @NonNull List<Object> payloads) {
+
+            if (item.isHeader()) {
+                tvHeaderText.setVisibility(View.VISIBLE);
+                tvHeaderText.setText(item.getHeaderTitle());
+            } else {
+                tvHeaderText.setVisibility(View.GONE);
+            }
+
 
             fileName.setText(item.getFile().getName());
             long sizeInBytes = item.file.length();
             String convertedSize;
             long reSize;
 
-
             if (itemView.isSelected()) {
                 fileImage.setImageResource(R.drawable.check);
             } else {
-
                 if (item.getFile().isDirectory()) {
                     fileImage.setImageResource(R.drawable.openfolder);
                     fileSize.setVisibility(View.GONE);
@@ -128,13 +145,7 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
 
             fileSize.setText(convertedSize);
 
-            btnFileInfo.setOnClickListener(v -> {
 
-                if (itemView.getContext() instanceof InternalStorageActivity) {
-                    ((InternalStorageActivity) itemView.getContext()).showBottomSheetIS(item.getFile());
-                }
-
-            });
 
         }
 

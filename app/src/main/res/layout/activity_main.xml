@@ -360,7 +360,11 @@
 
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_margin="10dp"
+                    android:layout_marginTop="10dp"
+                    >
 
                     <TextView
                         android:layout_width="match_parent"
@@ -380,11 +384,12 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="70dp"
+
                             android:orientation="horizontal">
 
                             <androidx.cardview.widget.CardView
                                 android:id="@+id/btnShowGallery"
-                                android:layout_width="180dp"
+                                android:layout_width="170dp"
                                 android:layout_height="50dp"
                                 android:layout_marginStart="10dp"
                                 android:layout_marginTop="10dp"
@@ -404,20 +409,17 @@
                                     <LinearLayout
                                         android:layout_width="match_parent"
                                         android:layout_height="match_parent"
+                                        android:gravity="center"
                                         android:orientation="vertical">
 
                                         <TextView
                                             android:layout_width="match_parent"
                                             android:layout_height="wrap_content"
-                                            android:gravity="center"
+                                            android:layout_marginStart="10dp"
+                                            android:gravity="center|start"
                                             android:text="Image"
                                             android:textStyle="bold" />
 
-                                        <TextView
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:gravity="center"
-                                            android:text="20 GB Free" />
 
                                     </LinearLayout>
                                 </LinearLayout>
@@ -427,7 +429,7 @@
                             <!--                CardView Download-->
                             <androidx.cardview.widget.CardView
                                 android:id="@+id/btnDownload"
-                                android:layout_width="180dp"
+                                android:layout_width="170dp"
                                 android:layout_height="50dp"
                                 android:layout_marginStart="10dp"
                                 android:layout_marginTop="10dp"
@@ -447,20 +449,18 @@
                                     <LinearLayout
                                         android:layout_width="match_parent"
                                         android:layout_height="match_parent"
+                                        android:gravity="center"
                                         android:orientation="vertical">
 
                                         <TextView
                                             android:layout_width="match_parent"
                                             android:layout_height="wrap_content"
-                                            android:gravity="center"
+                                            android:layout_marginStart="10dp"
+                                            android:gravity="center|start"
                                             android:text="Download"
+
                                             android:textStyle="bold" />
 
-                                        <TextView
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:gravity="center"
-                                            android:text="20 GB Free" />
 
                                     </LinearLayout>
                                 </LinearLayout>
@@ -478,7 +478,7 @@
 
                             <androidx.cardview.widget.CardView
                                 android:id="@+id/btnShowVideo"
-                                android:layout_width="180dp"
+                                android:layout_width="170dp"
                                 android:layout_height="50dp"
                                 android:layout_marginStart="10dp"
                                 android:layout_marginTop="10dp"
@@ -498,20 +498,16 @@
                                     <LinearLayout
                                         android:layout_width="match_parent"
                                         android:layout_height="match_parent"
+                                        android:gravity="center"
                                         android:orientation="vertical">
 
                                         <TextView
                                             android:layout_width="match_parent"
                                             android:layout_height="wrap_content"
-                                            android:gravity="center"
+                                            android:layout_marginStart="10dp"
+                                            android:gravity="center|start"
                                             android:text="Video"
                                             android:textStyle="bold" />
-
-                                        <TextView
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:gravity="center"
-                                            android:text="20 GB Free" />
 
                                     </LinearLayout>
                                 </LinearLayout>
@@ -521,7 +517,7 @@
 
                             <androidx.cardview.widget.CardView
                                 android:id="@+id/btnShowAudioFile"
-                                android:layout_width="180dp"
+                                android:layout_width="170dp"
                                 android:layout_height="50dp"
                                 android:layout_marginStart="10dp"
                                 android:layout_marginTop="10dp"
@@ -541,20 +537,16 @@
                                     <LinearLayout
                                         android:layout_width="match_parent"
                                         android:layout_height="match_parent"
+                                        android:gravity="center"
                                         android:orientation="vertical">
 
                                         <TextView
                                             android:layout_width="match_parent"
                                             android:layout_height="wrap_content"
-                                            android:gravity="center"
+                                            android:layout_marginStart="10dp"
+                                            android:gravity="center|start"
                                             android:text="Audio"
                                             android:textStyle="bold" />
-
-                                        <TextView
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:gravity="center"
-                                            android:text="20 GB Free" />
 
                                     </LinearLayout>
                                 </LinearLayout>
@@ -572,7 +564,7 @@
 
                             <androidx.cardview.widget.CardView
                                 android:id="@+id/btnShowDocument"
-                                android:layout_width="180dp"
+                                android:layout_width="170dp"
                                 android:layout_height="50dp"
                                 android:layout_marginStart="10dp"
                                 android:layout_marginTop="10dp"
@@ -592,20 +584,16 @@
                                     <LinearLayout
                                         android:layout_width="match_parent"
                                         android:layout_height="match_parent"
+                                        android:gravity="center"
                                         android:orientation="vertical">
 
                                         <TextView
                                             android:layout_width="match_parent"
                                             android:layout_height="wrap_content"
-                                            android:gravity="center"
+                                            android:layout_marginStart="10dp"
+                                            android:gravity="center|start"
                                             android:text="Document"
                                             android:textStyle="bold" />
-
-                                        <TextView
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:gravity="center"
-                                            android:text="@string/_20_gb_free" />
 
                                     </LinearLayout>
                                 </LinearLayout>
@@ -615,7 +603,7 @@
 
                             <androidx.cardview.widget.CardView
                                 android:id="@+id/btnShowRecentFile"
-                                android:layout_width="180dp"
+                                android:layout_width="170dp"
                                 android:layout_height="50dp"
                                 android:layout_marginStart="10dp"
                                 android:layout_marginTop="10dp"
@@ -635,20 +623,18 @@
                                     <LinearLayout
                                         android:layout_width="match_parent"
                                         android:layout_height="match_parent"
+                                        android:gravity="center"
                                         android:orientation="vertical">
 
                                         <TextView
                                             android:layout_width="match_parent"
                                             android:layout_height="wrap_content"
-                                            android:gravity="center"
+                                            android:layout_marginStart="10dp"
+                                            android:gravity="center|start"
+
                                             android:text="Recent File"
                                             android:textStyle="bold" />
 
-                                        <TextView
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:gravity="center"
-                                            android:text="20 GB Free" />
 
                                     </LinearLayout>
                                 </LinearLayout>

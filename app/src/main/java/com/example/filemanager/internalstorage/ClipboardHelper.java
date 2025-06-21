@@ -8,19 +8,21 @@ public class ClipboardHelper {
     private static final ArrayList<String> filePaths = new ArrayList<>();
 
     private static boolean isCutOperation = false;
+    private static boolean isPasting = false;
 
 
-
-    public static void copyFiles(List<String> files) {
+    public static void copy(List<String> files) {
         filePaths.clear();
         filePaths.addAll(files);
         isCutOperation = false;
+        isPasting = true;
     }
 
-    public static void cutFiles(List<String> files) {
+    public static void cut(List<String> files) {
         filePaths.clear();
         filePaths.addAll(files);
         isCutOperation = true;
+        isPasting = true;
     }
 
 
@@ -39,5 +41,16 @@ public class ClipboardHelper {
     public static void clear() {
         filePaths.clear();
         isCutOperation = false;
+        isPasting = false;
     }
+
+    public static boolean isIsPasting() {
+        return isPasting;
+    }
+
+    public static void setIsPasting(boolean value) {
+        isPasting = value;
+    }
+
+
 }

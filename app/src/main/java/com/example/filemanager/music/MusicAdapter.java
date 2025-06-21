@@ -119,9 +119,9 @@ public class MusicAdapter extends AbstractItem<MusicAdapter, MusicAdapter.ViewHo
 
             btnMusicInfo.setOnClickListener(v -> {
 
-                if (itemView.getContext() instanceof MusicActivity) {
-                    ((MusicActivity) itemView.getContext()).showBottomSheet(item.getFile());
-                }
+//                if (itemView.getContext() instanceof MusicActivity) {
+//                    ((MusicActivity) itemView.getContext()).showBottomSheet(item.getFile());
+//                }
 
             });
         }

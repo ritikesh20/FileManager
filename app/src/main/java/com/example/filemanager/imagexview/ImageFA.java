@@ -20,6 +20,7 @@ public class ImageFA extends AbstractItem<ImageFA, ImageFA.ViewHolder> {
     String imageName;
     String imageSize; // for ui
     String imageDate; // for ui
+
     long sizeInByte; // for sorting
     long photoDate; // for sorting
 
@@ -106,10 +107,11 @@ public class ImageFA extends AbstractItem<ImageFA, ImageFA.ViewHolder> {
             imageLvNameTv.setText(item.getImageName());
             imageSizeText.setText(item.getImageSize());
             imageLvDateTv.setText(item.getImageDate());
+
         }
 
         @Override
-        public void unbindView(ImageFA item) {
+        public void unbindView(@NonNull ImageFA item) {
 
             imageView.setImageDrawable(null);
             imageLvNameTv.setText(null);

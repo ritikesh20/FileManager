@@ -1,4 +1,4 @@
-package com.example.filemanager.internalstorage;
+package com.example.filemanager.recentfiles;
 
 import android.view.View;
 import android.widget.ImageView;
@@ -20,62 +20,42 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
+public class newRecentFile extends AbstractItem<newRecentFile, newRecentFile.ViewHolder> {
 
-    private File file;
-    private final boolean isHeader;
-    private final String headerTitle;
+    File file;
 
-
-    public ISAdapter(File file, boolean isHeader, String headerTitle) {
+    newRecentFile(File file) {
         this.file = file;
-        this.isHeader = isHeader;
-        this.headerTitle = headerTitle;
-    }
-
-    public boolean isHeader() {
-        return isHeader;
-    }
-
-    public String getHeaderTitle() {
-        return headerTitle;
     }
 
     public File getFile() {
         return file;
     }
 
-    public void setFile(File file) {
-        this.file = file;
-    }
-
-
     @NonNull
     @Override
-    public ViewHolder getViewHolder(@NonNull View v) {
+    public ViewHolder getViewHolder(View v) {
         return new ViewHolder(v);
     }
 
     @Override
     public int getType() {
-        return 102;
-//        return R.id.file_item_id;
+        return 0;
     }
 
     @Override
     public int getLayoutRes() {
-//        return InternalStorageActivity.isGridView ? R.layout.istore_grid_item : R.layout.internal_storage_items;
         return R.layout.internal_storage_items;
     }
 
-    public static class ViewHolder extends FastAdapter.ViewHolder<ISAdapter> {
+    public static class ViewHolder extends FastAdapter.ViewHolder<newRecentFile> {
 
-        TextView fileName;
-        ImageView fileImage;
-        TextView fileDate;
-        TextView tvHeaderText;
-        TextView fileSize;
-        IconicsImageView btnFileInfo;
+        private final TextView fileName;
+        private final ImageView fileImage;
+        private final TextView fileDate;
+        private final TextView fileSize;
+        private final IconicsImageView btnFileInfo;
+
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -85,22 +65,13 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
             fileDate = itemView.findViewById(R.id.tvModifierData);
             fileSize = itemView.findViewById(R.id.tvSize);
             btnFileInfo = itemView.findViewById(R.id.btnFileDetails);
-            tvHeaderText = itemView.findViewById(R.id.textHeader);
 
         }
 
         @Override
-        public void bindView(ISAdapter item, @NonNull List<Object> payloads) {
+        public void bindView(newRecentFile item, @NonNull List<Object> payloads) {
 
             Glide.with(itemView.getContext()).clear(fileImage);
-
-            if (item.isHeader()) {
-                tvHeaderText.setVisibility(View.VISIBLE);
-                tvHeaderText.setText(item.getHeaderTitle());
-            }
-            else {
-                tvHeaderText.setVisibility(View.GONE);
-            }
 
             fileName.setText(item.getFile().getName());
 
@@ -114,11 +85,9 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
             if (item.getFile().isDirectory()) {
                 fileImage.setImageResource(R.drawable.folderg);
                 fileSize.setVisibility(View.GONE);
-            }
-            else if (name.endsWith(".mp3") || name.endsWith(".wav")) {
+            } else if (name.endsWith(".mp3") || name.endsWith(".wav")) {
                 fileImage.setImageResource(R.drawable.musicicons);
-            }
-            else if (name.endsWith(".mp4")) {
+            } else if (name.endsWith(".mp4")) {
                 Glide.with(itemView.getContext()).load(item.getFile()).error(R.drawable.videoicons).into(fileImage);
             } else if (name.endsWith(".jpg") || name.endsWith(".png") || name.endsWith(".jpeg")) {
                 Glide.with(itemView.getContext()).load(item.getFile()).error(R.drawable.img).into(fileImage);
@@ -137,12 +106,6 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
                 btnFileInfo.setIcon(new IconicsDrawable(itemView.getContext(), GoogleMaterial.Icon.gmd_more_vert).actionBar());
 
             }
-
-//            btnFileInfo.setOnClickListener(v -> {
-//                if (itemView.getContext() instanceof InternalStorageActivity) {
-//                    ((InternalStorageActivity) itemView.getContext()).btnInfo();
-//                }
-//            });
 
             long lastModifiedData = item.file.lastModified();
             SimpleDateFormat date = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
@@ -169,16 +132,14 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
         }
 
         @Override
-        public void unbindView(@NonNull ISAdapter item) {
+        public void unbindView(newRecentFile item) {
 
             fileImage.setImageDrawable(null);
             fileName.setText(null);
             fileDate.setText(null);
             fileSize.setText(null);
-
-
         }
 
     }
-}
 
+}

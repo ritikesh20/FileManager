@@ -1,26 +1,19 @@
 package com.example.filemanager.imagexview;
 
 import android.Manifest;
-import android.content.ContentUris;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.provider.MediaStore;
-import android.text.format.DateFormat;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -32,17 +25,18 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.filemanager.MainActivity;
+import com.example.filemanager.MediaStoreHelper;
 import com.example.filemanager.R;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.example.filemanager.document.FileHelperAdapter;
 import com.mikepenz.fastadapter.FastAdapter;
+import com.mikepenz.fastadapter.IAdapter;
 import com.mikepenz.fastadapter.adapters.ItemAdapter;
+import com.mikepenz.fastadapter.listeners.OnClickListener;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
@@ -55,9 +49,9 @@ public class ImageGalleryActivity extends AppCompatActivity {
     SharedPreferences sharedPreferences;
 
     private RecyclerView recyclerView;
-    FastAdapter<ImageFA> imageFastAdapter;
-    ItemAdapter<ImageFA> imageItemAdapter;
-    List<ImageFA> imageList;
+    FastAdapter<FileHelperAdapter> imageFastAdapter;
+    ItemAdapter<FileHelperAdapter> imageItemAdapter;
+    List<FileHelperAdapter> imageList = new ArrayList<>();
     private Toolbar toolbar;
     ProgressBar progressBarImage;
     int imageCount = 0;
@@ -89,9 +83,29 @@ public class ImageGalleryActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
 
         recyclerViewSetUp();
-        loadImage();
-//        applySavedSorting();
-        fullImage();
+        progressBarImage.setVisibility(View.VISIBLE);
+
+        MediaStoreHelper.loadFile(this, "image", files -> {
+            imageList.clear();
+            imageList.addAll(files);
+            imageItemAdapter.setNewList(files);
+            progressBarImage.setVisibility(View.GONE);
+            imageFastAdapter.notifyDataSetChanged();
+
+
+        });
+
+        imageFastAdapter.withOnClickListener(new OnClickListener<FileHelperAdapter>() {
+            @Override
+            public boolean onClick(View v, IAdapter<FileHelperAdapter> adapter, FileHelperAdapter item, int position) {
+
+                MediaStoreHelper.fileOpenWith(v.getContext(), item.getUri(), item.getMineTypes());
+
+                return false;
+            }
+        });
+
+
     }
 
     public void recyclerViewSetUp() {
@@ -103,67 +117,66 @@ public class ImageGalleryActivity extends AppCompatActivity {
 
     private void loadImage() {
 
-        progressBarImage.setVisibility(View.VISIBLE);
-
-        executorService.execute(() -> {
-            Uri collection = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-//      String[] projection = new String[]{MediaStore.Images.Media._ID};
-
-            String[] projection = {
-
-                    MediaStore.Images.Media._ID,
-                    MediaStore.Images.Media.DISPLAY_NAME,
-                    MediaStore.Images.Media.DATE_ADDED,
-                    MediaStore.Images.Media.SIZE
-
-            };
-
-            Cursor cursor = getContentResolver().query(
-                    collection,
-                    projection,
-                    null,
-                    null,
-                    null //MediaStore.Images.Media.DATE_ADDED + " ASC" // DESC
-            );
-
-            if (cursor != null) {
-
-                int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID);
-                int nameCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME);
-                int dataCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED);
-                int sizeCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE);
-
-                while (cursor.moveToNext()) {
-                    imageCount++;
-                    long id = cursor.getLong(idColumn);
-                    String name = cursor.getString(nameCol);
-                    long dateTaken = cursor.getLong(dataCol) * 1000L;
-                    long sizeInBytes = cursor.getLong(sizeCol);
-
-                    Uri contentUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
-
-//               String imageSize = getFormattedImageSize(this, contentUri);
-                    String imageSize = formatSize(sizeInBytes);
-
-                    String imageDate = DateFormat.format("dd MMM yyyy", new Date(dateTaken)).toString();
-
-                    imageList.add(new ImageFA(contentUri, name, imageSize, imageDate, sizeInBytes, dateTaken));
-
-
-                }
-                cursor.close();
-            }
-
-//            imageItemAdapter.clear();
-            mainHandler.post(() -> {
-
-                toolbar.setSubtitle(imageCount + " files");
-                applySavedSorting();
-                imageItemAdapter.set(imageList);
-                progressBarImage.setVisibility(View.GONE);
-
-            });
-        });
+//        progressBarImage.setVisibility(View.VISIBLE);
+//
+//        executorService.execute(() -> {
+//
+//            Uri collection = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+//            String[] projection = {
+//
+//                    MediaStore.Images.Media._ID,
+//                    MediaStore.Images.Media.DISPLAY_NAME,
+//                    MediaStore.Images.Media.DATE_ADDED,
+//                    MediaStore.Images.Media.SIZE
+//
+//            };
+//
+//            Cursor cursor = getContentResolver().query(
+//                    collection,
+//                    projection,
+//                    null,
+//                    null,
+//                    MediaStore.Images.Media.DATE_ADDED + "  DESC"
+//            );
+//
+//            if (cursor != null) {
+//
+//                int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID);
+//                int nameCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME);
+//                int dataCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED);
+//                int sizeCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE);
+//
+//                while (cursor.moveToNext()) {
+//                    imageCount++;
+//                    long id = cursor.getLong(idColumn);
+//                    String name = cursor.getString(nameCol);
+//                    long dateTaken = cursor.getLong(dataCol) * 1000L;
+//                    long sizeInBytes = cursor.getLong(sizeCol);
+//
+//                    Uri contentUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
+//
+////               String imageSize = getFormattedImageSize(this, contentUri);
+//                    String imageSize = formatSize(sizeInBytes);
+//
+//                    String imageDate = DateFormat.format("dd MMM yyyy", new Date(dateTaken)).toString();
+//
+//                    imageList.add(new ImageFA(contentUri, name, imageSize, imageDate, sizeInBytes, dateTaken));
+//
+//
+//                }
+//                cursor.close();
+//            }
+//
+//            mainHandler.post(() -> {
+//
+//                toolbar.setSubtitle(imageCount + " files");
+//                applySavedSorting();
+//                imageItemAdapter.set(imageList);
+//
+//                progressBarImage.setVisibility(View.GONE);
+//
+//            });
+//        });
 
     }
 
@@ -176,15 +189,15 @@ public class ImageGalleryActivity extends AppCompatActivity {
 
     private void filterImages(String query) {
 
-        List<ImageFA> filteredList = new ArrayList<>();
-
-        for (ImageFA imageQuery : imageList) {
-            if (imageQuery.getImageName().toLowerCase().contains(query.toLowerCase())) {
-                filteredList.add(imageQuery);
-            }
-        }
-
-        imageItemAdapter.set(filteredList);
+//        List<ImageFA> filteredList = new ArrayList<>();
+//
+//        for (ImageFA imageQuery : imageList) {
+//            if (imageQuery.getImageName().toLowerCase().contains(query.toLowerCase())) {
+//                filteredList.add(imageQuery);
+//            }
+//        }
+//
+//        imageItemAdapter.set(filteredList);
 
     }
 
@@ -217,28 +230,6 @@ public class ImageGalleryActivity extends AppCompatActivity {
         }
     }
 
-    void reSize() {
-        //    public String getFormattedImageSize(Context context, Uri uri) {
-//        String sizeStr = "Unknown";
-//        Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
-//        if (cursor != null) {
-//            int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
-//            if (sizeIndex != -1 && cursor.moveToFirst()) {
-//                long sizeInBytes = cursor.getLong(sizeIndex);
-//                double kb = sizeInBytes / 1024.0;
-//                double mb = kb / 1024.0;
-//                if (mb >= 1) {
-//                    sizeStr = String.format(Locale.getDefault(), "%.2f MB", mb);
-//                } else {
-//                    sizeStr = String.format(Locale.getDefault(), "%.2f KB", kb);
-//                }
-//            }
-//            cursor.close();
-//        }
-//        return sizeStr;
-//    }
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -265,21 +256,23 @@ public class ImageGalleryActivity extends AppCompatActivity {
 
         SearchView searchView = (SearchView) searchItem.getActionView();
 
-        searchView.setQueryHint("Searching........");
+        if (searchView != null) {
+            searchView.setQueryHint("Searching........");
 
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                filterImages(query);
-                return true;
-            }
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    filterImages(query);
+                    return true;
+                }
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                filterImages(newText);
-                return true;
-            }
-        });
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    filterImages(newText);
+                    return true;
+                }
+            });
+        }
         return true;
     }
 
@@ -305,146 +298,95 @@ public class ImageGalleryActivity extends AppCompatActivity {
 
     void fullImage() {
 
-        imageFastAdapter.withOnClickListener((v, adapter, item, position) -> {
-            Intent intent = new Intent(ImageGalleryActivity.this, FullScreenImageActivity.class);
-            intent.putExtra("image", item.getImageUri().toString());
-
-            startActivity(intent);
-            return true;
-
-        });
+//        imageFastAdapter.withOnClickListener((v, adapter, item, position) -> {
+//            Intent intent = new Intent(ImageGalleryActivity.this, FullScreenImageActivity.class);
+//            intent.putExtra("image", item.getImageUri().toString());
+//
+//            startActivity(intent);
+//            return true;
+//
+//        });
 
     }
 
     void sorting() {
 
-        BottomSheetDialog dialog = new BottomSheetDialog(this);
-
-        View view = LayoutInflater.from(this).inflate(R.layout.bottomsheet_items, null);
-
-        dialog.setContentView(view);
-
-        RadioGroup btnRadioGroup = view.findViewById(R.id.btnRGImageSorting);
-
-        int savedSortOptionId = sharedPreferences.getInt(KEY_SORT_OPTION, R.id.nameAZ);
-
-        btnRadioGroup.check(savedSortOptionId);
-
-        btnRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putInt(KEY_SORT_OPTION, checkedId);
-            editor.apply();
-//          sharedPreferences.edit().putInt(KEY_SORT_OPTION, checkedId).apply();
-
-            if (checkedId == R.id.nameAZ) {
-
-                imageList.sort((name1, name2) -> name1.imageName.compareToIgnoreCase(name2.imageName));
-            }
-            else if (checkedId == R.id.nameZA) {
-                imageList.sort((name1, name2) -> name2.imageName.compareToIgnoreCase(name1.imageName));
-            }
-            else if (checkedId == R.id.rbBtnNDF) {
-                imageList.sort((ndf, odf) -> Long.compare(odf.getPhotoDate(), ndf.getPhotoDate()));
-            }
-            else if (checkedId == R.id.rbBtnODF) {
-                Collections.sort(imageList, (ndf, odf) -> Long.compare(ndf.getPhotoDate(), odf.getPhotoDate()));
-            }
-            else if (checkedId == R.id.rbBtnLargeFirst) {
-                Collections.sort(imageList, (largeSizeFile, smallSizeFile) -> Long.compare(smallSizeFile.getSizeInByte(), largeSizeFile.getSizeInByte()));
-
-            }
-            else if (checkedId == R.id.rbBtnSmallestFirst) {
-                Collections.sort(imageList, (largeSizeFile, smallSizeFile) -> Long.compare(largeSizeFile.getSizeInByte(), smallSizeFile.getSizeInByte()));
-            }
-
+//        BottomSheetDialog dialog = new BottomSheetDialog(this);
+//
+//        View view = LayoutInflater.from(this).inflate(R.layout.bottomsheet_items, null);
+//
+//        dialog.setContentView(view);
+//
+//        RadioGroup btnRadioGroup = view.findViewById(R.id.btnRGImageSorting);
+//
+//        int savedSortOptionId = sharedPreferences.getInt(KEY_SORT_OPTION, R.id.nameAZ);
+//
+//        btnRadioGroup.check(savedSortOptionId);
+//
+//        btnRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+//            SharedPreferences.Editor editor = sharedPreferences.edit();
+//            editor.putInt(KEY_SORT_OPTION, checkedId);
+//            editor.apply();
+////          sharedPreferences.edit().putInt(KEY_SORT_OPTION, checkedId).apply();
+//
+//            if (checkedId == R.id.nameAZ) {
+//
+//                imageList.sort((name1, name2) -> name1.imageName.compareToIgnoreCase(name2.imageName));
+//            } else if (checkedId == R.id.nameZA) {
+//                imageList.sort((name1, name2) -> name2.imageName.compareToIgnoreCase(name1.imageName));
+//            } else if (checkedId == R.id.rbBtnNDF) {
+//                imageList.sort((ndf, odf) -> Long.compare(odf.getPhotoDate(), ndf.getPhotoDate()));
+//            } else if (checkedId == R.id.rbBtnODF) {
+//                Collections.sort(imageList, (ndf, odf) -> Long.compare(ndf.getPhotoDate(), odf.getPhotoDate()));
+//            } else if (checkedId == R.id.rbBtnLargeFirst) {
+//                Collections.sort(imageList, (largeSizeFile, smallSizeFile) -> Long.compare(smallSizeFile.getSizeInByte(), largeSizeFile.getSizeInByte()));
+//
+//            } else if (checkedId == R.id.rbBtnSmallestFirst) {
+//                Collections.sort(imageList, (largeSizeFile, smallSizeFile) -> Long.compare(largeSizeFile.getSizeInByte(), smallSizeFile.getSizeInByte()));
+//            }
+//
 //          imageItemAdapter.setNewList(imageList);
-            mainHandler.post(() -> imageItemAdapter.set(imageList));
-            imageFastAdapter.notifyAdapterDataSetChanged();
-            dialog.dismiss();
+//            mainHandler.post(() -> imageItemAdapter.set(imageList));
+//            imageFastAdapter.notifyAdapterDataSetChanged();
+//            dialog.dismiss();
+//
+//        });
+//
+//
+//        dialog.show();
 
-        });
-
-
-        dialog.show();
     }
 
     private void applySavedSorting() {
 
-        int checkedId = sharedPreferences.getInt(KEY_SORT_OPTION, R.id.nameAZ);
-
-        if (checkedId == R.id.nameAZ) {
-            Collections.sort(imageList, (name1, name2) -> name1.imageName.compareToIgnoreCase(name2.imageName));
-        } else if (checkedId == R.id.nameZA) {
-            imageList.sort((name1, name2) -> name2.imageName.compareToIgnoreCase(name1.imageName));
-
-        } else if (checkedId == R.id.rbBtnNDF) {
-            imageList.sort((ndf, odf) -> Long.compare(odf.getPhotoDate(), ndf.getPhotoDate()));
-
-        } else if (checkedId == R.id.rbBtnODF) {
-            Collections.sort(imageList, (ndf, odf) -> Long.compare(ndf.getPhotoDate(), odf.getPhotoDate()));
-        } else if (checkedId == R.id.rbBtnLargeFirst) {
-
-            Collections.sort(imageList, (largeSizeFile, smallSizeFile) -> Long.compare(smallSizeFile.getSizeInByte(), largeSizeFile.getSizeInByte()));
-
-        } else if (checkedId == R.id.rbBtnSmallestFirst) {
-
-            Collections.sort(imageList, (largeSizeFile, smallSizeFile) -> Long.compare(largeSizeFile.getSizeInByte(), smallSizeFile.getSizeInByte()));
-
-        }
-
-        imageFastAdapter.notifyAdapterDataSetChanged();
-//        imageItemAdapter.setNewList(imageList);
-        mainHandler.post(() -> imageItemAdapter.set(imageList));
+//        int checkedId = sharedPreferences.getInt(KEY_SORT_OPTION, R.id.nameAZ);
+//
+//        if (checkedId == R.id.nameAZ) {
+//            Collections.sort(imageList, (name1, name2) -> name1.imageName.compareToIgnoreCase(name2.imageName));
+//        } else if (checkedId == R.id.nameZA) {
+//            imageList.sort((name1, name2) -> name2.imageName.compareToIgnoreCase(name1.imageName));
+//
+//        } else if (checkedId == R.id.rbBtnNDF) {
+//            imageList.sort((ndf, odf) -> Long.compare(odf.getPhotoDate(), ndf.getPhotoDate()));
+//
+//        } else if (checkedId == R.id.rbBtnODF) {
+//            Collections.sort(imageList, (ndf, odf) -> Long.compare(ndf.getPhotoDate(), odf.getPhotoDate()));
+//        } else if (checkedId == R.id.rbBtnLargeFirst) {
+//
+//            Collections.sort(imageList, (largeSizeFile, smallSizeFile) -> Long.compare(smallSizeFile.getSizeInByte(), largeSizeFile.getSizeInByte()));
+//
+//        } else if (checkedId == R.id.rbBtnSmallestFirst) {
+//
+//            Collections.sort(imageList, (largeSizeFile, smallSizeFile) -> Long.compare(largeSizeFile.getSizeInByte(), smallSizeFile.getSizeInByte()));
+//
+//        }
+//
+//        imageFastAdapter.notifyAdapterDataSetChanged();
+////        imageItemAdapter.setNewList(imageList);
+//        mainHandler.post(() -> imageItemAdapter.set(imageList));
 
     }
 }
-
-
-
-
-
-
-
-/*
-
-else if (id == R.id.menu_SizeSL) {
-
-            imageList.sort((size1, size2) -> size1.imageSize.compareTo(size2.imageSize));
-            imageItemAdapter.setNewList(imageList);
-
-            return true;
-
-        } else if (id == R.id.menu_SizeLS) {
-
-//            Collections.sort(imageList, (a, b) -> {
-//                long sizeA = extractBytesFromSize(a.getImageSize());
-//                long sizeB = extractBytesFromSize(b.getImageSize());
-//                return Long.compare(sizeA, sizeB);
-//            });
-
-            imageList.sort((size1, size2) -> size2.imageSize.compareTo(size1.imageSize));
-            imageItemAdapter.setNewList(imageList);
-
-            return true;
-
-        } else if (id == R.id.menuNameAZ) {
-
-            imageList.sort((name1, name2) -> name1.imageName.compareTo(name2.imageName));
-            imageItemAdapter.setNewList(imageList);
-
-            return true;
-
-        } else if (id == R.id.menuNameZA) {
-
-            imageList.sort((name1, name2) -> name2.imageName.compareTo(name1.imageName));
-            imageItemAdapter.setNewList(imageList);
-
-            return true;
-
-        }
- */
-
-
 
 
 

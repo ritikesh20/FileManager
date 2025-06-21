@@ -30,6 +30,7 @@
     <string name="_20_gb_free">20 GB Free</string>
     <string name="btnfileinfo">btnFileInfo</string>
     <string name="paste">Paste</string>
+    <string name="hint">Search \"confirmation\"</string>
 
     <item name="PhotoCount" type="id" />
     <item name="fastadapter_image_fa_item_id" type="id" />
@@ -39,5 +40,8 @@
     <item name="musicCount" type="id" />
     <item name="folder_item_id" type="id" />
     <item name="header_item_id" type="id" />
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="name">Name</string>
 
 </resources>

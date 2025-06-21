@@ -2,42 +2,64 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+
     <item
-        android:id="@+id/selCopy"
-        android:title="Copy"
-        android:icon="@drawable/copy"
-        app:showAsAction="always"
-        />
+        android:id="@+id/selShare"
+        android:icon="@drawable/outline_share_24"
+        android:title="Share"
+        app:showAsAction="ifRoom" />
+
     <item
         android:id="@+id/selDelete"
+        android:icon="@drawable/outline_delete_24"
         android:title="Delete"
-        android:icon="@drawable/delete"
-        app:showAsAction="always"
-        />
+        app:showAsAction="always" />
+
     <item
         android:id="@+id/selAll"
-        android:title="Select All"
         android:icon="@drawable/check"
-        app:showAsAction="always"
-        />
+        android:title="Select All" />
 
     <item
-        android:id="@+id/selCopy2"
-        android:title="Copy"
-        />
+        android:id="@+id/selOneFile"
+        android:icon="@drawable/check"
+        android:title="Select" />
+
+
+
+    <item
+        android:id="@+id/selOpenWith"
+        android:title="Open with" />
+
+
     <item
         android:id="@+id/selMove"
-        android:title="Move"
-        />
+        android:title="Move to" />
 
     <item
-        android:id="@+id/selSelect"
-        android:title="Select"
-        />
+        android:id="@+id/selCopy"
+        android:title="Copy to" />
 
     <item
-        android:id="@+id/selProperties"
-        android:title="Properties"
-        />
+        android:id="@+id/selRename"
+        android:title="Rename" />
+
+
+    <item
+        android:id="@+id/selAddToStarred"
+        android:title="Add to starred" />
+
+    <item
+        android:id="@+id/selSafeFolder"
+        android:title="Move to safe Folder" />
+
+    <item
+        android:id="@+id/selBackToGoogleDrive"
+        android:title="Back To Google Drive" />
+
+    <item
+        android:id="@+id/selFileInfo"
+        android:title="File info" />
+
 
 </menu>

@@ -65,6 +65,7 @@ public class PathHistoryAdapter extends AbstractItem<PathHistoryAdapter, PathHis
 
             fileHistoryName = itemView.findViewById(R.id.pathHistoryName);
             imageViewNext = itemView.findViewById(R.id.ivNext);
+
         }
 
         @Override

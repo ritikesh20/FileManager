@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.filemanager.DemoPage.HomeActivity;
 import com.example.filemanager.apps.AppsActivity;
 import com.example.filemanager.document.DocumentActivity;
+import com.example.filemanager.favouritesection.FavouriteActivity;
 import com.example.filemanager.imagexview.ImageGalleryActivity;
 import com.example.filemanager.internalstorage.InternalStorageActivity;
 import com.example.filemanager.music.MusicActivity;
@@ -57,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
             btnCVDownload, btnVideo,
             btnShowAudioFile, btnCVDocument,
             btnCVRecentFile, btnCVSDCard,
-            btnCVApps;
+            btnCVApps, btnCvFavourite, btnCVSafeFolder;
 
     TextView btnRecentFile;
 
@@ -70,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
     private FastAdapter<HomeFileAdapter> fastAdapterRecentFile;
 
     List<HomeFileAdapter> recentFileList = new ArrayList<>();
+
 
 //    long totalImageSize = 0;
 //    long totalVideoSize = 0;
@@ -90,8 +92,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        btnRecentFile = findViewById(R.id.btnSeeAllRecentFile);
 
+        btnCvFavourite = findViewById(R.id.btnShowStarred);
+
+        btnRecentFile = findViewById(R.id.btnSeeAllRecentFile);
         btnRecentFile.setOnClickListener(v -> {
 
             Intent intent = new Intent(this, RecentFilesActivity.class);
@@ -147,6 +151,12 @@ public class MainActivity extends AppCompatActivity {
         btnVideo = findViewById(R.id.btnShowVideo);
         btnCVDocument = findViewById(R.id.btnShowDocument);
         btnCVApps = findViewById(R.id.btnCVApps);
+
+        btnCvFavourite.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, FavouriteActivity.class);
+            startActivity(intent);
+        });
+
         btnCVSDCard = findViewById(R.id.cardViewMemoryCardStorage);
 
         btnImageView.setOnClickListener(v -> {
@@ -200,7 +210,6 @@ public class MainActivity extends AppCompatActivity {
 
         loadRecentFiles();
 
-
         fastAdapterRecentFile.withOnClickListener((v, adapter, item, position) -> {
 
             Uri openFileUri = item.getUri();
@@ -241,8 +250,8 @@ public class MainActivity extends AppCompatActivity {
                         MediaStore.Files.FileColumns.DISPLAY_NAME,
                         MediaStore.Files.FileColumns.MIME_TYPE,
                         MediaStore.Files.FileColumns.SIZE,
-                        MediaStore.Files.FileColumns.DATE_MODIFIED
-
+                        MediaStore.Files.FileColumns.DATE_MODIFIED,
+                        MediaStore.Files.FileColumns.RELATIVE_PATH
                 };
 
                 String selection =
@@ -267,7 +276,7 @@ public class MainActivity extends AppCompatActivity {
                     int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID);
                     int nameColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME);
                     int mimeColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.MIME_TYPE);
-//                    int folderColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.RELATIVE_PATH);
+                    int folderColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.RELATIVE_PATH);
 
                     int count = 0;
                     while (cursor.moveToNext() && count <= 20) {
@@ -275,11 +284,11 @@ public class MainActivity extends AppCompatActivity {
                         long id = cursor.getLong(idColumn);
                         String name = cursor.getString(nameColumn);
                         String mime = cursor.getString(mimeColumn);
-//                      String folder = cursor.getString(folderColumn);
+                        String folder = cursor.getString(folderColumn);
 
                         Uri recentFileUri = ContentUris.withAppendedId(uriRecentFile, id);
 
-                        tempRecentFile.add(new HomeFileAdapter(recentFileUri, name, null, mime));
+                        tempRecentFile.add(new HomeFileAdapter(recentFileUri, name, folder, mime));
                     }
                     cursor.close();
                 }

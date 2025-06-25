@@ -24,6 +24,19 @@ public class FileHelperAdapter extends AbstractItem<FileHelperAdapter, FileHelpe
     String docDate;
     String size;
 
+//    private boolean isFavourite;
+//
+//    public boolean isFavourite() {
+//        return isFavourite;
+//    }
+//
+//    public void setFavourite(boolean favourite) {
+//        isFavourite = favourite;
+//    }
+
+    public FileHelperAdapter() {
+    }
+
     public FileHelperAdapter(Uri uri, String name, String mineTypes, String docDate, String size) {
         this.uri = uri;
         this.name = name;
@@ -52,6 +65,7 @@ public class FileHelperAdapter extends AbstractItem<FileHelperAdapter, FileHelpe
         return size;
     }
 
+
     @NonNull
     @Override
     public ViewHolder getViewHolder(@NonNull View v) {
@@ -73,28 +87,30 @@ public class FileHelperAdapter extends AbstractItem<FileHelperAdapter, FileHelpe
 //        private final ImageView fileIcons;
 
         private final IconicsImageView fileIcons;
+        private final IconicsImageView fileFavIcon;
         private final IconicsImageView fileIconMusicVideo;
         private final TextView fileName;
         private final TextView fileDate;
         private final TextView fileSize;
+        private final IconicsImageView btnFileMenu;
 
         public ViewHolder(View itemView) {
 
             super(itemView);
 
-            fileIcons = itemView.findViewById(R.id.musicIcons);
-            fileName = itemView.findViewById(R.id.tvMusicName);
-            fileDate = itemView.findViewById(R.id.tvMusicModifierData);
-            fileSize = itemView.findViewById(R.id.tvMusicSize);
+            fileIcons = itemView.findViewById(R.id.fileIcons);
+            fileName = itemView.findViewById(R.id.tvFileName);
+            fileDate = itemView.findViewById(R.id.tvFileModifierData);
+            fileSize = itemView.findViewById(R.id.tvFileSize);
             fileIconMusicVideo = itemView.findViewById(R.id.iconMusicVideo);
-
+            btnFileMenu = itemView.findViewById(R.id.btnFileDot);
+            fileFavIcon = itemView.findViewById(R.id.favIconFav);
         }
 
         @Override
         public void bindView(FileHelperAdapter item, @NonNull List<Object> payloads) {
 
             String mime = item.mineTypes;
-
             if (mime != null) {
                 if (mime.startsWith("image/")) {
                     Glide.with(itemView.getContext()).load(item.uri).placeholder(R.drawable.img).error(R.drawable.img).into(fileIcons);
@@ -120,6 +136,21 @@ public class FileHelperAdapter extends AbstractItem<FileHelperAdapter, FileHelpe
             fileDate.setText(item.getDocDate());
 
             fileSize.setText(item.getSize());
+
+            if (itemView.isSelected()) {
+                btnFileMenu.setIcon(new IconicsDrawable(itemView.getContext(), GoogleMaterial.Icon.gmd_check_circle).actionBar());
+            } else {
+                btnFileMenu.setIcon(new IconicsDrawable(itemView.getContext(), GoogleMaterial.Icon.gmd_more_vert).actionBar());
+            }
+
+
+//            if (item.isFavourite) {
+//                fileFavIcon.setVisibility(View.VISIBLE);
+//                fileFavIcon.setIcon(new IconicsDrawable(itemView.getContext(), GoogleMaterial.Icon.gmd_star).actionBar());
+//            } else {
+//                fileFavIcon.setVisibility(View.GONE);
+//            }
+
 
         }
 

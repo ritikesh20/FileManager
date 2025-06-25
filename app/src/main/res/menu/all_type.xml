@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/file_search"
+        android:title="@string/search"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/file_ChangeView"
+        android:title="@string/changeview"
+        app:showAsAction="ifRoom"
+        />
+
+    <item
+        android:id="@+id/file_Selected"
+        android:title="@string/select_all" />
+
+    <item
+        android:id="@+id/file_SortBy"
+        android:title="@string/sort_by" />
+
+    <item
+        android:id="@+id/file_Share"
+        android:title="Share"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/file_Delete"
+        android:title="Delete"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/file_OpenWith"
+        android:title="Open with" />
+
+
+    <item
+        android:id="@+id/file_Move"
+        android:title="Move to" />
+
+    <item
+        android:id="@+id/file_Copy"
+        android:title="Copy to" />
+
+    <item
+        android:id="@+id/file_Rename"
+        android:title="Rename" />
+
+
+    <item
+        android:id="@+id/file_AddToStarred"
+        android:title="Add to starred" />
+
+    <item
+        android:id="@+id/file_SafeFolder"
+        android:title="Move to safe Folder" />
+
+    <item
+        android:id="@+id/file_BackToGoogleDrive"
+        android:title="Back To Google Drive" />
+
+    <item
+        android:id="@+id/file_FileInfo"
+        android:title="File info" />
+
+
+</menu>

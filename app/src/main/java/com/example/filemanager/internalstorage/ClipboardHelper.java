@@ -26,11 +26,11 @@ public class ClipboardHelper {
     }
 
 
-    public static ArrayList<String> getFilePaths() {
+    public static ArrayList<String> getFilePaths() { // function hai jo selected file ko return karta hai
         return filePaths;
     }
 
-    public static boolean isCut() {
+    public static boolean isCut() { // if isCut == true then cut operation else id isCut == false copyOperation
         return isCutOperation;
     }
 
@@ -44,11 +44,11 @@ public class ClipboardHelper {
         isPasting = false;
     }
 
-    public static boolean isIsPasting() {
+    public static boolean isIsPasting() { // to show btnCopy, btnPast
         return isPasting;
     }
 
-    public static void setIsPasting(boolean value) {
+    public static void setIsPasting(boolean value) { // change value after pasting
         isPasting = value;
     }
 

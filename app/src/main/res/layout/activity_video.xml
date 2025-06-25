@@ -7,6 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".videolist.VideoActivity">
 
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbarVideo"
         android:layout_width="match_parent"
@@ -19,13 +20,58 @@
         app:layout_constraintVertical_bias="0.5"
         app:title="Videos" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewVideo"
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/toolbarVideo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5">
+
+        <Button
+            android:id="@+id/btnVideoCopy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="@color/black"
+            android:text="Copy" />
+
+        <Button
+            android:id="@+id/btnVideoMove"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/black"
+            android:text="Move" />
+
+    </LinearLayout>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewVideo"
+        android:layout_width="413dp"
+        android:layout_height="579dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbarVideo" />
+
+    <Button
+        android:id="@+id/btnVideoPasting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:backgroundTint="@color/black"
+        android:text="Pasting"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,18 +3,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="10dp">
+    android:layout_height="wrap_content">
 
     <LinearLayout
         android:id="@+id/linearLayout9"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
+        android:layout_marginTop="20dp"
         android:orientation="vertical"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5"
+        app:layout_goneMarginTop="100dp">
 
         <LinearLayout
             android:id="@+id/linearLayout8"
@@ -33,7 +37,7 @@
                     android:layout_height="50dp">
 
                     <com.mikepenz.iconics.view.IconicsImageView
-                        android:id="@+id/musicIcons"
+                        android:id="@+id/fileIcons"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:contentDescription="@string/musicicon"
@@ -56,7 +60,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/tvMusicName"
+                    android:id="@+id/tvFileName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
@@ -67,17 +71,27 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
+                    android:layout_marginStart="10dp"
                     android:orientation="horizontal">
 
+                    <com.mikepenz.iconics.view.IconicsImageView
+                        android:id="@+id/favIconFav"
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        android:visibility="gone"
+                        android:layout_marginTop="5dp"
+                        android:src="@color/black" />
+
+
                     <TextView
-                        android:id="@+id/tvMusicModifierData"
+                        android:id="@+id/tvFileModifierData"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
                         android:text="@string/_15_may_2024" />
 
                     <TextView
-                        android:id="@+id/tvMusicSize"
+                        android:id="@+id/tvFileSize"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
@@ -86,8 +100,8 @@
 
             </LinearLayout>
 
-            <ImageButton
-                android:id="@+id/btnMusicDot"
+            <com.mikepenz.iconics.view.IconicsImageView
+                android:id="@+id/btnFileDot"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:background="@android:color/transparent"
@@ -98,12 +112,6 @@
 
         </LinearLayout>
 
-
-        <com.google.android.material.divider.MaterialDivider
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_marginStart="75dp" />
     </LinearLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

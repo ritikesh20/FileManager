@@ -103,7 +103,7 @@ public class HomeFileAdapter extends AbstractItem<HomeFileAdapter, HomeFileAdapt
             }
 
             recentFileName.setText(item.getRecentFileName());
-            recentFolderName.setText(item.getRecentMimeType());
+            recentFolderName.setText(item.getRecentFolderName());
 
         }
 

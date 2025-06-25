@@ -9,31 +9,18 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/menuImage_Home"
-        android:title="Home"
-        app:showAsAction="ifRoom" />
+        android:id="@+id/menuImage_ChangeView"
+        android:title="@string/changeview"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/fileSelected"
+        android:title="@string/select_all"
+        />
 
     <item
         android:id="@+id/menuImage_SortBy"
         android:title="@string/sort_by" />
 
-    <item
-        android:id="@+id/menuImage_ChangeView"
-        android:title="@string/changeview"
-         />
-
-    <item
-        android:id="@+id/menuImage_SetHome"
-        android:title="Set as home screen" />
-
-
-    <item
-        android:id="@+id/menuImage_AdvanceSetting"
-        android:title="Advance Setting"
-         />
-
-    <item
-        android:id="@+id/menuImage_Closed"
-        android:title="Closed" />
 
 </menu>

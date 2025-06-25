@@ -10,10 +10,18 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
 import android.text.format.DateFormat;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.filemanager.document.FileHelperAdapter;
+import com.example.filemanager.internalstorage.InternalStorageActivity;
+import com.example.filemanager.music.MusicAdapter;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -25,6 +33,7 @@ public class MediaStoreHelper {
     public interface FileLoadCallback {
         void onFilesLoaded(List<FileHelperAdapter> files);
     }
+
 
     public static void loadFile(Context context, String type, FileLoadCallback callback) {
 
@@ -46,6 +55,7 @@ public class MediaStoreHelper {
                         MediaStore.Files.FileColumns.SIZE,
                         MediaStore.Files.FileColumns.DATE_MODIFIED,
                         MediaStore.Files.FileColumns.MIME_TYPE,
+                        MediaStore.Files.FileColumns.DATA
 
                 };
 
@@ -121,9 +131,7 @@ public class MediaStoreHelper {
 
                 ContentResolver contentResolver = context.getContentResolver();
 
-                Cursor cursor = contentResolver.query(
-                        fileUri, projection, selection, selectionArgs, sortingOrder
-                );
+                Cursor cursor = contentResolver.query(fileUri, projection, selection, selectionArgs, sortingOrder);
 
                 if (cursor != null) {
 
@@ -149,6 +157,7 @@ public class MediaStoreHelper {
 
                         fileList.add(new FileHelperAdapter(contentUri, name, mime, newDate, newSize));
 
+
                     }
                     cursor.close();
                 }
@@ -165,12 +174,12 @@ public class MediaStoreHelper {
     }
 
 
-    public static void fileOpenWith(Context context, Uri uri, String mimeTypes) {
+    public static void fileOpenWith(Context context, Uri uri, String mimeType) {
 
         try {
 
             Intent intentOpenWith = new Intent(Intent.ACTION_VIEW);
-            intentOpenWith.setDataAndType(uri, mimeTypes);
+            intentOpenWith.setDataAndType(uri, mimeType);
             intentOpenWith.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
             intentOpenWith.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
@@ -197,21 +206,28 @@ public class MediaStoreHelper {
         }
     }
 
+    // option to selected internal storage or sd Card
+    public static void goStorageTypes(Context context, String title) {
 
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(context);
 
+        View view = LayoutInflater.from(context).inflate(R.layout.copymove_item, null);
 
+        bottomSheetDialog.show();
+        bottomSheetDialog.setContentView(view);
 
+        TextView tvTitleCopyMove = view.findViewById(R.id.titleCopyMove);
 
+        LinearLayout btnInterStorage = view.findViewById(R.id.layoutInterStorage);
 
+        tvTitleCopyMove.setText(title);
 
+        btnInterStorage.setOnClickListener(v -> {
+            Intent intent = new Intent(context, InternalStorageActivity.class);
+            context.startActivity(intent);
+        });
 
-
-
-
-
-
-
-
+    }
 
 
 }

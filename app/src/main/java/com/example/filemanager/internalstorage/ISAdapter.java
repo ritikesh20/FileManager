@@ -1,5 +1,7 @@
 package com.example.filemanager.internalstorage;
 
+import static com.example.filemanager.internalstorage.InternalStorageActivity.isGridView;
+
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -64,8 +66,8 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
 
     @Override
     public int getLayoutRes() {
-//        return InternalStorageActivity.isGridView ? R.layout.istore_grid_item : R.layout.internal_storage_items;
-        return R.layout.internal_storage_items;
+        return isGridView ? R.layout.istore_grid_item : R.layout.internal_storage_items;
+//        return R.layout.internal_storage_items;
     }
 
     public static class ViewHolder extends FastAdapter.ViewHolder<ISAdapter> {
@@ -138,12 +140,6 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
 
             }
 
-//            btnFileInfo.setOnClickListener(v -> {
-//                if (itemView.getContext() instanceof InternalStorageActivity) {
-//                    ((InternalStorageActivity) itemView.getContext()).btnInfo();
-//                }
-//            });
-
             long lastModifiedData = item.file.lastModified();
             SimpleDateFormat date = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
             String setDate = date.format(new Date(lastModifiedData));
@@ -165,6 +161,9 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
 
             fileSize.setText(convertedSize);
 
+            if (isGridView){
+                tvHeaderText.setVisibility(View.GONE);
+            }
 
         }
 

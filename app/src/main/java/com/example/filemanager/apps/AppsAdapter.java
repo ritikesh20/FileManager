@@ -54,10 +54,10 @@ public class AppsAdapter extends AbstractItem<AppsAdapter, AppsAdapter.ViewHolde
         public ViewHolder(View itemView) {
             super(itemView);
 
-            fileIcons = itemView.findViewById(R.id.musicIcons);
-            fileName = itemView.findViewById(R.id.tvMusicName);
-            fileDate = itemView.findViewById(R.id.tvMusicModifierData);
-            fileSize = itemView.findViewById(R.id.tvMusicSize);
+            fileIcons = itemView.findViewById(R.id.fileIcons);
+            fileName = itemView.findViewById(R.id.tvFileName);
+            fileDate = itemView.findViewById(R.id.tvFileModifierData);
+            fileSize = itemView.findViewById(R.id.tvFileSize);
 
         }
 

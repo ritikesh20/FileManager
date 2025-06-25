@@ -50,7 +50,7 @@
         android:title="Add to starred" />
 
     <item
-        android:id="@+id/selSafeFolder"
+        android:id="@+id/file_SafeFolder"
         android:title="Move to safe Folder" />
 
     <item

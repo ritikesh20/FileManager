@@ -1,7 +1,6 @@
 package com.example.filemanager.imagexview;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -24,7 +23,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.filemanager.MainActivity;
 import com.example.filemanager.MediaStoreHelper;
 import com.example.filemanager.R;
 import com.example.filemanager.document.FileHelperAdapter;
@@ -247,10 +245,6 @@ public class ImageGalleryActivity extends AppCompatActivity {
         menu.findItem(R.id.menuImage_search).setIcon(new IconicsDrawable(this, GoogleMaterial.Icon.gmd_search).color(Color.BLACK).actionBar());
         menu.findItem(R.id.menuImage_SortBy).setIcon(new IconicsDrawable(this, GoogleMaterial.Icon.gmd_filter_list).color(Color.BLACK).actionBar());
         menu.findItem(R.id.menuImage_ChangeView).setIcon(new IconicsDrawable(this, GoogleMaterial.Icon.gmd_grid_on).color(Color.BLACK).actionBar());
-        menu.findItem(R.id.menuImage_Home).setIcon(new IconicsDrawable(this, GoogleMaterial.Icon.gmd_home).color(Color.BLACK).actionBar());
-        menu.findItem(R.id.menuImage_SetHome).setIcon(new IconicsDrawable(this, GoogleMaterial.Icon.gmd_home).color(Color.BLACK).actionBar());
-        menu.findItem(R.id.menuImage_AdvanceSetting).setIcon(new IconicsDrawable(this, GoogleMaterial.Icon.gmd_settings).color(Color.BLACK).actionBar());
-        menu.findItem(R.id.menuImage_Closed).setIcon(new IconicsDrawable(this, GoogleMaterial.Icon.gmd_close).color(Color.BLACK).actionBar());
 
         MenuItem searchItem = menu.findItem(R.id.menuImage_search);
 
@@ -276,6 +270,7 @@ public class ImageGalleryActivity extends AppCompatActivity {
         return true;
     }
 
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
@@ -284,9 +279,6 @@ public class ImageGalleryActivity extends AppCompatActivity {
         if (id == android.R.id.home) {
             onBackPressed();
             return true;
-        } else if (id == R.id.menuImage_Home) {
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
         } else if (id == R.id.menuImage_SortBy) {
             sorting();
             return true;

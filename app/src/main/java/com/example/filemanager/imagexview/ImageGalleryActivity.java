@@ -23,6 +23,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.filemanager.FileOperation;
 import com.example.filemanager.MediaStoreHelper;
 import com.example.filemanager.R;
 import com.example.filemanager.document.FileHelperAdapter;
@@ -42,6 +43,7 @@ import java.util.concurrent.Executors;
 
 public class ImageGalleryActivity extends AppCompatActivity {
 
+    ProgressBar progressBarImage;
     public static final String PREF_NAME = "sorting_pref";
     public static final String KEY_SORT_OPTION = "sort_option";
     SharedPreferences sharedPreferences;
@@ -50,13 +52,10 @@ public class ImageGalleryActivity extends AppCompatActivity {
     FastAdapter<FileHelperAdapter> imageFastAdapter;
     ItemAdapter<FileHelperAdapter> imageItemAdapter;
     List<FileHelperAdapter> imageList = new ArrayList<>();
-    private Toolbar toolbar;
-    ProgressBar progressBarImage;
+
     int imageCount = 0;
     private static final int REQUEST_PERMISSION_CODE = 101;
 
-    ExecutorService executorService = Executors.newSingleThreadExecutor();
-    Handler mainHandler = new Handler(Looper.getMainLooper());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +63,7 @@ public class ImageGalleryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_image_gallery);
 
         recyclerView = findViewById(R.id.rvImageGallery);
-        toolbar = findViewById(R.id.toolbarGalleryImage);
+        Toolbar toolbar = findViewById(R.id.toolbarGalleryImage);
 
         progressBarImage = findViewById(R.id.progressBarImage);
 
@@ -84,12 +83,12 @@ public class ImageGalleryActivity extends AppCompatActivity {
         progressBarImage.setVisibility(View.VISIBLE);
 
         MediaStoreHelper.loadFile(this, "image", files -> {
+
             imageList.clear();
             imageList.addAll(files);
             imageItemAdapter.setNewList(files);
             progressBarImage.setVisibility(View.GONE);
             imageFastAdapter.notifyDataSetChanged();
-
 
         });
 
@@ -97,7 +96,7 @@ public class ImageGalleryActivity extends AppCompatActivity {
             @Override
             public boolean onClick(View v, IAdapter<FileHelperAdapter> adapter, FileHelperAdapter item, int position) {
 
-                MediaStoreHelper.fileOpenWith(v.getContext(), item.getUri(), item.getMineTypes());
+                FileOperation.fileOpenWith(v.getContext(), item.getUri(), item.getMineTypes());
 
                 return false;
             }
@@ -270,7 +269,6 @@ public class ImageGalleryActivity extends AppCompatActivity {
         return true;
     }
 
-
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
@@ -378,6 +376,8 @@ public class ImageGalleryActivity extends AppCompatActivity {
 //        mainHandler.post(() -> imageItemAdapter.set(imageList));
 
     }
+
+
 }
 
 

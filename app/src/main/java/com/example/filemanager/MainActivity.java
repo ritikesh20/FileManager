@@ -16,6 +16,7 @@ import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +34,7 @@ import com.example.filemanager.favouritesection.FavouriteActivity;
 import com.example.filemanager.imagexview.ImageGalleryActivity;
 import com.example.filemanager.internalstorage.InternalStorageActivity;
 import com.example.filemanager.music.MusicActivity;
+import com.example.filemanager.music.NewSearchActivity;
 import com.example.filemanager.recentfiles.RecentFilesActivity;
 import com.example.filemanager.videolist.HomeFileAdapter;
 import com.example.filemanager.videolist.VideoActivity;
@@ -61,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
             btnCVApps, btnCvFavourite, btnCVSafeFolder;
 
     TextView btnRecentFile;
-
+    TextView etSearchingFile;
     IconicsImageView homeIconDownload, homeIconImage, homeIconVideo, homeIconAudio,
             homeIconDoc, homeIconApps, homeIconStarred, homeIconSafeFolder,
             homeIconInternalStorage, homeIconSDCard, homeSideNav;
@@ -138,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerViewHome);
         itemAdapterRecentFile = new ItemAdapter<>();
         fastAdapterRecentFile = FastAdapter.with(itemAdapterRecentFile);
-
+        etSearchingFile = findViewById(R.id.btnFileSearchingName);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
 
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -152,6 +154,11 @@ public class MainActivity extends AppCompatActivity {
         btnCVDocument = findViewById(R.id.btnShowDocument);
         btnCVApps = findViewById(R.id.btnCVApps);
 
+
+        etSearchingFile.setOnClickListener(v -> {
+            Intent intent = new Intent(this, NewSearchActivity.class);
+            startActivity(intent);
+        });
         btnCvFavourite.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, FavouriteActivity.class);
             startActivity(intent);

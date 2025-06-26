@@ -130,8 +130,15 @@ public class MusicActivity extends AppCompatActivity {
         });
 
         isPastDeselect();
-        uploadMusic();
+//        uploadMusic();
+        loadingMusic();
 
+    }
+
+    void loadingMusic() {
+        MediaStoreHelper.loadFile(this, "audio", files -> {
+            Toast.makeText(this, "Music Loading Successfully", Toast.LENGTH_SHORT).show();
+        });
     }
 
     void uploadMusic() {
@@ -145,19 +152,12 @@ public class MusicActivity extends AppCompatActivity {
                 musicList.clear();
 
                 Uri videoUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-//                Uri videoUri = MediaStore.Files.getContentUri("external");
 
                 String[] projection = {
                         MediaStore.Audio.Media._ID,
                         MediaStore.Audio.Media.TITLE,
                         MediaStore.Audio.Media.DATA,
                         MediaStore.Audio.Media.DISPLAY_NAME
-//                        MediaStore.Files.FileColumns._ID,
-//                        MediaStore.Files.FileColumns.DISPLAY_NAME,
-//                        MediaStore.Files.FileColumns.SIZE,
-//                        MediaStore.Files.FileColumns.DATE_MODIFIED,
-//                        MediaStore.Files.FileColumns.MIME_TYPE,
-//                        MediaStore.Files.FileColumns.DATA
                 };
 
                 Cursor cursor = getContentResolver().query(videoUri, projection, null, null, null);

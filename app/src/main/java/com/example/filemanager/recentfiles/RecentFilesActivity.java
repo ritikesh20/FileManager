@@ -9,6 +9,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.filemanager.FileOperation;
 import com.example.filemanager.MediaStoreHelper;
 import com.example.filemanager.R;
 import com.example.filemanager.document.FileHelperAdapter;
@@ -72,7 +73,7 @@ public class RecentFilesActivity extends AppCompatActivity {
             @Override
             public boolean onClick(View v, IAdapter<FileHelperAdapter> adapter, FileHelperAdapter item, int position) {
 
-                MediaStoreHelper.fileOpenWith(v.getContext(), item.getUri(), item.getMineTypes());
+                FileOperation.fileOpenWith(v.getContext(), item.getUri(), item.getMineTypes());
 
                 return true;
             }

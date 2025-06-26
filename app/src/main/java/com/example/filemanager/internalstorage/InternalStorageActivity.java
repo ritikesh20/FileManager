@@ -40,7 +40,6 @@ import com.example.filemanager.MediaStoreHelper;
 import com.example.filemanager.R;
 import com.example.filemanager.favouritesection.AppDatabase;
 import com.example.filemanager.favouritesection.FavouriteDao;
-import com.example.filemanager.favouritesection.FavouriteItem;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -73,10 +72,12 @@ import java.util.concurrent.Executors;
 
 public class InternalStorageActivity extends AppCompatActivity {
 
+    // fastAdapter Path History
     private RecyclerView recyclerPathHistory;
     private ItemAdapter<PathHistoryAdapter> itemAdapterPathHistory;
     private FastAdapter<PathHistoryAdapter> fastAdapterPathHistory;
     private List<PathHistoryAdapter> historyPathList;
+
     private Context context;
     private boolean isAscending = true;
     private int selectedSortingOption = R.id.rBtnName;
@@ -90,11 +91,9 @@ public class InternalStorageActivity extends AppCompatActivity {
 
     private ActivityResultLauncher<Intent> permissionLauncher;
 
-    //    public static File currentFolder = null; // set according to folder clicked
-    Button pasteBtn;
-
     public static boolean isGridView = false;
 
+    // fastAdapter SetUp
     private RecyclerView recyclerView;
     private ItemAdapter<ISAdapter> itemAdapter;
     private FastAdapter<ISAdapter> fastAdapter;
@@ -197,6 +196,7 @@ public class InternalStorageActivity extends AppCompatActivity {
         }
 
         currentDirectory = new File(path);
+
         fileLoading(path);
 
         isPastDeselect();
@@ -231,8 +231,8 @@ public class InternalStorageActivity extends AppCompatActivity {
 
         fastAdapter.withOnLongClickListener((v, adapter, itemx, position) -> {
 
-            AppDatabase db = AppDatabase.getInstance(InternalStorageActivity.this);
-            db.favouriteVideoDao().insert(new FavouriteItem(itemx.getFile().getAbsolutePath(), itemx.getFile().getName(), false, "20 jun", "2 mb", position));
+//            AppDatabase db = AppDatabase.getInstance(InternalStorageActivity.this);
+//            db.favouriteVideoDao().insert(new FavouriteItem(itemx.getFile().getAbsolutePath(), itemx.getFile().getName(), false, "20 jun", "2 mb", position));
 
 
             inStorageToolbar.setVisibility(View.GONE);
@@ -257,7 +257,7 @@ public class InternalStorageActivity extends AppCompatActivity {
                     btnNewMFolder.setVisibility(View.VISIBLE);
                     inStorageToolbar.setTitle("My files");
                     isOpenWith = true;
-                    inStorageToolbar.setSubtitle(folderCount + " Folder" + fileCount + " Files");
+                    inStorageToolbar.setSubtitle(folderCount + " Folder " + fileCount + " Files");
 
                 }
 
@@ -293,7 +293,6 @@ public class InternalStorageActivity extends AppCompatActivity {
     }
 
     // loading file with sorting
-
     void fileLoading(String path) {
 
         currentPath = path;
@@ -614,13 +613,13 @@ public class InternalStorageActivity extends AppCompatActivity {
 
 //            MIME (Multipurpose Internet Mail Extensions) type ek standard hota hai jo batata hai ki file ka type/content kya hai.
 
-            String mime = URLConnection.guessContentTypeFromName(clickedFile.getName());
+            String mine = URLConnection.guessContentTypeFromName(clickedFile.getName());
 
-            if (mime != null && mime.startsWith("audio")) {
+            if (mine != null && mine.startsWith("audio")) {
 
                 try {
 
-                    Uri audioUri = FileProvider.getUriForFile(this, this.getPackageName() + ".provider", clickedFile);
+                    Uri audioUri = FileProvider.getUriForFile(InternalStorageActivity.this, this.getPackageName() + ".provider", clickedFile);
 
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setDataAndType(audioUri, "audio/*");
@@ -631,7 +630,7 @@ public class InternalStorageActivity extends AppCompatActivity {
                     Toast.makeText(this, "Cannot play audio " + e.getMessage(), Toast.LENGTH_SHORT).show();
 
                 }
-            } else if (mime != null && mime.startsWith("image")) {
+            } else if (mine != null && mine.startsWith("image")) {
 
                 try {
 
@@ -646,7 +645,7 @@ public class InternalStorageActivity extends AppCompatActivity {
                     Toast.makeText(this, "Cannot open image " + e.getMessage(), Toast.LENGTH_SHORT).show();
 
                 }
-            } else if (mime != null && mime.startsWith("application/pdf")) {
+            } else if (mine != null && mine.startsWith("application/pdf")) {
 
                 try {
                     Toast.makeText(InternalStorageActivity.this, "PDF FIle", Toast.LENGTH_SHORT).show();
@@ -659,7 +658,7 @@ public class InternalStorageActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     Toast.makeText(this, "No Pdf Reader Installed", Toast.LENGTH_SHORT).show();
                 }
-            } else if (mime != null && mime.startsWith("video/")) {
+            } else if (mine != null && mine.startsWith("video/")) {
                 try {
 
                     Uri videoUri = FileProvider.getUriForFile(this, this.getPackageName() + ".provider", clickedFile);
@@ -672,7 +671,7 @@ public class InternalStorageActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     Toast.makeText(this, "NO Video Player" + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
-            } else if (mime != null && mime.startsWith("apk")) {
+            } else if (mine != null && mine.startsWith("apk")) {
 
                 apkFileToInstall = clickedFile;
 
@@ -743,19 +742,6 @@ public class InternalStorageActivity extends AppCompatActivity {
         bottomSheetDialog.show();
     }
 
-
-//    @Override
-//    public boolean onPrepareOptionsMenu(Menu menu) {
-//        MenuItem selectAllItem = menu.findItem(R.id.menu_select_all);
-//
-//        if (isSelected) {
-//            selectAllItem.setTitle("Deselect All");
-//
-//        } else {
-//            selectAllItem.setTitle("Select All");
-//        }
-//    }
-
     private void showPopupMenu(View anchorView, ISAdapter item, int position) {
 
         PopupMenu popupMenu = new PopupMenu(InternalStorageActivity.this, anchorView);
@@ -800,7 +786,7 @@ public class InternalStorageActivity extends AppCompatActivity {
                 singleFileShare(item.getFile());
 
             } else if (id == R.id.selRename) {
-                singleFileFavourite(item.getFile());
+
             } else if (id == R.id.selMove) {
 
 //                selectedFile.add(item.getFile().getAbsolutePath());
@@ -839,26 +825,6 @@ public class InternalStorageActivity extends AppCompatActivity {
 
     }
 
-//    if (isFav) {
-//        db.favouriteVideoDao().delete(video);
-//        heartIcon.setImageResource(R.drawable.ic_heart_outline);
-//    } else {
-//        db.favouriteVideoDao().insert(video);
-//        heartIcon.setImageResource(R.drawable.ic_heart_filled);
-//    }
-
-    boolean isFav = false;
-
-    private void singleFileFavourite(File file) {
-        if (!isFav) {
-            new FavouriteItem(file.getAbsolutePath(), file.getName(), false, "12 jan", "5 MB", 1);
-        } else {
-
-        }
-        isFav = !isFav;
-
-
-    }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -1442,7 +1408,6 @@ public class InternalStorageActivity extends AppCompatActivity {
 //
 //    }
 
-
     void singleFileShare(File file) {
 
         try {
@@ -1506,6 +1471,7 @@ public class InternalStorageActivity extends AppCompatActivity {
 
     private String getMimeType(Uri uri) {
         ContentResolver cr = getContentResolver();
+
         return cr.getType(uri);
     }
 
@@ -1526,15 +1492,15 @@ public class InternalStorageActivity extends AppCompatActivity {
 
             for (ISAdapter adapterItem : selectedItems) {
 
-                FavouriteItem favItem = new FavouriteItem(
-                        adapterItem.getFile().getAbsolutePath(),
-                        adapterItem.getFile().getName(),
-                        false,
-                        "12 jan",
-                        "5 MB",
-                        1
-                );
-                dao.insert(favItem);
+//                FavouriteItem favItem = new FavouriteItem(
+//                        adapterItem.getFile().getAbsolutePath(),
+//                        adapterItem.getFile().getName(),
+//                        false,
+//                        "12 jan",
+//                        "5 MB",
+//                        1
+//                );
+//                dao.insert(favItem);
             }
 
             runOnUiThread(() ->

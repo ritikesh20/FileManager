@@ -1,4 +1,4 @@
-package com.example.filemanager.videolist;
+package com.example.filemanager.favouritesection;
 
 import android.view.View;
 import android.widget.ImageView;
@@ -7,7 +7,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.example.filemanager.R;
-import com.example.filemanager.favouritesection.FavouriteItem;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.items.AbstractItem;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
@@ -18,11 +17,16 @@ import java.util.List;
 
 public class FavouriteAdapter extends AbstractItem<FavouriteAdapter, FavouriteAdapter.ViewHolder> {
 
-    private final FavouriteItem favouriteItem;
+    FavouriteItem favouriteItem;
 
     public FavouriteAdapter(FavouriteItem favouriteItem) {
         this.favouriteItem = favouriteItem;
     }
+
+//    @Override
+//    public boolean isSelectable() {
+//        return true;
+//    }
 
     @NonNull
     @Override
@@ -45,6 +49,7 @@ public class FavouriteAdapter extends AbstractItem<FavouriteAdapter, FavouriteAd
         ImageView musicIcon;
         TextView musicName, musicDate, musicSize;
         IconicsImageView favListIcons;
+        IconicsImageView btnFavMenu;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -54,6 +59,8 @@ public class FavouriteAdapter extends AbstractItem<FavouriteAdapter, FavouriteAd
             musicDate = itemView.findViewById(R.id.tvFileModifierData);
             musicSize = itemView.findViewById(R.id.tvFileSize);
             favListIcons = itemView.findViewById(R.id.favIconFav);
+            btnFavMenu = itemView.findViewById(R.id.btnFileDot);
+
         }
 
 
@@ -64,6 +71,13 @@ public class FavouriteAdapter extends AbstractItem<FavouriteAdapter, FavouriteAd
             musicName.setText(item.favouriteItem.getName());
             musicDate.setText(item.favouriteItem.getDateAdded());
             musicSize.setText(item.favouriteItem.getSize());
+
+            if (item.isSelected()) {
+                btnFavMenu.setIcon(new IconicsDrawable(itemView.getContext(), GoogleMaterial.Icon.gmd_check_circle).actionBar());
+            } else {
+                btnFavMenu.setIcon(new IconicsDrawable(itemView.getContext(), GoogleMaterial.Icon.gmd_more_vert).actionBar());
+            }
+
 
             favListIcons.setIcon(new IconicsDrawable(itemView.getContext(), GoogleMaterial.Icon.gmd_star).actionBar());
 

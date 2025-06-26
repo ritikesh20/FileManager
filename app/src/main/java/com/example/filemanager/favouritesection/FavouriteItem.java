@@ -13,16 +13,19 @@ public class FavouriteItem {
     public boolean isFolder;
     public String dateAdded;
     public String size;
+    public String mimeView;
     public int position;
 
-    public FavouriteItem (){}
+    public FavouriteItem() {
+    }
 
-    public FavouriteItem(String uri, String name, boolean isFolder, String dateAdded,String size, int position) {
+    public FavouriteItem(String uri, String name, boolean isFolder, String dateAdded, String size, String mimeView, int position) {
         this.uri = uri;
         this.name = name;
         this.isFolder = isFolder;
         this.dateAdded = dateAdded;
         this.size = size;
+        this.mimeView = mimeView;
         this.position = position;
 
     }
@@ -49,6 +52,10 @@ public class FavouriteItem {
 
     public String getSize() {
         return size;
+    }
+
+    public String getMimeView() {
+        return mimeView;
     }
 
     public int getPosition() {

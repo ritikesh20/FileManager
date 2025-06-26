@@ -24,18 +24,17 @@ public class FileHelperAdapter extends AbstractItem<FileHelperAdapter, FileHelpe
     String docDate;
     String size;
 
-//    private boolean isFavourite;
-//
-//    public boolean isFavourite() {
-//        return isFavourite;
-//    }
-//
-//    public void setFavourite(boolean favourite) {
-//        isFavourite = favourite;
-//    }
+    private boolean isFavourite;
 
-    public FileHelperAdapter() {
+    public boolean isFavourite() {
+        return isFavourite;
     }
+
+    public void setFavourite(boolean favourite) {
+        isFavourite = favourite;
+    }
+
+    public FileHelperAdapter() {}
 
     public FileHelperAdapter(Uri uri, String name, String mineTypes, String docDate, String size) {
         this.uri = uri;
@@ -111,6 +110,7 @@ public class FileHelperAdapter extends AbstractItem<FileHelperAdapter, FileHelpe
         public void bindView(FileHelperAdapter item, @NonNull List<Object> payloads) {
 
             String mime = item.mineTypes;
+
             if (mime != null) {
                 if (mime.startsWith("image/")) {
                     Glide.with(itemView.getContext()).load(item.uri).placeholder(R.drawable.img).error(R.drawable.img).into(fileIcons);
@@ -144,12 +144,12 @@ public class FileHelperAdapter extends AbstractItem<FileHelperAdapter, FileHelpe
             }
 
 
-//            if (item.isFavourite) {
-//                fileFavIcon.setVisibility(View.VISIBLE);
-//                fileFavIcon.setIcon(new IconicsDrawable(itemView.getContext(), GoogleMaterial.Icon.gmd_star).actionBar());
-//            } else {
-//                fileFavIcon.setVisibility(View.GONE);
-//            }
+            if (item.isFavourite) {
+                fileFavIcon.setVisibility(View.VISIBLE);
+                fileFavIcon.setIcon(new IconicsDrawable(itemView.getContext(), GoogleMaterial.Icon.gmd_star).actionBar());
+            } else {
+                fileFavIcon.setVisibility(View.GONE);
+            }
 
 
         }

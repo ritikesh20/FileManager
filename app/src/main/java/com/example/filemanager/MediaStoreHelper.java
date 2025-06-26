@@ -14,14 +14,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.filemanager.document.FileHelperAdapter;
 import com.example.filemanager.internalstorage.InternalStorageActivity;
-import com.example.filemanager.music.MusicAdapter;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -151,7 +148,7 @@ public class MediaStoreHelper {
 
                         String newDate = DateFormat.format("dd MMM yyy", new Date(data)).toString();
 
-                        String newSize = sizeCal(size);
+                        String newSize = FileOperation.sizeCal(size);
 
                         Uri contentUri = ContentUris.withAppendedId(fileUri, id);
 
@@ -173,38 +170,6 @@ public class MediaStoreHelper {
 
     }
 
-
-    public static void fileOpenWith(Context context, Uri uri, String mimeType) {
-
-        try {
-
-            Intent intentOpenWith = new Intent(Intent.ACTION_VIEW);
-            intentOpenWith.setDataAndType(uri, mimeType);
-            intentOpenWith.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
-            intentOpenWith.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-            context.startActivity(Intent.createChooser(intentOpenWith, "Open With"));
-        } catch (Exception e) {
-            Toast.makeText(context, "Cannot open this file", Toast.LENGTH_SHORT).show();
-            throw new RuntimeException(e);
-        }
-
-    }
-
-    private static String sizeCal(long size) {
-
-        float kb = size / 1024f;
-        float mb = kb / 1024f;
-        float gb = mb / 1024f;
-
-        if (gb >= 1) {
-            return String.format("%.2f Gb", gb);
-        } else if (mb >= 1) {
-            return String.format("%.2f Mb", mb);
-        } else {
-            return String.format("%.2f KB", kb);
-        }
-    }
 
     // option to selected internal storage or sd Card
     public static void goStorageTypes(Context context, String title) {

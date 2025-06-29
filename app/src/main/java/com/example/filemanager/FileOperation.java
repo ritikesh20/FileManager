@@ -21,6 +21,7 @@ import com.example.filemanager.document.FileHelperAdapter;
 import com.example.filemanager.favouritesection.AppDatabase;
 import com.example.filemanager.favouritesection.FavouriteDao;
 import com.example.filemanager.favouritesection.FavouriteItem;
+import com.example.filemanager.music.NewSearchActivity;
 import com.mikepenz.fastadapter.adapters.ItemAdapter;
 import com.mikepenz.fastadapter.select.SelectExtension;
 
@@ -41,9 +42,17 @@ public class FileOperation {
      move to -> copy to -> back up to google drive -> file info
      */
 
-//    selected
-    public static List<FileHelperAdapter> getSelectedFiles(ItemAdapter<FileHelperAdapter> itemAdapter,
-                                                           SelectExtension<FileHelperAdapter> selectExtension) {
+    public static void searchingIntent(Activity activity) {
+        Intent searching = new Intent(activity, NewSearchActivity.class);
+        activity.startActivity(searching);
+    }
+
+
+    //    selected
+    public static List<FileHelperAdapter> getSelectedFiles(
+
+            ItemAdapter<FileHelperAdapter> itemAdapter,
+            SelectExtension<FileHelperAdapter> selectExtension) {
 
         List<FileHelperAdapter> selectedFiles = new ArrayList<>();
 
@@ -106,37 +115,38 @@ public class FileOperation {
 
     }
 
-//    public static void sendToFavourite(Activity activity, SelectExtension<FileHelperAdapter> selectExtension) {
-//
-//        Set<FileHelperAdapter> selectedFavItem = selectExtension.getSelectedItems();
-//
-//        if (selectedFavItem.isEmpty()) {
-//            Toast.makeText(activity, "No file selected", Toast.LENGTH_SHORT).show();
-//            return;
-//        }
-//
-//        ExecutorService executor = Executors.newSingleThreadExecutor();
-//
-//        executor.execute(() -> {
-//            FavouriteDao dao = AppDatabase.getInstance(activity).favouriteVideoDao();
-//
-//            for (FileHelperAdapter fileHelperAdapter : selectedFavItem) {
-//                FavouriteItem favouriteItem = new FavouriteItem(
-//                        fileHelperAdapter.getUri().toString(),
-//                        fileHelperAdapter.getName(),
-//                        false,
-//                        fileHelperAdapter.getDocDate(),
-//                        fileHelperAdapter.getSize(),
-//                        0
-//                );
-//                dao.insert(favouriteItem);
-//            }
-//
-//            activity.runOnUiThread(() ->
-//                    Toast.makeText(activity, "File Add to Favourite Successfully", Toast.LENGTH_SHORT).show()
-//            );
-//        });
-//    }
+    public static void sendToFavourite(Activity activity, SelectExtension<FileHelperAdapter> selectExtension) {
+
+        Set<FileHelperAdapter> selectedFavItem = selectExtension.getSelectedItems();
+
+        if (selectedFavItem.isEmpty()) {
+            Toast.makeText(activity, "No file selected", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+
+        executor.execute(() -> {
+            FavouriteDao dao = AppDatabase.getInstance(activity).favouriteVideoDao();
+
+            for (FileHelperAdapter fileHelperAdapter : selectedFavItem) {
+                FavouriteItem favouriteItem = new FavouriteItem(
+                        fileHelperAdapter.getUri().toString(),
+                        fileHelperAdapter.getName(),
+                        false,
+                        fileHelperAdapter.getDocDate(),
+                        fileHelperAdapter.getSize(),
+                        fileHelperAdapter.getMineTypes(),
+                        0
+                );
+                dao.insert(favouriteItem);
+            }
+
+            activity.runOnUiThread(() ->
+                    Toast.makeText(activity, "File Add to Favourite Successfully", Toast.LENGTH_SHORT).show()
+            );
+        });
+    }
 
     public static void shareFilesToGoogleDrive(Context context, List<FileHelperAdapter> selectedFiles) {
         if (selectedFiles == null || selectedFiles.isEmpty()) {
@@ -214,7 +224,6 @@ public class FileOperation {
 
         alertDialog.show();
     }
-
 
 
     public static void showRenameDialog(Activity activity, ItemAdapter<FileHelperAdapter> itemAdapter, SelectExtension<FileHelperAdapter> selectExtension) {

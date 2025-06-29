@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".internalstorage.FileInfoActivity">
+
+    <LinearLayout
+        android:id="@+id/linearLayout16"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.mikepenz.iconics.view.IconicsImageView
+            android:id="@+id/fileInfoImage"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:src="@drawable/delete" />
+
+        <TextView
+            android:id="@+id/fileInfoName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="20dp"
+            android:text="VIDE_20250521"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp">
+
+            <com.mikepenz.iconics.view.IconicsImageView
+                android:id="@+id/fileNameIcons"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="20dp"
+                android:padding="10dp"
+                android:src="@drawable/download" />
+
+            <TextView
+                android:id="@+id/fileInfoPathName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="80dp"
+                android:text="fileInfoPathName" />
+
+            <TextView
+                android:id="@+id/fileInfoSize"
+                android:layout_width="match_parent"
+                android:layout_height="25dp"
+                android:layout_marginStart="80dp"
+                android:layout_marginTop="25dp"
+                android:text="fileInfoSize"
+                android:textSize="12sp" />
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp">
+
+            <com.mikepenz.iconics.view.IconicsImageView
+                android:id="@+id/fileIconModifiedDate"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="20dp"
+                android:padding="10dp"
+                android:src="@drawable/download" />
+
+            <TextView
+                android:id="@+id/fileInfoModifiedDate"
+                android:layout_width="match_parent"
+                android:layout_height="25dp"
+                android:layout_marginStart="80dp"
+                android:text="Modified  22 June 2:244 am" />
+
+        </FrameLayout>
+
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

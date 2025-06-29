@@ -30,6 +30,7 @@ public class ClipboardHelper {
         return filePaths;
     }
 
+
     public static boolean isCut() { // if isCut == true then cut operation else id isCut == false copyOperation
         return isCutOperation;
     }

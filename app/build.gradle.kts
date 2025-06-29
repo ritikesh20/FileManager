@@ -79,5 +79,7 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     annotationProcessor("androidx.room:room-compiler:2.6.1")
 
+    implementation("androidx.preference:preference:1.2.1")
+
 
 }

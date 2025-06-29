@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
@@ -27,6 +26,14 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
+                android:id="@+id/tvModifierData"
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:text="20/may/2020"
+                android:textSize="11sp"
+                android:visibility="gone" />
+
+            <TextView
                 android:id="@+id/textHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -37,14 +44,14 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:visibility="gone" />
-<!--            image view-->
-            <LinearLayout
+            <!--            image view-->
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <ImageView
+                <com.mikepenz.iconics.view.IconicsImageView
                     android:id="@+id/file_icon_image"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -52,55 +59,66 @@
                     android:scaleType="centerCrop"
                     android:src="@drawable/openfolder" />
 
-
-            </LinearLayout>
-
-<!--            space bar-->
-            <com.google.android.material.divider.MaterialDivider
-                android:layout_width="match_parent"
-                android:layout_height="2dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#2196F3"
-                android:orientation="horizontal">
-
                 <LinearLayout
-                    android:layout_width="80dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/file_name_text_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:maxLines="1"
-                        android:text="File Name"
-                        android:textSize="14sp" />
-
-                    <TextView
-                        android:id="@+id/tvModifierData"
-                        android:layout_width="70dp"
-                        android:layout_height="wrap_content"
-                        android:text="20/may/2020"
-                        android:textSize="11sp" />
+                    android:layout_marginStart="80dp"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/tvSize"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="200 KB" />
+                        android:text="200 KB"
+                        android:textSize="12sp" />
+
+                    <com.mikepenz.iconics.view.IconicsImageView
+                        android:id="@+id/btnFileType"
+                        android:layout_width="10dp"
+                        android:visibility="gone"
+                        android:layout_height="10dp"
+                        android:layout_marginStart="10dp"
+                        android:src="@drawable/share" />
 
                 </LinearLayout>
 
                 <com.mikepenz.iconics.view.IconicsImageView
                     android:id="@+id/btnFileDetails"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    />
-            </LinearLayout>
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="10dp"
+                    android:src="@drawable/share" />
+
+                <com.mikepenz.iconics.view.IconicsImageView
+                    android:id="@+id/favIcon"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="80dp"
+                    android:src="@color/black" />
+
+                <TextView
+                    android:id="@+id/file_name_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="25dp"
+                    android:layout_marginTop="80dp"
+                    android:maxLines="1"
+                    android:text="File Name"
+                    android:textSize="14sp" />
+
+                <com.mikepenz.iconics.view.IconicsImageView
+                    android:id="@+id/btnFileIcon"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="10dp"
+                    android:src="@drawable/share" />
+
+
+            </FrameLayout>
 
         </LinearLayout>
 
@@ -108,3 +126,4 @@
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

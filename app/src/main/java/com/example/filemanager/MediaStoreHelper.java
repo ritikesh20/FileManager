@@ -31,7 +31,6 @@ public class MediaStoreHelper {
         void onFilesLoaded(List<FileHelperAdapter> files);
     }
 
-
     public static void loadFile(Context context, String type, FileLoadCallback callback) {
 
         ExecutorService executorService = Executors.newSingleThreadExecutor();

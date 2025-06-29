@@ -25,12 +25,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.filemanager.MediaStoreHelper;
 import com.example.filemanager.R;
+import com.example.filemanager.document.FileHelperAdapter;
 import com.example.filemanager.internalstorage.ClipboardHelper;
 import com.example.filemanager.internalstorage.InternalStorageActivity;
 import com.mikepenz.fastadapter.FastAdapter;
-import com.mikepenz.fastadapter.IAdapter;
 import com.mikepenz.fastadapter.adapters.ItemAdapter;
-import com.mikepenz.fastadapter.listeners.OnLongClickListener;
 import com.mikepenz.fastadapter.select.SelectExtension;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
@@ -51,12 +50,17 @@ public class MusicActivity extends AppCompatActivity {
 
     private RecyclerView recyclerViewMusic;
 
-    private ItemAdapter<MusicAdapter> itemAdapterMusic;
-    private FastAdapter<MusicAdapter> fastAdapterMusic;
+//    private ItemAdapter<MusicAdapter> itemAdapterMusic;
+//    private FastAdapter<MusicAdapter> fastAdapterMusic;
+//    private List<MusicAdapter> musicList = new ArrayList<>();
+//    private SelectExtension<MusicAdapter> selectExtension;
 
-    List<MusicAdapter> musicList = new ArrayList<>();
+    private ItemAdapter<FileHelperAdapter> itemAdapterMusic;
+    private FastAdapter<FileHelperAdapter> fastAdapterMusic;
+    List<FileHelperAdapter> musicList = new ArrayList<>();
 
-    SelectExtension<MusicAdapter> selectExtension;
+    SelectExtension<FileHelperAdapter> selectExtension;
+
 
     Button btnMusicCopy;
     Button btnMusicMove;
@@ -67,7 +71,7 @@ public class MusicActivity extends AppCompatActivity {
     private boolean isCutMode = false;
     private boolean isAllFileSelected = false;
 
-    private File destination = InternalStorageActivity.currentDirectory;
+    private final File destination = InternalStorageActivity.currentDirectory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,42 +108,43 @@ public class MusicActivity extends AppCompatActivity {
         selectExtension.withMultiSelect(true);
         selectExtension.withSelectWithItemUpdate(true);
 
-        fastAdapterMusic.withOnLongClickListener(new OnLongClickListener<MusicAdapter>() {
-            @Override
-            public boolean onLongClick(View v, IAdapter<MusicAdapter> adapter, MusicAdapter item, int position) {
+//        fastAdapterMusic.withOnLongClickListener(new OnLongClickListener<MusicAdapter>() {
+//            @Override
+//            public boolean onLongClick(View v, IAdapter<MusicAdapter> adapter, MusicAdapter item, int position) {
+//
+//                selectExtension.toggleSelection(position);
+//
+//                return false;
+//            }
+//        });
 
-                selectExtension.toggleSelection(position);
 
-                return false;
-            }
-        });
-
-
-        btnMusicCopy.setOnClickListener(v -> {
-            isCutMode = false;
-            fileSelected();
-            MediaStoreHelper.goStorageTypes(this, "Move to");
-            btnMusicPasting.setVisibility(View.VISIBLE);
-        });
-
-        btnMusicMove.setOnClickListener(v -> {
-            isCutMode = true;
-            fileSelected();
-            MediaStoreHelper.goStorageTypes(this, "Copy to");
-            btnMusicPasting.setVisibility(View.VISIBLE);
-        });
+//        btnMusicCopy.setOnClickListener(v -> {
+//            isCutMode = false;
+//            fileSelected();
+//            MediaStoreHelper.goStorageTypes(this, "Move to");
+//            btnMusicPasting.setVisibility(View.VISIBLE);
+//        });
+//
+//        btnMusicMove.setOnClickListener(v -> {
+//            isCutMode = true;
+//            fileSelected();
+//            MediaStoreHelper.goStorageTypes(this, "Copy to");
+//            btnMusicPasting.setVisibility(View.VISIBLE);
+//        });
 
         isPastDeselect();
 //        uploadMusic();
-        loadingMusic();
 
-    }
-
-    void loadingMusic() {
-        MediaStoreHelper.loadFile(this, "audio", files -> {
-            Toast.makeText(this, "Music Loading Successfully", Toast.LENGTH_SHORT).show();
+        MediaStoreHelper.loadFile(this, "Audio", files -> {
+            musicList.clear();
+            musicList.addAll(files);
+            itemAdapterMusic.setNewList(files);
+            fastAdapterMusic.notifyDataSetChanged();
         });
+
     }
+
 
     void uploadMusic() {
 
@@ -171,7 +176,7 @@ public class MusicActivity extends AppCompatActivity {
                         File file = new File(path);
 
                         if (file.exists() && path.endsWith(".mp3")) {
-                            musicList.add(new MusicAdapter(file));
+//                            musicList.add(new MusicAdapter(file));
                         }
 
                     }
@@ -257,7 +262,6 @@ public class MusicActivity extends AppCompatActivity {
         return super.onPrepareOptionsMenu(menu);
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -340,8 +344,12 @@ public class MusicActivity extends AppCompatActivity {
 
         selectedFile = new ArrayList<>();
 
-        for (MusicAdapter select : selectExtension.getSelectedItems()) {
-            selectedFile.add(select.getFile().getAbsolutePath());
+//        for (MusicAdapter select : selectExtension.getSelectedItems()) {
+//            selectedFile.add(select.getFile().getAbsolutePath());
+//        }
+//
+        for (FileHelperAdapter select : selectExtension.getSelectedItems()) {
+            selectedFile.add(select.getUri().toString());
         }
 
         if (isCutMode) {

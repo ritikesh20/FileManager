@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <PreferenceCategory android:title="General Settings">
+
+        <ListPreference
+            android:defaultValue="50"
+            android:entries="@array/RecentFile"
+            android:entryValues="@array/RecentFile_values"
+            android:icon="@drawable/device"
+            android:key="recentFile_size"
+            android:summary="Select recent file size"
+            android:title="My RecentFile size" />
+
+
+        <SwitchPreference
+            android:key="dark_mode"
+            android:summary="Enable or disable dark Mode"
+            android:title="DarkMode" />
+
+    </PreferenceCategory>
+
+
+</androidx.preference.PreferenceScreen>

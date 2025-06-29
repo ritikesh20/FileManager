@@ -1,5 +1,6 @@
 package com.example.filemanager.videolist;
 
+
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,13 +13,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.documentfile.provider.DocumentFile;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -31,11 +32,11 @@ import com.example.filemanager.favouritesection.AppDatabase;
 import com.example.filemanager.favouritesection.FavouriteDao;
 import com.example.filemanager.favouritesection.FavouriteItem;
 import com.example.filemanager.internalstorage.InternalStorageActivity;
+import com.google.android.material.textfield.TextInputEditText;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.IAdapter;
 import com.mikepenz.fastadapter.ISelectionListener;
 import com.mikepenz.fastadapter.adapters.ItemAdapter;
-import com.mikepenz.fastadapter.listeners.OnClickListener;
 import com.mikepenz.fastadapter.listeners.OnLongClickListener;
 import com.mikepenz.fastadapter.select.SelectExtension;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
@@ -53,19 +54,18 @@ public class VideoActivity extends AppCompatActivity {
 
     FileHelperAdapter item;
     SharedPreferences sharedPreferences;
-
+    public static boolean isVideoView = false;
+    private Toolbar toolbarVideo;
     private RecyclerView recyclerViewVideo;
     private ItemAdapter<FileHelperAdapter> itemAdapterVideo;
-    FastAdapter<FileHelperAdapter> fastAdapterVideo;
-    List<FileHelperAdapter> videoList = new ArrayList<>();
-
-    private Toolbar toolbarVideo;
-    boolean isAllFileSelected = false;
+    private FastAdapter<FileHelperAdapter> fastAdapterVideo;
+    private List<FileHelperAdapter> videoList = new ArrayList<>();
     private SelectExtension<FileHelperAdapter> selectExtension;
+
+    private boolean isAllFileSelected = false;
 
     private List<FileHelperAdapter> selectedFiles = new ArrayList<>();
 
-//    public static File currentDirectory;
 
     Button btnVideoPasting;
     File currentDirectory = InternalStorageActivity.currentDirectory;
@@ -76,13 +76,8 @@ public class VideoActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_video);
 
-//        currentDirectory = new File(Environment.getExternalStorageDirectory(), "MyVideoPasteFolder");
-//        if (!currentDirectory.exists()) currentDirectory.mkdirs();
-        VideoClipboardHelper.loadFromPrefs(this);
         btnVideoPasting = findViewById(R.id.btnVideoPasting);
-
         toolbarVideo = findViewById(R.id.toolbarVideo);
-
         sharedPreferences = getSharedPreferences("MyViewPrefs", MODE_PRIVATE);
 
         setSupportActionBar(toolbarVideo);
@@ -96,7 +91,7 @@ public class VideoActivity extends AppCompatActivity {
         recyclerViewVideo = findViewById(R.id.recyclerViewVideo);
         itemAdapterVideo = new ItemAdapter<>();
         fastAdapterVideo = FastAdapter.with(itemAdapterVideo);
-        recyclerViewVideo.setLayoutManager(new LinearLayoutManager(this));
+
 
         selectExtension = fastAdapterVideo.getExtension(SelectExtension.class);
 
@@ -104,16 +99,13 @@ public class VideoActivity extends AppCompatActivity {
             selectExtension = new SelectExtension<>();
             fastAdapterVideo.addExtension(selectExtension);
         }
-
         selectExtension.withSelectable(true);
         selectExtension.withMultiSelect(true);
         selectExtension.withSelectWithItemUpdate(true);
-
-        recyclerViewVideo.setAdapter(fastAdapterVideo);
+        layout();
 
         // loading video
         MediaStoreHelper.loadFile(this, "video", files -> {
-
             videoList.clear();
             videoList.addAll(files);
             itemAdapterVideo.setNewList(files);
@@ -121,348 +113,68 @@ public class VideoActivity extends AppCompatActivity {
 
         });
 
-        if (VideoClipboardHelper.hasData()) {
-            btnVideoPasting.setVisibility(View.VISIBLE);
-        } else {
-            btnVideoPasting.setVisibility(View.GONE);
-        }
+//        if (VideoClipboardHelper.hasData()) {
+//            btnVideoPasting.setVisibility(View.VISIBLE);
+//        } else {
+//            btnVideoPasting.setVisibility(View.GONE);
+//        }
 
+//        fastAdapterVideo.withOnClickListener((v, adapter, item, position) -> {
+//
+//            if (v != null) {
+//                FileOperation.fileOpenWith(v.getContext(), item.getUri(), item.getMineTypes());
+//            }
+//
+//            return true;
+//        });
 
-    }
+        fastAdapterVideo.withOnLongClickListener((v, adapter, item, position) -> {
 
+            selectExtension.toggleSelection(position);
 
-    private void selectedFiles() {
+            selectExtension.withSelectionListener((items, selected) -> {
 
-        selectedFiles.clear();
-
-        for (int index : selectExtension.getSelections()) {
-            FileHelperAdapter item = itemAdapterVideo.getAdapterItem(index);
-            if (item != null) selectedFiles.add(item);
-        }
-
-    }
-
-    private void selectedSendToFav() {
-
-        Set<FileHelperAdapter> selectedFavItem = selectExtension.getSelectedItems();
-
-        if (selectedFavItem.isEmpty()) {
-            Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                FavouriteDao dao = AppDatabase.getInstance(VideoActivity.this).favouriteVideoDao();
-
-                for (FileHelperAdapter fileHelperAdapter : selectedFavItem) {
-                    FavouriteItem favouriteItem = new FavouriteItem(
-                            fileHelperAdapter.getUri().toString(),
-                            fileHelperAdapter.getName(),
-                            false,
-                            "" + fileHelperAdapter.getDocDate(),
-                            "" + fileHelperAdapter.getSize(),
-                            fileHelperAdapter.getMineTypes(),
-                            0
-                    );
-                    dao.insert(favouriteItem);
-                }
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(VideoActivity.this, "File Add to Favourite Successfully", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-        });
-
-
-    }
-
-    private void newShareSelectedFiles() {
-
-        selectedFiles();
-
-        if (selectedFiles.isEmpty()) {
-            Toast.makeText(this, "No files selected", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        ArrayList<Uri> uris = new ArrayList<>();
-        for (FileHelperAdapter item : selectedFiles) {
-            uris.add(item.getUri());
-        }
-
-        Intent shareIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
-        shareIntent.setType("*/*");
-        shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
-        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-        startActivity(Intent.createChooser(shareIntent, "Share files via"));
-    }
-
-    private void showRenameInputDialog() {
-
-        for (Integer index : selectExtension.getSelections()) {
-            item = itemAdapterVideo.getAdapterItem(index);
-        }
-
-//        int index = selectExtension.getSelections().iterator().next();
-//        FileHelperAdapter item = itemAdapterVideo.getAdapterItem(index);
-
-//        List<Integer> indexOfFile = new ArrayList<>(selectExtension.getSelections());
-//        int indexx = indexOfFile.get(0);
-//        FileHelperAdapter itemx = itemAdapterVideo.getAdapterItem(indexx);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Rename File");
-
-        final EditText input = new EditText(this);
-        input.setHint("Enter new file name");
-        input.setText(item.getName());
-        builder.setView(input);
-
-        builder.setPositiveButton("Rename", (dialog, which) -> {
-            String newName = input.getText().toString().trim();
-
-            if (!newName.isEmpty()) {
-                Uri fileUri = item.getUri();
-                boolean success = FileOperation.showRenameFileDialog(this, fileUri, newName);
-                recreate();
-                Toast.makeText(this, success ? "File renamed successfully" : "Failed to rename file", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, "File name cannot be empty", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
-
-
-        builder.show();
-    }
-
-    private void deletedSelectedFile() {
-
-        selectedFiles();
-
-        if (selectedFiles.isEmpty()) {
-            Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show();
-        }
-
-        AlertDialog.Builder deleteBuilder = new AlertDialog.Builder(this);
-        View view = LayoutInflater.from(this).inflate(R.layout.delete_item, null);
-
-        Button btnDelete = view.findViewById(R.id.btnDeleteDelete);
-        Button btnCancel = view.findViewById(R.id.btnDeleteCancel);
-        deleteBuilder.setView(view);
-
-        AlertDialog alertDialog = deleteBuilder.create();
-
-        btnDelete.setOnClickListener(v -> {
-
-            int deletedCount = 0;
-
-            for (FileHelperAdapter deleteItem : selectedFiles) {
-
-                Uri uri = deleteItem.getUri();
-
-                try {
-                    int rows = getContentResolver().delete(uri, null, null);
-                    if (rows > 0) {
-                        deletedCount++;
-                    }
-                } catch (SecurityException e) {
-                    Toast.makeText(this, "Permission denied for: " + item.getName(), Toast.LENGTH_SHORT).show();
-                }
-            }
-            alertDialog.dismiss();
-            Toast.makeText(this, deletedCount + "files deleted", Toast.LENGTH_SHORT).show();
-            recreate();
-        });
-
-
-        btnCancel.setOnClickListener(v -> {
-            alertDialog.dismiss();
-        });
-
-        alertDialog.show();
-    }
-
-    void fileLongClick() {
-        fastAdapterVideo.withOnLongClickListener(new OnLongClickListener<FileHelperAdapter>() {
-            @Override
-            public boolean onLongClick(@NonNull View v, @NonNull IAdapter<FileHelperAdapter> adapter, @NonNull FileHelperAdapter item, int position) {
-
-                selectExtension.toggleSelection(position);
-
-                selectExtension.withSelectionListener(new ISelectionListener<FileHelperAdapter>() {
-                    @Override
-                    public void onSelectionChanged(FileHelperAdapter item, boolean selected) {
-
-                        int count = selectExtension.getSelections().size();
-
-                        if (count > 0) {
-                            toolbarVideo.setTitle(count + " selected");
-                            toolbarVideo.setSubtitle(getSelectedFileSize());
-                            toolbarVideo.setSubtitle(getSelectedFileSize());
+                        int size = selectExtension.getSelections().size();
+                        if (size > 0) {
+                            toolbarVideo.setTitle(size + " selected");
                         } else {
                             toolbarVideo.setTitle("Video");
-                            toolbarVideo.setSubtitle("");
                         }
-
                     }
-                });
+            );
 
 
-                // cal add file size also
-                return true;
-            }
+            return false;
         });
+
     }
 
-    private void copyVideo() {
-        List<Uri> selectedUris = new ArrayList<>();
-        for (FileHelperAdapter item : selectExtension.getSelectedItems()) {
-            selectedUris.add(item.getUri());
+    void layout() {
+        if (isVideoView) {
+            recyclerViewVideo.setLayoutManager(new GridLayoutManager(this, 3));
+        } else {
+            recyclerViewVideo.setLayoutManager(new LinearLayoutManager(this));
         }
-        VideoClipboardHelper.copy(this, selectedUris);
-        Toast.makeText(this, "Copied to clipboard", Toast.LENGTH_SHORT).show();
-        btnVideoPasting.setVisibility(View.VISIBLE);
-        MediaStoreHelper.goStorageTypes(this, "Copy From Video");
-    }
-
-    private void moveVideo() {
-
-        List<Uri> selectedUris = new ArrayList<>();
-        for (FileHelperAdapter item : selectExtension.getSelectedItems()) {
-            selectedUris.add(item.getUri());
-        }
-        VideoClipboardHelper.cut(this, selectedUris);
-        Toast.makeText(this, "Cut to clipboard", Toast.LENGTH_SHORT).show();
-        btnVideoPasting.setVisibility(View.VISIBLE);
-
-    }
-
-    private void videoCutCopyPasting() {
-        btnVideoPasting.setOnClickListener(v -> {
-            if (!VideoClipboardHelper.hasData()) {
-                Toast.makeText(this, "Nothing to paste", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            for (Uri uri : VideoClipboardHelper.getCopiedUris()) {
-                String fileName = FileOperation.getFileNameFromUri(this, uri);
-                File destFile = new File(currentDirectory, fileName);
-
-                boolean success = FileOperation.copyFileFromUri(this, uri, destFile);
-
-                if (success) {
-                    Toast.makeText(this, "Copied: " + fileName, Toast.LENGTH_SHORT).show();
-
-                    if (VideoClipboardHelper.isCutMode()) {
-                        DocumentFile source = DocumentFile.fromSingleUri(this, uri);
-                        if (source != null && source.exists()) source.delete();
-                    }
-                } else {
-                    Toast.makeText(this, "Failed: " + fileName, Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            VideoClipboardHelper.clear(this);
-            btnVideoPasting.setVisibility(View.GONE);
-        });
+        recyclerViewVideo.setAdapter(fastAdapterVideo);
     }
 
 
-    private void click() {
-
-        fastAdapterVideo.withOnClickListener(new OnClickListener<FileHelperAdapter>() {
-            @Override
-            public boolean onClick(View v, IAdapter<FileHelperAdapter> adapter, FileHelperAdapter item, int position) {
-
-                FileOperation.fileOpenWith(v.getContext(), item.getUri(), item.getMineTypes());
-
-                return false;
-            }
-        });
-    }
-
-
-//    private void addSingleToFavourite() {
-//        FileHelperAdapter fileHelperAdapter = new FileHelperAdapter();
-//        ExecutorService executor = Executors.newSingleThreadExecutor();
-//        executor.execute(() -> {
-//            FavouriteDao dao = AppDatabase.getInstance(VideoActivity.this).favouriteVideoDao();
-//            FavouriteItem favouriteItem = new FavouriteItem(
-//                    fileHelperAdapter.getUri().toString(),
-//                    fileHelperAdapter.getName(),
-//                    false,
-//                    "" + fileHelperAdapter.getDocDate(),
-//                    "" + fileHelperAdapter.getSize(),
-//                    0
-//            );
-//            dao.insert(favouriteItem);
+//    private void selectedFiles() {
 //
-//            runOnUiThread(() ->
-//                    Toast.makeText(VideoActivity.this, "Single file added to Favourite", Toast.LENGTH_SHORT).show()
-//            );
-//        });
+//        selectedFiles.clear();
+//
+//        for (int index : selectExtension.getSelections()) {
+//            FileHelperAdapter item = itemAdapterVideo.getAdapterItem(index);
+//            if (item != null) selectedFiles.add(item);
+//        }
+//
 //    }
 
-
-    public String getSelectedFileSize() {
-
-        long fileSizeSum = 0;
-
-        for (Integer selectedItem : selectExtension.getSelections()) {
-            FileHelperAdapter fileSize = itemAdapterVideo.getAdapterItem(selectedItem);
-            fileSizeSum += parseSizeToBytes(fileSize.getSize());
-        }
-
-//        return findFileSize(fileSizeSum);
-        return FileOperation.sizeCal(fileSizeSum);
+    // for selection
+    void shareFromUtils() {
+        FileOperation.getSelectedFiles(itemAdapterVideo, selectExtension);
     }
 
-    private String findFileSize(long sizeInBytes) {
-
-        float kb = sizeInBytes / 1024f;
-        float mb = kb / 1024f;
-        float gb = mb / 1024f;
-
-        if (gb >= 1) {
-            return String.format("%.2f Gb", gb);
-        } else if (mb >= 1) {
-            return String.format("%.2f Mb", mb);
-        } else {
-            return String.format("%.2f KB", kb);
-        }
-    }
-
-    public long parseSizeToBytes(String sizeStr) {
-
-        sizeStr = sizeStr.trim().toUpperCase();
-
-        try {
-            if (sizeStr.endsWith("KB")) {
-                return (long) (Double.parseDouble(sizeStr.replace("KB", "").trim()) * 1024);
-            } else if (sizeStr.endsWith("MB")) {
-                return (long) (Double.parseDouble(sizeStr.replace("MB", "").trim()) * 1024 * 1024);
-            } else if (sizeStr.endsWith("GB")) {
-                return (long) (Double.parseDouble(sizeStr.replace("GB", "").trim()) * 1024 * 1024 * 1024);
-            } else if (sizeStr.endsWith("B")) {
-                return Long.parseLong(sizeStr.replace("B", "").trim());
-            } else {
-                return Long.parseLong(sizeStr); // assume it's already in bytes
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return 0;
-        }
-    }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -564,9 +276,13 @@ public class VideoActivity extends AppCompatActivity {
             onBackPressed();
             return true;
         } else if (id == R.id.file_search) {
-
+            openSearching();
+            return true;
         } else if (id == R.id.file_ChangeView) {
-
+            isVideoView = !isVideoView;
+            layout();
+            fastAdapterVideo.notifyDataSetChanged();
+            return true;
         } else if (id == R.id.file_Selected) {
             if (!isAllFileSelected) {
                 selectExtension.select();
@@ -575,7 +291,6 @@ public class VideoActivity extends AppCompatActivity {
                 selectExtension.deselect();
                 Toast.makeText(VideoActivity.this, "All file deSelected", Toast.LENGTH_SHORT).show();
             }
-
             isAllFileSelected = !isAllFileSelected;
 
             return true;
@@ -587,14 +302,16 @@ public class VideoActivity extends AppCompatActivity {
             newSorting();
             return true;
         } else if (id == R.id.file_OpenWith) {
-            openWithSelectedFile();
+
             return true;
         } else if (id == R.id.file_Move) {
             moveVideo();
         } else if (id == R.id.file_Copy) {
             copyVideo();
         } else if (id == R.id.file_Rename) {
+
             showRenameInputDialog();
+
             return true;
         } else if (id == R.id.file_AddToStarred) {
             selectedSendToFav();
@@ -607,6 +324,310 @@ public class VideoActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    void openSearching() {
+        FileOperation.searchingIntent(VideoActivity.this);
+    }
+
+    private void selectedSendToFav() {
+
+        Set<FileHelperAdapter> selectedFavItem = selectExtension.getSelectedItems();
+
+        if (selectedFavItem.isEmpty()) {
+            Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                FavouriteDao dao = AppDatabase.getInstance(VideoActivity.this).favouriteVideoDao();
+
+                for (FileHelperAdapter fileHelperAdapter : selectedFavItem) {
+                    FavouriteItem favouriteItem = new FavouriteItem(
+                            fileHelperAdapter.getUri().toString(),
+                            fileHelperAdapter.getName(),
+                            false,
+                            "" + fileHelperAdapter.getDocDate(),
+                            "" + fileHelperAdapter.getSize(),
+                            fileHelperAdapter.getMineTypes(),
+                            0
+                    );
+                    dao.insert(favouriteItem);
+                }
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(VideoActivity.this, "File Add to Favourite Successfully", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+
+
+    }
+
+    private void addSingleToFavourite() {
+        FileHelperAdapter fileHelperAdapter = new FileHelperAdapter();
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+            FavouriteDao dao = AppDatabase.getInstance(VideoActivity.this).favouriteVideoDao();
+            FavouriteItem favouriteItem = new FavouriteItem(
+                    fileHelperAdapter.getUri().toString(),
+                    fileHelperAdapter.getName(),
+                    false,
+                    fileHelperAdapter.getDocDate(),
+                    fileHelperAdapter.getSize(),
+                    fileHelperAdapter.getMineTypes(),
+                    0
+            );
+            dao.insert(favouriteItem);
+
+            runOnUiThread(() ->
+                    Toast.makeText(VideoActivity.this, "Single file added to Favourite", Toast.LENGTH_SHORT).show()
+            );
+        });
+    }
+
+    private void showRenameInputDialog() {
+
+        for (Integer index : selectExtension.getSelections()) {
+            item = itemAdapterVideo.getAdapterItem(index);
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        View view = LayoutInflater.from(this).inflate(R.layout.rename_item, null);
+        builder.setView(view);
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+        TextInputEditText etName = view.findViewById(R.id.etRename);
+        Button btnOkRename = view.findViewById(R.id.btnOkRename);
+        Button btnCancelRename = view.findViewById(R.id.btnCancelRename);
+
+        etName.setText(item.getName());
+
+        btnOkRename.setOnClickListener(v -> {
+
+            String newFileName = etName.getText().toString().trim();
+
+            if (!newFileName.isEmpty()) {
+                Uri fileUri = item.getUri();
+                boolean renameSuccess = FileOperation.showRenameFileDialog(this, fileUri, newFileName);
+                fastAdapterVideo.notifyDataSetChanged();
+                Toast.makeText(this, renameSuccess ? "File renamed successfully" : "Failed to rename file", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "File name cannot be empty", Toast.LENGTH_SHORT).show();
+            }
+            alertDialog.dismiss();
+        });
+
+        btnCancelRename.setOnClickListener(v -> {
+            alertDialog.dismiss();
+        });
+
+//            if (!newName.isEmpty()) {
+//                Uri fileUri = item.getUri();
+//                boolean success = FileOperation.showRenameFileDialog(this, fileUri, newName);
+//                recreate();
+//                Toast.makeText(this, success ? "File renamed successfully" : "Failed to rename file", Toast.LENGTH_SHORT).show();
+//            } else {
+//                Toast.makeText(this, "File name cannot be empty", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//
+//        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+
+//        final EditText input = new EditText(this);
+//        input.setHint("Enter new file name");
+//        input.setText(item.getName());
+//        builder.setView(input);
+//
+//        builder.setPositiveButton("Rename", (dialog, which) -> {
+//            String newName = input.getText().toString().trim();
+//
+        //        int index = selectExtension.getSelections().iterator().next();
+//        FileHelperAdapter item = itemAdapterVideo.getAdapterItem(index);
+
+//        List<Integer> indexOfFile = new ArrayList<>(selectExtension.getSelections());
+//        int indexx = indexOfFile.get(0);
+//        FileHelperAdapter itemx = itemAdapterVideo.getAdapterItem(indexx);
+
+    }
+
+    private void myFileNameEdit() {
+        FileOperation.showRenameDialog(this, itemAdapterVideo, selectExtension);
+    }
+
+    private void deletedSelectedFile() {
+
+//        selectedFiles();
+        shareFromUtils();
+
+        if (selectedFiles.isEmpty()) {
+            Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show();
+        }
+
+        AlertDialog.Builder deleteBuilder = new AlertDialog.Builder(this);
+        View view = LayoutInflater.from(this).inflate(R.layout.delete_item, null);
+
+        Button btnDelete = view.findViewById(R.id.btnDeleteDelete);
+        Button btnCancel = view.findViewById(R.id.btnDeleteCancel);
+        deleteBuilder.setView(view);
+
+        AlertDialog alertDialog = deleteBuilder.create();
+
+        btnDelete.setOnClickListener(v -> {
+
+            int deletedCount = 0;
+
+            for (FileHelperAdapter deleteItem : selectedFiles) {
+
+                Uri uri = deleteItem.getUri();
+
+                try {
+                    int rows = getContentResolver().delete(uri, null, null);
+                    if (rows > 0) {
+                        deletedCount++;
+                    }
+                } catch (SecurityException e) {
+                    Toast.makeText(this, "Permission denied for: " + item.getName(), Toast.LENGTH_SHORT).show();
+                }
+            }
+            alertDialog.dismiss();
+            Toast.makeText(this, deletedCount + "files deleted", Toast.LENGTH_SHORT).show();
+            recreate();
+        });
+
+
+        btnCancel.setOnClickListener(v -> {
+            alertDialog.dismiss();
+        });
+
+        alertDialog.show();
+    }
+
+    void fileLongClick() {
+        fastAdapterVideo.withOnLongClickListener(new OnLongClickListener<FileHelperAdapter>() {
+            @Override
+            public boolean onLongClick(@NonNull View v, @NonNull IAdapter<FileHelperAdapter> adapter, @NonNull FileHelperAdapter item, int position) {
+
+                selectExtension.toggleSelection(position);
+
+                selectExtension.withSelectionListener(new ISelectionListener<FileHelperAdapter>() {
+                    @Override
+                    public void onSelectionChanged(FileHelperAdapter item, boolean selected) {
+
+                        int count = selectExtension.getSelections().size();
+
+                        if (count > 0) {
+                            toolbarVideo.setTitle(count + " selected");
+                            toolbarVideo.setSubtitle(getSelectedFileSize());
+                            toolbarVideo.setSubtitle(getSelectedFileSize());
+                        } else {
+                            toolbarVideo.setTitle("Video");
+                            toolbarVideo.setSubtitle("");
+                        }
+
+                    }
+                });
+
+
+                // cal add file size also
+                return true;
+            }
+        });
+    }
+
+    private void copyVideo() {
+        List<Uri> selectedUris = new ArrayList<>();
+        for (FileHelperAdapter item : selectExtension.getSelectedItems()) {
+            selectedUris.add(item.getUri());
+        }
+        Toast.makeText(this, "Copied to clipboard", Toast.LENGTH_SHORT).show();
+        btnVideoPasting.setVisibility(View.VISIBLE);
+        MediaStoreHelper.goStorageTypes(this, "Copy From Video");
+    }
+
+    private void moveVideo() {
+
+        List<Uri> selectedUris = new ArrayList<>();
+        for (FileHelperAdapter item : selectExtension.getSelectedItems()) {
+            selectedUris.add(item.getUri());
+        }
+        Toast.makeText(this, "Cut to clipboard", Toast.LENGTH_SHORT).show();
+        btnVideoPasting.setVisibility(View.VISIBLE);
+
+    }
+
+    private void videoCutCopyPasting() {
+        btnVideoPasting.setOnClickListener(v -> {
+            if (!VideoClipboardHelper.hasData()) {
+                Toast.makeText(this, "Nothing to paste", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            for (Uri uri : VideoClipboardHelper.getCopiedUris()) {
+                String fileName = FileOperation.getFileNameFromUri(this, uri);
+                File destFile = new File(currentDirectory, fileName);
+
+                boolean success = FileOperation.copyFileFromUri(this, uri, destFile);
+
+                if (success) {
+                    Toast.makeText(this, "Copied: " + fileName, Toast.LENGTH_SHORT).show();
+
+                    if (VideoClipboardHelper.isCutMode()) {
+                        DocumentFile source = DocumentFile.fromSingleUri(this, uri);
+                        if (source != null && source.exists()) source.delete();
+                    }
+                } else {
+                    Toast.makeText(this, "Failed: " + fileName, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            btnVideoPasting.setVisibility(View.GONE);
+        });
+    }
+
+    public String getSelectedFileSize() {
+
+        long fileSizeSum = 0;
+
+        for (Integer selectedItem : selectExtension.getSelections()) {
+            FileHelperAdapter fileSize = itemAdapterVideo.getAdapterItem(selectedItem);
+            fileSizeSum += parseSizeToBytes(fileSize.getSize());
+        }
+
+//        return findFileSize(fileSizeSum);
+        return FileOperation.sizeCal(fileSizeSum);
+    }
+
+    public long parseSizeToBytes(String sizeStr) {
+
+        sizeStr = sizeStr.trim().toUpperCase();
+
+        try {
+            if (sizeStr.endsWith("KB")) {
+                return (long) (Double.parseDouble(sizeStr.replace("KB", "").trim()) * 1024);
+            } else if (sizeStr.endsWith("MB")) {
+                return (long) (Double.parseDouble(sizeStr.replace("MB", "").trim()) * 1024 * 1024);
+            } else if (sizeStr.endsWith("GB")) {
+                return (long) (Double.parseDouble(sizeStr.replace("GB", "").trim()) * 1024 * 1024 * 1024);
+            } else if (sizeStr.endsWith("B")) {
+                return Long.parseLong(sizeStr.replace("B", "").trim());
+            } else {
+                return Long.parseLong(sizeStr); // assume it's already in bytes
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
     }
 
     // sorting working
@@ -690,6 +711,29 @@ public class VideoActivity extends AppCompatActivity {
 //        fastAdapterVideo.notifyAdapterDataSetChanged();
     }
 
+
+    private void openSelectedFile() {
+
+        Set<Integer> selectedIndices = selectExtension.getSelections();
+
+
+        if (selectedIndices.isEmpty()) {
+            Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        int index = selectedIndices.iterator().next();
+        FileHelperAdapter selectedItem = itemAdapterVideo.getAdapterItem(index);
+
+        if (selectedItem != null) {
+            FileOperation.fileOpenWith(this, selectedItem.getUri(), selectedItem.getMineTypes());
+        } else {
+            Toast.makeText(this, "Failed to open file", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    // not using function
     private void openWith() {
 
         for (Integer index : selectExtension.getSelections()) {
@@ -704,39 +748,6 @@ public class VideoActivity extends AppCompatActivity {
         FileHelperAdapter itemz = itemAdapterVideo.getAdapterItem(video.size());
         FileOperation.fileOpenWith(this, item.getUri(), item.getMineTypes());
 
-    }
-
-
-    // sharing file working
-    private void shareSelectedFiles() {
-//
-//        Set<Integer> selectedIndexes = selectExtension.getSelections();
-//
-//        if (selectedIndexes.isEmpty()) {
-//            Toast.makeText(this, "No files selected", Toast.LENGTH_SHORT).show();
-//            return;
-//        }
-//
-//        ArrayList<Uri> urisToShare = new ArrayList<>();
-//
-//        for (int index : selectedIndexes) {
-//            FileHelperAdapter file = itemAdapterVideo.getAdapterItem(index);
-//            if (file != null) {
-//                urisToShare.add(file.getUri());
-//            }
-//        }
-//
-//        if (urisToShare.isEmpty()) {
-//            Toast.makeText(this, "No valid files to share", Toast.LENGTH_SHORT).show();
-//            return;
-//        }
-//
-//        Intent shareIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
-//        shareIntent.setType("*/*"); // Or detect the type dynamically if you prefer
-//        shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, urisToShare);
-//        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//
-//        startActivity(Intent.createChooser(shareIntent, "Share files via"));
     }
 
     private void uploadVideo() {
@@ -773,25 +784,73 @@ public class VideoActivity extends AppCompatActivity {
 
     }
 
-    private void openWithSelectedFile() {
+    // sharing file working
+    private void shareSelectedFiles() {
+//
+//        Set<Integer> selectedIndexes = selectExtension.getSelections();
+//
+//        if (selectedIndexes.isEmpty()) {
+//            Toast.makeText(this, "No files selected", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+//
+//        ArrayList<Uri> urisToShare = new ArrayList<>();
+//
+//        for (int index : selectedIndexes) {
+//            FileHelperAdapter file = itemAdapterVideo.getAdapterItem(index);
+//            if (file != null) {
+//                urisToShare.add(file.getUri());
+//            }
+//        }
+//
+//        if (urisToShare.isEmpty()) {
+//            Toast.makeText(this, "No valid files to share", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+//
+//        Intent shareIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+//        shareIntent.setType("*/*"); // Or detect the type dynamically if you prefer
+//        shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, urisToShare);
+//        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//
+//        startActivity(Intent.createChooser(shareIntent, "Share files via"));
+    }
 
-        Set<Integer> selectedIndices = selectExtension.getSelections();
+    private String findFileSize(long sizeInBytes) {
 
-        if (selectedIndices.isEmpty()) {
-            Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        float kb = sizeInBytes / 1024f;
+        float mb = kb / 1024f;
+        float gb = mb / 1024f;
 
-        // Only open first selected file
-        int index = selectedIndices.iterator().next();
-        FileHelperAdapter selectedItem = itemAdapterVideo.getAdapterItem(index);
-
-        if (selectedItem != null) {
-            FileOperation.fileOpenWith(this, selectedItem.getUri(), selectedItem.getMineTypes());
+        if (gb >= 1) {
+            return String.format("%.2f Gb", gb);
+        } else if (mb >= 1) {
+            return String.format("%.2f Mb", mb);
         } else {
-            Toast.makeText(this, "Failed to open file", Toast.LENGTH_SHORT).show();
+            return String.format("%.2f KB", kb);
         }
     }
 
+    private void newShareSelectedFiles() {
 
+//        selectedFiles();
+        shareFromUtils();
+
+        if (selectedFiles.isEmpty()) {
+            Toast.makeText(this, "No files selected", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        ArrayList<Uri> uris = new ArrayList<>();
+        for (FileHelperAdapter item : selectedFiles) {
+            uris.add(item.getUri());
+        }
+
+        Intent shareIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+        shareIntent.setType("*/*");
+        shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        startActivity(Intent.createChooser(shareIntent, "Share files via"));
+    }
 }

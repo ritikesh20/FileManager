@@ -1,11 +1,13 @@
 package com.example.filemanager.recentfiles;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,6 +23,7 @@ import com.mikepenz.fastadapter.listeners.OnClickListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class RecentFilesActivity extends AppCompatActivity {
 
@@ -30,8 +33,8 @@ public class RecentFilesActivity extends AppCompatActivity {
     private File file;
     private ProgressBar progressBar;
     private List<FileHelperAdapter> recentFileList = new ArrayList<>();
-
     private Toolbar toolbarRecentFile;
+    int limit = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,11 +61,37 @@ public class RecentFilesActivity extends AppCompatActivity {
 
         progressBar.setVisibility(View.VISIBLE);
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        String sizeLimit = prefs.getString("recentFile_size", "50");
+        int recentFileLimit = Integer.parseInt(sizeLimit);
+
+        if (recentFileLimit == 50) {
+            limit = 50;
+        } else if (recentFileLimit == 100) {
+            limit = 100;
+        } else if (recentFileLimit == 500) {
+            limit = 500;
+        } else {
+            limit = 1000;
+        }
 
         MediaStoreHelper.loadFile(this, "recentfile", files -> {
 
+            int recentSize = limit;
+
+            List<FileHelperAdapter> limitedList;
+
+            if (files.size() > recentSize) {
+                limitedList = files.subList(0, recentSize);
+            } else {
+                limitedList = files;
+            }
+
+            Objects.requireNonNull(getSupportActionBar()).setSubtitle(recentSize + " Files");
+
             recentFileList.clear();
-            recentFileList.addAll(files);
+            recentFileList.addAll(limitedList);
             itemAdapter.setNewList(recentFileList);
             progressBar.setVisibility(View.GONE);
             fastAdapter.notifyDataSetChanged();

@@ -16,18 +16,17 @@ import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.filemanager.DemoPage.HomeActivity;
 import com.example.filemanager.apps.AppsActivity;
 import com.example.filemanager.document.DocumentActivity;
 import com.example.filemanager.favouritesection.FavouriteActivity;
@@ -36,6 +35,7 @@ import com.example.filemanager.internalstorage.InternalStorageActivity;
 import com.example.filemanager.music.MusicActivity;
 import com.example.filemanager.music.NewSearchActivity;
 import com.example.filemanager.recentfiles.RecentFilesActivity;
+import com.example.filemanager.safefolder.SafeFolderActivity;
 import com.example.filemanager.videolist.HomeFileAdapter;
 import com.example.filemanager.videolist.VideoActivity;
 import com.google.android.material.navigation.NavigationView;
@@ -61,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
             btnShowAudioFile, btnCVDocument,
             btnCVRecentFile, btnCVSDCard,
             btnCVApps, btnCvFavourite, btnCVSafeFolder;
+
+    IconicsImageView btnHomeIconShowSideNav;
 
     TextView btnRecentFile;
     TextView etSearchingFile;
@@ -107,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
 
         addIconHome();
 
+
 //        pbFileLong = findViewById(R.id.pbFileSize);
 
 //        tvAudioSize = findViewById(R.id.tvAudioFileSize);
@@ -119,24 +122,17 @@ public class MainActivity extends AppCompatActivity {
 
         homeDrawerLayout = findViewById(R.id.homeDreawerLayout);
         navigationView = findViewById(R.id.home_nav_DL);
+        btnHomeIconShowSideNav = findViewById(R.id.homeIconShowSideNav);
 
-//        setSupportActionBar(homeToolbar);
+        btnHomeIconShowSideNav.setOnClickListener(v -> {
+            if (homeDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+                homeDrawerLayout.closeDrawer(GravityCompat.START);
+            } else {
+                homeDrawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
 
-//        if (getSupportActionBar() != null) {
-//            getSupportActionBar().setTitle("Dashboard");
-//        }
 
-//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-//                this,
-//                homeDrawerLayout,
-//                homeToolbar,
-//                R.string.open,
-//                R.string.close
-//        );
-//
-//        toggle.setDrawerIndicatorEnabled(true);
-//        homeDrawerLayout.addDrawerListener(toggle);
-//        toggle.syncState();
         recyclerView = findViewById(R.id.recyclerViewHome);
         itemAdapterRecentFile = new ItemAdapter<>();
         fastAdapterRecentFile = FastAdapter.with(itemAdapterRecentFile);
@@ -153,12 +149,19 @@ public class MainActivity extends AppCompatActivity {
         btnVideo = findViewById(R.id.btnShowVideo);
         btnCVDocument = findViewById(R.id.btnShowDocument);
         btnCVApps = findViewById(R.id.btnCVApps);
+        btnCVSafeFolder = findViewById(R.id.btnSafe);
 
 
         etSearchingFile.setOnClickListener(v -> {
             Intent intent = new Intent(this, NewSearchActivity.class);
             startActivity(intent);
         });
+
+        btnCVSafeFolder.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, SafeFolderActivity.class);
+            startActivity(intent);
+        });
+
         btnCvFavourite.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, FavouriteActivity.class);
             startActivity(intent);
@@ -214,6 +217,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(appsIntent);
         });
 
+        openNavOption();
 
         loadRecentFiles();
 
@@ -324,9 +328,6 @@ public class MainActivity extends AppCompatActivity {
 
         menuInflater.inflate(R.menu.menu_home, menu);
 
-        menu.findItem(R.id.homeSearch).setIcon(new IconicsDrawable(this, GoogleMaterial.Icon.gmd_search).color(getColor(R.color.black)).actionBar());
-        menu.findItem(R.id.homeRefresh).setIcon(new IconicsDrawable(this, GoogleMaterial.Icon.gmd_refresh).color(getColor(R.color.black)).actionBar());
-
         return true;
     }
 
@@ -335,21 +336,6 @@ public class MainActivity extends AppCompatActivity {
 
         int id = item.getItemId();
 
-        if (id == R.id.homeSearch) {
-            Toast.makeText(this, "Searching Feature Coming Soon", Toast.LENGTH_SHORT).show();
-        } else if (id == R.id.homePremium) {
-            String path = Environment.getExternalStorageDirectory().getPath();
-            Intent intent = new Intent(this, HomeActivity.class);
-            intent.putExtra("path", path);
-            startActivity(intent);
-            Toast.makeText(this, "Premium Feature Coming Soon", Toast.LENGTH_SHORT).show();
-        } else if (id == R.id.homeRefresh) {
-
-            Intent intent = new Intent(this, MainActivity.class);
-            Toast.makeText(this, "Refreshing", Toast.LENGTH_SHORT).show();
-            startActivity(intent);
-
-        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -554,6 +540,27 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+
+    void openNavOption() {
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+                int id = item.getItemId();
+
+                if (id == R.id.nav_Setting) {
+
+                    Intent settingIntent = new Intent(MainActivity.this, SettingsActivity.class);
+                    startActivity(settingIntent);
+
+                }
+
+                homeDrawerLayout.closeDrawer(GravityCompat.START);
+                return false;
+            }
+        });
     }
 
 

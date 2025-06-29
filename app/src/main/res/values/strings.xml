@@ -42,7 +42,7 @@
     <item name="header_item_id" type="id" />
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="name">Name</string>
+    <string name="name">Rename File </string>
     <string name="select_all">Select all</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>

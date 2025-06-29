@@ -3,7 +3,6 @@ package com.example.filemanager.internalstorage;
 import static com.example.filemanager.internalstorage.InternalStorageActivity.isGridView;
 
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -25,9 +24,12 @@ import java.util.Locale;
 public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
 
     private File file;
-    private final boolean isHeader;
-    private final String headerTitle;
+    boolean isHeader;
+    String headerTitle;
 
+    public ISAdapter(File file) {
+        this.file = file;
+    }
 
     public ISAdapter(File file, boolean isHeader, String headerTitle) {
         this.file = file;
@@ -72,21 +74,26 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
 
     public static class ViewHolder extends FastAdapter.ViewHolder<ISAdapter> {
 
-        TextView fileName;
-        ImageView fileImage;
-        TextView fileDate;
-        TextView tvHeaderText;
-        TextView fileSize;
         IconicsImageView btnFileInfo;
+        private IconicsImageView fileTypeIcon;
+        private IconicsImageView fileImage;
+
+        private TextView fileName;
+        private TextView fileDate;
+        private TextView tvHeaderText;
+        private TextView fileSize;
+
 
         public ViewHolder(View itemView) {
             super(itemView);
 
-            fileName = itemView.findViewById(R.id.file_name_text_view);
             fileImage = itemView.findViewById(R.id.file_icon_image);
+            btnFileInfo = itemView.findViewById(R.id.btnFileDetails);
+            fileTypeIcon = itemView.findViewById(R.id.btnFileType);
+
+            fileName = itemView.findViewById(R.id.file_name_text_view);
             fileDate = itemView.findViewById(R.id.tvModifierData);
             fileSize = itemView.findViewById(R.id.tvSize);
-            btnFileInfo = itemView.findViewById(R.id.btnFileDetails);
             tvHeaderText = itemView.findViewById(R.id.textHeader);
 
         }
@@ -99,12 +106,12 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
             if (item.isHeader()) {
                 tvHeaderText.setVisibility(View.VISIBLE);
                 tvHeaderText.setText(item.getHeaderTitle());
-            }
-            else {
+            } else {
                 tvHeaderText.setVisibility(View.GONE);
             }
 
             fileName.setText(item.getFile().getName());
+            fileName.setVisibility(View.VISIBLE);
 
             long sizeInBytes = item.file.length();
 
@@ -114,14 +121,13 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
             String name = item.getFile().getName().toLowerCase();
 
             if (item.getFile().isDirectory()) {
-                fileImage.setImageResource(R.drawable.folderg);
+                fileImage.setIcon(new IconicsDrawable(itemView.getContext(), GoogleMaterial.Icon.gmd_folder).paddingDp(5).actionBar());
                 fileSize.setVisibility(View.GONE);
-            }
-            else if (name.endsWith(".mp3") || name.endsWith(".wav")) {
-                fileImage.setImageResource(R.drawable.musicicons);
-            }
-            else if (name.endsWith(".mp4")) {
+            } else if (name.endsWith(".mp3") || name.endsWith(".wav")) {
+                fileImage.setIcon(new IconicsDrawable(itemView.getContext(), GoogleMaterial.Icon.gmd_music_note).actionBar());
+            } else if (name.endsWith(".mp4")) {
                 Glide.with(itemView.getContext()).load(item.getFile()).error(R.drawable.videoicons).into(fileImage);
+                fileTypeIcon.setIcon(new IconicsDrawable(itemView.getContext(), GoogleMaterial.Icon.gmd_play_circle_outline));
             } else if (name.endsWith(".jpg") || name.endsWith(".png") || name.endsWith(".jpeg")) {
                 Glide.with(itemView.getContext()).load(item.getFile()).error(R.drawable.img).into(fileImage);
             } else if (name.endsWith(".apk")) {
@@ -129,22 +135,23 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
             } else if (name.endsWith(".pdf")) {
                 Glide.with(itemView.getContext()).load(item.getFile()).error(R.drawable.pdficons).into(fileImage);
             } else {
-                fileImage.setImageResource(R.drawable.newdocument);
+                fileImage.setIcon(new IconicsDrawable(itemView.getContext(), GoogleMaterial.Icon.gmd_attach_file));
             }
 
             if (itemView.isSelected()) {
                 btnFileInfo.setIcon(new IconicsDrawable(itemView.getContext(), GoogleMaterial.Icon.gmd_check_circle).actionBar());
-
             } else {
                 btnFileInfo.setIcon(new IconicsDrawable(itemView.getContext(), GoogleMaterial.Icon.gmd_more_vert).actionBar());
 
             }
+
 
             long lastModifiedData = item.file.lastModified();
             SimpleDateFormat date = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
             String setDate = date.format(new Date(lastModifiedData));
 
             fileDate.setText(setDate);
+
 
             if (sizeInBytes < 1024) {
                 convertedSize = sizeInBytes + " B";
@@ -161,7 +168,10 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
 
             fileSize.setText(convertedSize);
 
-            if (isGridView){
+            if (isGridView) {
+                if (name.endsWith(".mp4")) {
+                    fileName.setVisibility(View.GONE);
+                }
                 tvHeaderText.setVisibility(View.GONE);
             }
 
@@ -181,3 +191,10 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
     }
 }
 
+/*
+
+
+
+
+
+ */

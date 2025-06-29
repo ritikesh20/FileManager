@@ -13,7 +13,6 @@
         android:layout_marginStart="20dp"
         android:padding="4dp"
         android:text="Header"
-        android:textColor="@android:color/black"
         android:textSize="18sp"
         android:textStyle="bold"
         android:visibility="gone" />
@@ -45,14 +44,28 @@
             android:backgroundTint="@android:color/white"
             app:cardCornerRadius="8dp">
 
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-            <ImageView
-                android:id="@+id/file_icon_image"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center"
-                android:scaleType="centerCrop"
-                android:src="@drawable/folderg" />
+                <com.mikepenz.iconics.view.IconicsImageView
+                    android:id="@+id/file_icon_image"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/folderg" />
+
+                <com.mikepenz.iconics.view.IconicsImageView
+                    android:id="@+id/btnFileType"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginTop="5dp"
+                    android:src="@drawable/share" />
+
+            </FrameLayout>
+
 
         </androidx.cardview.widget.CardView>
 
@@ -80,6 +93,7 @@
                 <com.mikepenz.iconics.view.IconicsImageView
                     android:id="@+id/favIcon"
                     android:layout_width="10dp"
+                    android:visibility="gone"
                     android:layout_height="10dp"
                     android:layout_marginTop="5dp"
                     android:src="@color/black" />
@@ -88,7 +102,6 @@
                     android:id="@+id/tvSize"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
                     android:text="200 KB" />
 
                 <TextView

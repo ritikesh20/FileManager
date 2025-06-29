@@ -177,13 +177,6 @@ public class ImageGalleryActivity extends AppCompatActivity {
 
     }
 
-    private String formatSize(long bytes) {
-        double kb = bytes / 1024.0;
-        double mb = kb / 1024.0;
-        if (mb >= 1) return String.format(Locale.getDefault(), "%.2f MB", mb);
-        else return String.format(Locale.getDefault(), "%.2f KB", kb);
-    }
-
     private void filterImages(String query) {
 
 //        List<ImageFA> filteredList = new ArrayList<>();
@@ -379,6 +372,5 @@ public class ImageGalleryActivity extends AppCompatActivity {
 
 
 }
-
 
 

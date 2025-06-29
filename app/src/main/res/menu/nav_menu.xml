@@ -4,28 +4,27 @@
 
     <item
         android:id="@+id/nav_home"
-        android:title="Home"
-        />
+        android:title="Home" />
 
     <item
         android:id="@+id/nav_internalStorage"
-        android:title="InternalStorage"
-        />
+        android:title="InternalStorage" />
 
 
     <item
         android:id="@+id/nav_Favourites"
-        android:title="Favourites"
-        />
-
+        android:title="Favourites" />
 
 
     <item
         android:id="@+id/nav_image"
-        android:title="Photo"
+        android:title="Photo" />
+
+    <item
+        android:id="@+id/nav_Setting"
+        android:title="Settings"
+
         />
-
-
 
 
 </menu>

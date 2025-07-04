@@ -5,31 +5,37 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
-import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.filemanager.document.FileHelperAdapter;
 import com.example.filemanager.internalstorage.InternalStorageActivity;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.iconics.view.IconicsImageView;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class MediaStoreHelper {
 
     public interface FileLoadCallback {
+
         void onFilesLoaded(List<FileHelperAdapter> files);
+
     }
+
 
     public static void loadFile(Context context, String type, FileLoadCallback callback) {
 
@@ -51,7 +57,8 @@ public class MediaStoreHelper {
                         MediaStore.Files.FileColumns.SIZE,
                         MediaStore.Files.FileColumns.DATE_MODIFIED,
                         MediaStore.Files.FileColumns.MIME_TYPE,
-                        MediaStore.Files.FileColumns.DATA
+                        MediaStore.Files.FileColumns.DATA,
+
 
                 };
 
@@ -79,13 +86,10 @@ public class MediaStoreHelper {
                     case "audio": {
 
                         selection = MediaStore.Files.FileColumns.MEDIA_TYPE + "=? ";
-                        selectionArgs = new String[]{
-                                String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO)
-                        };
+                        selectionArgs = new String[]{String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO)};
 
                         break;
                     }
-
                     case "document": {
 
                         selection = MediaStore.Files.FileColumns.MIME_TYPE + "=? OR " +
@@ -110,7 +114,8 @@ public class MediaStoreHelper {
                         selectionArgs = new String[]{
                                 String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE),
                                 String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO),
-                                String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO)
+                                String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO),
+
                         };
 
                         break;
@@ -145,13 +150,17 @@ public class MediaStoreHelper {
                         long data = cursor.getLong(dataModifiedColum);
                         String mime = cursor.getString(mimeColum);
 
-                        String newDate = DateFormat.format("dd MMM yyy", new Date(data)).toString();
+                        Date fileXdate = new Date(data * 1000L);
+
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyy", Locale.getDefault());
+
+                        String formattedDate = sdf.format(fileXdate);
 
                         String newSize = FileOperation.sizeCal(size);
 
                         Uri contentUri = ContentUris.withAppendedId(fileUri, id);
 
-                        fileList.add(new FileHelperAdapter(contentUri, name, mime, newDate, newSize));
+                        fileList.add(new FileHelperAdapter(contentUri, name, mime, formattedDate, newSize));
 
 
                     }
@@ -163,6 +172,7 @@ public class MediaStoreHelper {
                     public void run() {
                         callback.onFilesLoaded(fileList);
                     }
+
                 });
             }
         });
@@ -175,7 +185,14 @@ public class MediaStoreHelper {
 
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(context);
 
+
         View view = LayoutInflater.from(context).inflate(R.layout.copymove_item, null);
+
+        IconicsImageView goToInternalStorage = view.findViewById(R.id.goToInternalStorage);
+        IconicsImageView goToIconSDCard = view.findViewById(R.id.goToIconSDCard);
+
+        goToInternalStorage.setIcon(new IconicsDrawable(context, GoogleMaterial.Icon.gmd_devices));
+        goToIconSDCard.setIcon(new IconicsDrawable(context, GoogleMaterial.Icon.gmd_sd_card));
 
         bottomSheetDialog.show();
         bottomSheetDialog.setContentView(view);

@@ -7,23 +7,14 @@
         android:title="Home" />
 
     <item
-        android:id="@+id/nav_internalStorage"
-        android:title="InternalStorage" />
-
-
-    <item
-        android:id="@+id/nav_Favourites"
-        android:title="Favourites" />
-
-
-    <item
-        android:id="@+id/nav_image"
-        android:title="Photo" />
+        android:id="@+id/nav_Trash"
+        android:title="Trash"
+        android:icon="@drawable/delete"
+        />
 
     <item
         android:id="@+id/nav_Setting"
         android:title="Settings"
-
         />
 
 

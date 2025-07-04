@@ -17,15 +17,6 @@ public class PathHistoryAdapter extends AbstractItem<PathHistoryAdapter, PathHis
     String pathName;
     boolean showArrow;
 
-//    public PathHistoryAdapter(String pathName) {
-//        this.pathName = pathName;
-//    }
-//
-//    public String getPathName() {
-//        return pathName;
-//    }
-
-
     public PathHistoryAdapter(String pathName, boolean showArrow) {
         this.pathName = pathName;
         this.showArrow = showArrow;

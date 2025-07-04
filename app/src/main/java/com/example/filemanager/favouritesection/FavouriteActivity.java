@@ -1,14 +1,11 @@
 package com.example.filemanager.favouritesection;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,15 +13,13 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.filemanager.FileOperation;
 import com.example.filemanager.R;
-import com.example.filemanager.videolist.VideoActivity;
+import com.example.filemanager.internalstorage.ISAdapter;
 import com.mikepenz.fastadapter.FastAdapter;
-import com.mikepenz.fastadapter.IAdapter;
 import com.mikepenz.fastadapter.adapters.ItemAdapter;
-import com.mikepenz.fastadapter.listeners.OnLongClickListener;
 import com.mikepenz.fastadapter.select.SelectExtension;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -34,10 +29,10 @@ public class FavouriteActivity extends AppCompatActivity {
 
     boolean isAllFileSelected = false;
     private RecyclerView recyclerViewFav;
-    private ItemAdapter<FavouriteAdapter> itemAdapterFav;
-    private FastAdapter<FavouriteAdapter> fastAdapterFav;
-    private List<FavouriteAdapter> listFav;
-    SelectExtension<FavouriteAdapter> selectExtension;
+    private ItemAdapter<ISAdapter> itemAdapterFav;
+    private FastAdapter<ISAdapter> fastAdapterFav;
+    private List<ISAdapter> listFav;
+    SelectExtension<ISAdapter> selectExtension;
     private Toolbar toolbarFav;
     private boolean isOpen = true;
 
@@ -64,7 +59,7 @@ public class FavouriteActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbarFav);
 
-        if (getSupportActionBar() != null){
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle("Starred");
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
@@ -73,62 +68,8 @@ public class FavouriteActivity extends AppCompatActivity {
         selectExtension.withMultiSelect(true);
         selectExtension.withSelectWithItemUpdate(true);
 
-        loadFavItems();
 
-        fastAdapterFav.withOnLongClickListener(new OnLongClickListener<FavouriteAdapter>() {
-            @Override
-            public boolean onLongClick(View v, IAdapter<FavouriteAdapter> adapter, FavouriteAdapter item, int position) {
-                selectExtension.toggleSelection(position);
-
-//                int selectedFileCount = selectExtension.getSelectedItems().size();
-
-
-                Toast.makeText(FavouriteActivity.this, "" + item.favouriteItem.getName(), Toast.LENGTH_SHORT).show();
-
-                return true;
-            }
-        });
-
-    }
-
-    void click(boolean isOpenFile) {
-        if (!isOpenFile) {
-            fastAdapterFav.withOnClickListener((v, adapter, item, position) -> {
-
-                Uri favFileUri = Uri.parse(item.favouriteItem.getUri());
-                assert v != null;
-                FileOperation.fileOpenWith(v.getContext(), favFileUri, item.favouriteItem.getMimeView());
-
-                return false;
-            });
-        }
-    }
-
-    void loadFavItems() {
-
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        Handler handler = new Handler(Looper.getMainLooper());
-
-        executorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                List<FavouriteItem> favList = AppDatabase.getInstance(FavouriteActivity.this).favouriteVideoDao().getAll();
-                listFav.clear();
-
-                for (FavouriteItem fav : favList) {
-                    listFav.add(new FavouriteAdapter(fav));
-                }
-
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        itemAdapterFav.setNewList(listFav);
-                    }
-                });
-
-            }
-        });
-
+        loadingFavoriteDojo();
 
     }
 
@@ -196,4 +137,38 @@ public class FavouriteActivity extends AppCompatActivity {
     }
 
 
+    void loadingFavoriteDojo() {
+
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+
+                List<FavouriteItem> favouriteList = FavouriteDatabase.getInstance(FavouriteActivity.this).favouriteDao().getAllFavorites();
+                List<ISAdapter> items = new ArrayList<>();
+
+                for (FavouriteItem file : favouriteList) {
+                    File favFile = new File(file.getFilePath());
+
+                    if (favFile.exists()) {
+                        items.add(new ISAdapter(favFile));
+                    }
+
+                }
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        itemAdapterFav.setNewList(items);
+                        fastAdapterFav.notifyDataSetChanged();
+                    }
+                });
+
+
+            }
+        });
+
+
+    }
 }

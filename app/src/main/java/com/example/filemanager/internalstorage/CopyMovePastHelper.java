@@ -3,7 +3,7 @@ package com.example.filemanager.internalstorage;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClipboardHelper {
+public class CopyMovePastHelper {
 
     private static final ArrayList<String> filePaths = new ArrayList<>();
 

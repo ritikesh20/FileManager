@@ -36,7 +36,7 @@
             android:orientation="horizontal">
 
             <com.mikepenz.iconics.view.IconicsImageView
-                android:id="@+id/homeIconInternalStorage"
+                android:id="@+id/goToInternalStorage"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_marginStart="30dp"
@@ -61,7 +61,7 @@
             android:orientation="horizontal">
 
             <com.mikepenz.iconics.view.IconicsImageView
-                android:id="@+id/homeIconSDCard"
+                android:id="@+id/goToIconSDCard"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_marginStart="30dp"

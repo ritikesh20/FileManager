@@ -1,5 +1,7 @@
 package com.example.filemanager.safefolder;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -30,8 +32,10 @@ public class SafeFolderActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_safe_folder);
+
 
         toolbarSafeBox = findViewById(R.id.toolbarSafeBox);
         recyclerView = findViewById(R.id.recyclerViewSafeBox);
@@ -57,10 +61,12 @@ public class SafeFolderActivity extends AppCompatActivity {
     }
 
     private void loadSafeBoxFiles() {
+
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
 
         executorService.execute(() -> {
+
             List<SafeBoxFile> safeList = safeBoxFileDB.safeBoxFileDao().getAllSafeBoxFiles();
             List<ISAdapter> items = new ArrayList<>();
 
@@ -76,6 +82,7 @@ public class SafeFolderActivity extends AppCompatActivity {
             });
         });
     }
+
 
 
     @Override

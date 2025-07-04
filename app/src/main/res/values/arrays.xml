@@ -16,4 +16,20 @@
     </string-array>
 
 
+    <string-array name="Mode">
+        <item>Light Mode</item>
+        <item>Dark Mode</item>
+        <item>Default Mode</item>
+
+    </string-array>
+
+    <string-array name="Mode_values">
+
+        <item>lightMode</item>
+        <item>darkMode</item>
+        <item>defaultMode</item>
+
+    </string-array>
+
+
 </resources>

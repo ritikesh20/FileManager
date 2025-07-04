@@ -116,15 +116,17 @@ public class AppsActivity extends AppCompatActivity {
 //            if ((app.flags & ApplicationInfo.FLAG_SYSTEM) != 0) {
 //                continue;
 //            }
-
                     Drawable icon = app.loadIcon(packageManager);
                     String name = app.loadLabel(packageManager).toString();
                     long size = new File(app.sourceDir).length();
+
                     String sizeFormatted = Formatter.formatFileSize(AppsActivity.this, size);
 
                     try {
                         PackageInfo pi = packageManager.getPackageInfo(app.packageName, 0);
-                        String date = new SimpleDateFormat("dd MMM", Locale.getDefault())
+                        String date = new SimpleDateFormat(
+                                "dd MMM",
+                                Locale.getDefault())
                                 .format(new Date(pi.firstInstallTime));
 
                         listApps.add(new AppsAdapter(icon, name, sizeFormatted, date));
@@ -143,8 +145,6 @@ public class AppsActivity extends AppCompatActivity {
             }
         });
     }
-
-
 
 
 }

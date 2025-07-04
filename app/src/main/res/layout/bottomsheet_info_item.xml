@@ -39,7 +39,6 @@
                     android:layout_height="60dp"
                     android:layout_marginStart="20dp"
                     android:padding="5dp"
-                    android:src="@drawable/blackdb"
                     app:civ_border_color="@color/white"
                     app:civ_border_overlay="true"
                     app:civ_border_width="1dp" />

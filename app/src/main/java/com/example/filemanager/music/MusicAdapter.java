@@ -154,14 +154,4 @@ public class MusicAdapter extends AbstractItem<MusicAdapter, MusicAdapter.ViewHo
            musicIcon.setImageResource(R.drawable.videoicons);
         }
 
-
-                    <ImageView
-                android:id="@+id/musicIcons"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_marginStart="10dp"
-                android:contentDescription="@string/musicicon"
-                tools:src="@drawable/musicicons" />
-
-
  */

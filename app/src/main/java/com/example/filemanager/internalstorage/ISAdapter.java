@@ -8,6 +8,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.bumptech.glide.Glide;
+import com.example.filemanager.FileOperation;
 import com.example.filemanager.R;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.items.AbstractItem;
@@ -69,19 +70,18 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
     @Override
     public int getLayoutRes() {
         return isGridView ? R.layout.istore_grid_item : R.layout.internal_storage_items;
-//        return R.layout.internal_storage_items;
     }
 
     public static class ViewHolder extends FastAdapter.ViewHolder<ISAdapter> {
 
         IconicsImageView btnFileInfo;
-        private IconicsImageView fileTypeIcon;
-        private IconicsImageView fileImage;
+        private final IconicsImageView fileTypeIcon;
+        private final IconicsImageView fileImage;
 
-        private TextView fileName;
-        private TextView fileDate;
-        private TextView tvHeaderText;
-        private TextView fileSize;
+        private final TextView fileName;
+        private final TextView fileDate;
+        private final TextView tvHeaderText;
+        private final TextView fileSize;
 
 
         public ViewHolder(View itemView) {
@@ -115,8 +115,6 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
 
             long sizeInBytes = item.file.length();
 
-            String convertedSize;
-            long reSize;
 
             String name = item.getFile().getName().toLowerCase();
 
@@ -135,7 +133,7 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
             } else if (name.endsWith(".pdf")) {
                 Glide.with(itemView.getContext()).load(item.getFile()).error(R.drawable.pdficons).into(fileImage);
             } else {
-                fileImage.setIcon(new IconicsDrawable(itemView.getContext(), GoogleMaterial.Icon.gmd_attach_file));
+                fileImage.setIcon(new IconicsDrawable(itemView.getContext(), GoogleMaterial.Icon.gmd_drafts));
             }
 
             if (itemView.isSelected()) {
@@ -145,28 +143,13 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
 
             }
 
-
             long lastModifiedData = item.file.lastModified();
             SimpleDateFormat date = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
             String setDate = date.format(new Date(lastModifiedData));
 
             fileDate.setText(setDate);
 
-
-            if (sizeInBytes < 1024) {
-                convertedSize = sizeInBytes + " B";
-            } else if (sizeInBytes < 1024 * 1024) {
-                reSize = sizeInBytes / 1024;
-                convertedSize = reSize + " KB";
-            } else if (sizeInBytes < 1024 * 1024 * 1014) {
-                reSize = sizeInBytes / (1024 * 1024);
-                convertedSize = reSize + " MB";
-            } else {
-                reSize = sizeInBytes / (1024 * 1024 * 1024);
-                convertedSize = reSize + " GB";
-            }
-
-            fileSize.setText(convertedSize);
+            fileSize.setText(FileOperation.sizeCal(sizeInBytes));
 
             if (isGridView) {
                 if (name.endsWith(".mp4")) {
@@ -185,16 +168,7 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
             fileDate.setText(null);
             fileSize.setText(null);
 
-
         }
 
     }
 }
-
-/*
-
-
-
-
-
- */

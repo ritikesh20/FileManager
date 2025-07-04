@@ -3,62 +3,44 @@ package com.example.filemanager.favouritesection;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "favourite_items")
+@Entity(tableName = "Favorite_box")
+
 public class FavouriteItem {
 
     @PrimaryKey(autoGenerate = true)
-    int id;
-    public String uri;
-    public String name;
-    public boolean isFolder;
-    public String dateAdded;
-    public String size;
-    public String mimeView;
-    public int position;
+    private int id;
 
-    public FavouriteItem() {
+    private String filePath;
+
+    private String fileName;
+
+    private long addedTime;
+
+
+    public FavouriteItem(String filePath, String fileName, long addedTime) {
+        this.filePath = filePath;
+        this.fileName = fileName;
+        this.addedTime = addedTime;
     }
 
-    public FavouriteItem(String uri, String name, boolean isFolder, String dateAdded, String size, String mimeView, int position) {
-        this.uri = uri;
-        this.name = name;
-        this.isFolder = isFolder;
-        this.dateAdded = dateAdded;
-        this.size = size;
-        this.mimeView = mimeView;
-        this.position = position;
-
-    }
 
     public int getId() {
         return id;
     }
 
-    public String getUri() {
-        return uri;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getFilePath() {
+        return filePath;
     }
 
-    public boolean isFolder() {
-        return isFolder;
+    public String getFileName() {
+        return fileName;
     }
 
-    public String getDateAdded() {
-        return dateAdded;
-    }
-
-    public String getSize() {
-        return size;
-    }
-
-    public String getMimeView() {
-        return mimeView;
-    }
-
-    public int getPosition() {
-        return position;
+    public long getAddedTime() {
+        return addedTime;
     }
 }

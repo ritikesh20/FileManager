@@ -26,8 +26,9 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/file_Delete"
-        android:title="Delete"
+        android:id="@+id/file_Trash"
+        android:title="Trash"
+        android:icon="@drawable/delete"
         app:showAsAction="always" />
 
     <item
@@ -59,6 +60,17 @@
     <item
         android:id="@+id/file_BackToGoogleDrive"
         android:title="Back To Google Drive" />
+
+    <item
+        android:id="@+id/file_newFolder"
+        android:title="New Folder" />
+
+
+    <item
+        android:id="@+id/file_Delete"
+        android:title="Delete"
+         />
+
 
     <item
         android:id="@+id/file_FileInfo"

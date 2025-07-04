@@ -27,7 +27,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:src="@drawable/mask"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -40,10 +39,11 @@
 
             <TextView
                 android:id="@+id/homeRecentName"
-                android:layout_width="100dp"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
                 android:layout_marginTop="130dp"
+                android:textSize="12sp"
                 android:maxLines="1"
                 android:text="IMG_202..."
                 android:textColor="@color/white"
@@ -52,20 +52,21 @@
 
             <TextView
                 android:id="@+id/homeRecentFolderName"
-                android:layout_width="wrap_content"
+                android:layout_width="80dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
-                android:layout_marginTop="150dp"
+                android:layout_marginTop="145dp"
                 android:maxLines="1"
                 android:text="Camera"
                 android:textColor="@color/white"
                 android:textSize="12sp" />
 
             <com.mikepenz.iconics.view.IconicsImageView
+                android:id="@+id/recentHomeInfoIcon"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:layout_marginStart="120dp"
-                android:layout_marginTop="140dp"
+                android:layout_marginStart="105dp"
+                android:layout_marginTop="135dp"
                 android:src="@drawable/dots" />
 
 

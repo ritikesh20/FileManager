@@ -1,7 +1,8 @@
 package com.example.filemanager.music;
 
-import android.content.ContentResolver;
+import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
@@ -9,88 +10,88 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.filemanager.FileHelperAdapter;
+import com.example.filemanager.FileOperation;
 import com.example.filemanager.MediaStoreHelper;
 import com.example.filemanager.R;
-import com.example.filemanager.document.FileHelperAdapter;
-import com.example.filemanager.internalstorage.ClipboardHelper;
-import com.example.filemanager.internalstorage.InternalStorageActivity;
+import com.example.filemanager.SortingHelper;
+import com.google.android.material.textfield.TextInputEditText;
 import com.mikepenz.fastadapter.FastAdapter;
+import com.mikepenz.fastadapter.IAdapter;
 import com.mikepenz.fastadapter.adapters.ItemAdapter;
+import com.mikepenz.fastadapter.listeners.ClickEventHook;
+import com.mikepenz.fastadapter.listeners.OnClickListener;
 import com.mikepenz.fastadapter.select.SelectExtension;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.lang.reflect.Method;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class MusicActivity extends AppCompatActivity {
 
     private RecyclerView recyclerViewMusic;
-
-//    private ItemAdapter<MusicAdapter> itemAdapterMusic;
-//    private FastAdapter<MusicAdapter> fastAdapterMusic;
-//    private List<MusicAdapter> musicList = new ArrayList<>();
-//    private SelectExtension<MusicAdapter> selectExtension;
-
+    public static boolean isMusicView = false;
+    FileHelperAdapter item;
+    private SharedPreferences sharedPreferencesMusic;
     private ItemAdapter<FileHelperAdapter> itemAdapterMusic;
     private FastAdapter<FileHelperAdapter> fastAdapterMusic;
     List<FileHelperAdapter> musicList = new ArrayList<>();
 
     SelectExtension<FileHelperAdapter> selectExtension;
 
-
     Button btnMusicCopy;
     Button btnMusicMove;
     Button btnMusicPasting;
 
+    Toolbar toolbarMusic;
 
     private List<String> selectedFile;
-    private boolean isCutMode = false;
     private boolean isAllFileSelected = false;
 
-    private final File destination = InternalStorageActivity.currentDirectory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music);
 
-        Toolbar toolbarMusic = findViewById(R.id.toolbarMusic);
+        toolbarMusic = findViewById(R.id.toolbarMusic);
 
         recyclerViewMusic = findViewById(R.id.recyclerViewMusic);
         itemAdapterMusic = new ItemAdapter<>();
         fastAdapterMusic = FastAdapter.with(itemAdapterMusic);
-        recyclerViewMusic.setLayoutManager(new LinearLayoutManager(this));
+
         recyclerViewMusic.setAdapter(fastAdapterMusic);
+        sharedPreferencesMusic = getSharedPreferences("MusicPref", MODE_PRIVATE);
         setSupportActionBar(toolbarMusic);
 
         btnMusicCopy = findViewById(R.id.btnMusicCopy);
         btnMusicMove = findViewById(R.id.btnMusicMove);
         btnMusicPasting = findViewById(R.id.btnMusicPast);
-
+        layout();
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle("Music");
@@ -108,34 +109,6 @@ public class MusicActivity extends AppCompatActivity {
         selectExtension.withMultiSelect(true);
         selectExtension.withSelectWithItemUpdate(true);
 
-//        fastAdapterMusic.withOnLongClickListener(new OnLongClickListener<MusicAdapter>() {
-//            @Override
-//            public boolean onLongClick(View v, IAdapter<MusicAdapter> adapter, MusicAdapter item, int position) {
-//
-//                selectExtension.toggleSelection(position);
-//
-//                return false;
-//            }
-//        });
-
-
-//        btnMusicCopy.setOnClickListener(v -> {
-//            isCutMode = false;
-//            fileSelected();
-//            MediaStoreHelper.goStorageTypes(this, "Move to");
-//            btnMusicPasting.setVisibility(View.VISIBLE);
-//        });
-//
-//        btnMusicMove.setOnClickListener(v -> {
-//            isCutMode = true;
-//            fileSelected();
-//            MediaStoreHelper.goStorageTypes(this, "Copy to");
-//            btnMusicPasting.setVisibility(View.VISIBLE);
-//        });
-
-        isPastDeselect();
-//        uploadMusic();
-
         MediaStoreHelper.loadFile(this, "Audio", files -> {
             musicList.clear();
             musicList.addAll(files);
@@ -143,6 +116,20 @@ public class MusicActivity extends AppCompatActivity {
             fastAdapterMusic.notifyDataSetChanged();
         });
 
+
+        click();
+
+        fileLongClick();
+
+        clickBtnFileInfo();
+    }
+
+    private void layout() {
+        if (isMusicView) {
+            recyclerViewMusic.setLayoutManager(new GridLayoutManager(this, 3));
+        } else {
+            recyclerViewMusic.setLayoutManager(new LinearLayoutManager(this));
+        }
     }
 
 
@@ -195,6 +182,62 @@ public class MusicActivity extends AppCompatActivity {
 
     }
 
+    void click() {
+        fastAdapterMusic.withOnClickListener(new OnClickListener<FileHelperAdapter>() {
+            @Override
+            public boolean onClick(View v, IAdapter<FileHelperAdapter> adapter, FileHelperAdapter item, int position) {
+
+                FileOperation.fileOpenWith(MusicActivity.this, item.getUri(), item.getMineTypes());
+                return false;
+            }
+        });
+    }
+
+    void clickBtnFileInfo() {
+        fastAdapterMusic.withEventHook(new ClickEventHook<FileHelperAdapter>() {
+            @Override
+            public void onClick(@NonNull View v, int position, @NonNull FastAdapter<FileHelperAdapter> fastAdapter, @NonNull FileHelperAdapter item) {
+
+                selectExtension.select(position);
+
+                showBtnFileInfo(v, item, position);
+            }
+
+            @Override
+            public View onBind(@NonNull RecyclerView.ViewHolder viewHolder) {
+                if (viewHolder instanceof FileHelperAdapter.ViewHolder) {
+                    return ((FileHelperAdapter.ViewHolder) viewHolder).btnFileInfo;
+                }
+                return super.onBind(viewHolder);
+            }
+        });
+    }
+
+    void fileLongClick() {
+
+        fastAdapterMusic.withOnLongClickListener((v, adapter, item, position) -> {
+
+            selectExtension.toggleSelection(position);
+
+            return true;
+
+        });
+
+        selectExtension.withSelectionListener((item, selected) -> {
+
+            int count = selectExtension.getSelections().size();
+
+            if (count > 0) {
+                toolbarMusic.setTitle(count + " selected");
+                toolbarMusic.setSubtitle(getSelectedFileSize());
+                toolbarMusic.setSubtitle(getSelectedFileSize());
+            } else {
+                toolbarMusic.setTitle("Music");
+                toolbarMusic.setSubtitle("");
+            }
+
+        });
+    }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -296,9 +339,13 @@ public class MusicActivity extends AppCompatActivity {
             onBackPressed();
             return true;
         } else if (id == R.id.file_search) {
-
+            openSearching();
         } else if (id == R.id.file_ChangeView) {
-
+            isMusicView = !isMusicView;
+            layout();
+//            fastAdapterMusic.notifyDataSetChanged();
+            recreate();
+            return true;
         } else if (id == R.id.file_Selected) {
             if (!isAllFileSelected) {
                 selectExtension.select();
@@ -312,27 +359,27 @@ public class MusicActivity extends AppCompatActivity {
 
             return true;
         } else if (id == R.id.file_Share) {
-
+            FileOperation.shareSelectedFiles(this, itemAdapterMusic, selectExtension);
+            return true;
         } else if (id == R.id.file_Delete) {
-
+            FileOperation.deleteSelectedFiles(this, itemAdapterMusic, selectExtension);
+            return true;
         } else if (id == R.id.file_SortBy) {
-
+            newSorting();
             return true;
         } else if (id == R.id.file_OpenWith) {
-
+            openSelectedFile();
             return true;
-        } else if (id == R.id.file_Move) {
-        } else if (id == R.id.file_Copy) {
-
         } else if (id == R.id.file_Rename) {
-
+            showRenameInputDialog();
             return true;
         } else if (id == R.id.file_AddToStarred) {
 
+            return true;
         } else if (id == R.id.file_SafeFolder) {
 
         } else if (id == R.id.file_BackToGoogleDrive) {
-
+            addToDrive();
         } else if (id == R.id.file_FileInfo) {
 
         }
@@ -340,224 +387,179 @@ public class MusicActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void fileSelected() {
+    private void showBtnFileInfo(View anchorView, FileHelperAdapter item, int position) {
 
-        selectedFile = new ArrayList<>();
+        PopupMenu popupMenu = new PopupMenu(MusicActivity.this, anchorView);
+        popupMenu.getMenuInflater().inflate(R.menu.selected_menu, popupMenu.getMenu());
 
-//        for (MusicAdapter select : selectExtension.getSelectedItems()) {
-//            selectedFile.add(select.getFile().getAbsolutePath());
-//        }
-//
-        for (FileHelperAdapter select : selectExtension.getSelectedItems()) {
-            selectedFile.add(select.getUri().toString());
-        }
+        popupMenu.setOnMenuItemClickListener(menuItem -> {
 
-        if (isCutMode) {
-            ClipboardHelper.cut(selectedFile);
-        } else {
-            ClipboardHelper.copy(selectedFile);
-        }
+            int id = menuItem.getItemId();
 
-        btnMusicPasting.setVisibility(View.VISIBLE);
-
-    }
-
-    private void pasteFiles(File destinationDir) {
-
-        if (ClipboardHelper.isEmpty()) {
-            Toast.makeText(this, "No files selected", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        for (String path : ClipboardHelper.getFilePaths()) {
-            File source = new File(path); // copy file path
-            File dest = new File(destinationDir, source.getName()); // past copy file folder location
-
-            if (dest.exists()) {
-                dest = getNonConflictingFile(dest);
-            }
-
-            boolean success = false;
-
-            if (ClipboardHelper.isCut()) { // isCut check krha rha hai file copy hai ya fir past hai
-                success = source.renameTo(dest); //renameTo method ka kaam hota hai file ya folder ko ek location se dusare location pe move karna ya rename karna.
-                if (!success) {
-                    success = moveFileManually(source, dest);
-                }
-            } else {
-                if (source.isDirectory()) {
-                    try {
-                        copyDirectory(source, dest); // recursive call on folder
-                        success = true;
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+            if (id == R.id.selOneFile) {
+                boolean isOneFileSelected = false;
+                if (!isOneFileSelected) {
+                    selectExtension.select(position);
                 } else {
-                    success = copyFile(source, dest);
+                    selectExtension.deselect(position);
                 }
+                return true;
+            } else if (id == R.id.selOpenWith) {
+                openSelectedFile();
+                selectExtension.deselect(position);
+                return true;
+            } else if (id == R.id.selShare) {
+                FileOperation.shareSelectedFiles(this, itemAdapterMusic, selectExtension);
+                return true;
+            } else if (id == R.id.selRename) {
+                showRenameInputDialog();
+                selectExtension.deselect(position);
+                return true;
+            } else if (id == R.id.selDelete) {
+                FileOperation.deleteSelectedFiles(this, itemAdapterMusic, selectExtension);
+                selectExtension.deselect(position);
+                return true;
+            } else if (id == R.id.selAddToStarred) {
+                selectExtension.deselect(position);
+                return true;
+            } else if (id == R.id.selBackToGoogleDrive) {
+                selectExtension.deselect(position);
+                return true;
+            } else if (id == R.id.selFileInfo) {
+
+                return true;
             }
-
-            if (!success) {
-                Toast.makeText(this, "Failed: " + source.getName(), Toast.LENGTH_SHORT).show();
-            }
-
-        }
-
-        ClipboardHelper.clear();
-        itemAdapterMusic.setNewList(new ArrayList<>());
-        recreate();
-
-    }
-
-    private File getNonConflictingFile(File file) {
-
-        if (!file.exists()) return file;
-
-        String name = file.getName();
-        String baseName;
-        String extension = "";
-
-        int dotIndex = name.lastIndexOf('.');
-
-        if (dotIndex != -1 && file.isFile()) {
-            baseName = name.substring(0, dotIndex);
-            extension = name.substring(dotIndex);
-        } else {
-            baseName = name;
-        }
-
-        int index = 1;
-        File newFile;
-        do {
-            String newName = baseName + "(" + index + ")" + extension;
-            newFile = new File(file.getParent(), newName);
-            index++;
-        } while (newFile.exists());
-
-        return newFile;
-
-    }
-
-    private boolean copyFile(File source, File dest) {
-
-        try {
-            FileInputStream pickFileLocation = new FileInputStream(source);
-            FileOutputStream dropFileLocation = new FileOutputStream(dest);
-
-            byte[] buffer = new byte[1024]; // temporary store file
-
-            int len;
-
-            while ((len = pickFileLocation.read(buffer)) > 0) {
-                dropFileLocation.write(buffer, 0, len);
-            }
-
-            pickFileLocation.close();
-            dropFileLocation.close();
             return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
+        });
+        popupMenu.show();
     }
 
-    private boolean moveFileManually(File source, File dest) {
-        boolean copied = copyFile(source, dest);
-        if (copied) {
-            return source.delete();
-        }
-        return false;
-    }
 
-    private void copyDirectory(File source, File destination) throws IOException {
+    private void showRenameInputDialog() {
 
-        if (!destination.exists()) {
-            destination.mkdirs();
+        for (Integer index : selectExtension.getSelections()) {
+            item = itemAdapterMusic.getAdapterItem(index);
         }
 
-        File[] files = source.listFiles();
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        if (files != null) {
+        View view = LayoutInflater.from(this).inflate(R.layout.rename_item, null);
+        builder.setView(view);
 
-            for (File file : files) {
-                File newDest = new File(destination, file.getName());
-                if (newDest.exists()) {
-                    newDest = getNonConflictingFile(newDest);
-                }
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
 
-                if (file.isDirectory()) {
-                    copyDirectory(file, newDest);
-                } else {
-                    Files.copy(file.toPath(), newDest.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                }
+        TextInputEditText etName = view.findViewById(R.id.etRename);
+
+        Button btnOkRename = view.findViewById(R.id.btnOkRename);
+        Button btnCancelRename = view.findViewById(R.id.btnCancelRename);
+
+        etName.setText(item.getName());
+
+        btnOkRename.setOnClickListener(v -> {
+
+            String newFileName = etName.getText().toString().trim();
+
+            if (!newFileName.isEmpty()) {
+                Uri fileUri = item.getUri();
+                boolean renameSuccess = FileOperation.showRenameFileDialog(this, fileUri, newFileName);
+                fastAdapterMusic.notifyDataSetChanged();
+                Toast.makeText(this, renameSuccess ? "File renamed successfully" : "Failed to rename file", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "File name cannot be empty", Toast.LENGTH_SHORT).show();
             }
-        }
+            alertDialog.dismiss();
+        });
+
+        btnCancelRename.setOnClickListener(v -> {
+            alertDialog.dismiss();
+        });
+
+//        int index = selectExtension.getSelections().iterator().next();
+//        FileHelperAdapter item = itemAdapterVideo.getAdapterItem(index);
+
+
     }
 
-    void isPastDeselect() {
-
-        if (ClipboardHelper.isIsPasting()) {
-
-            btnMusicPasting.setVisibility(View.VISIBLE);
-
-            btnMusicPasting.setOnClickListener(v -> {
-                ClipboardHelper.setIsPasting(false);
-//                pasteFiles(currentDirectory);
-                pasteFiles(destination);
-                btnMusicPasting.setVisibility(View.GONE);
-
-            });
-
-        }
+    void newSorting() {
+        SortingHelper.sortingBy(this,
+                musicList,
+                fastAdapterMusic,
+                itemAdapterMusic,
+                sharedPreferencesMusic,
+                "MUSICSORTINGBY",
+                sortedList -> {
+                    Toast.makeText(MusicActivity.this, "List sorted", Toast.LENGTH_SHORT).show();
+                }
+        );
     }
 
+    void openSearching() {
+        FileOperation.searchingIntent(MusicActivity.this);
+    }
 
-    private void shareSelectedFiles() {
+    private void addToDrive() {
+        FileOperation.shareFilesToGoogleDrive(this, itemAdapterMusic, selectExtension);
+    }
 
-        if (selectedFile == null || selectedFile.isEmpty()) {
+    private void openSelectedFile() {
+
+        Set<Integer> selectedIndices = selectExtension.getSelections();
+
+        if (selectedIndices.isEmpty()) {
             Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        ArrayList<Uri> uriList = new ArrayList<>();
+        int index = selectedIndices.iterator().next();
+        FileHelperAdapter selectedItem = itemAdapterMusic.getAdapterItem(index);
 
-        for (String path : selectedFile) {
-            File file = new File(path);
-            Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".provider", file);
-            uriList.add(uri);
-        }
-
-        Intent shareIntent = new Intent();
-        if (uriList.size() == 1) {
-            shareIntent.setAction(Intent.ACTION_SEND);
-            shareIntent.putExtra(Intent.EXTRA_STREAM, uriList.get(0));
-            shareIntent.setType(getMimeType(uriList.get(0)));
+        if (selectedItem != null) {
+            FileOperation.fileOpenWith(this, selectedItem.getUri(), selectedItem.getMineTypes());
         } else {
-            shareIntent.setAction(Intent.ACTION_SEND_MULTIPLE);
-            shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uriList);
-            shareIntent.setType("*/*"); // or a common mime type
+            Toast.makeText(this, "Failed to open file", Toast.LENGTH_SHORT).show();
         }
 
-        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        startActivity(Intent.createChooser(shareIntent, "Share File(s) via"));
     }
 
-    private String getMimeType(Uri uri) {
-        ContentResolver cr = getContentResolver();
-        return cr.getType(uri);
+    public String getSelectedFileSize() {
+
+        long fileSizeSum = 0;
+
+        for (Integer selectedItem : selectExtension.getSelections()) {
+            FileHelperAdapter fileSize = itemAdapterMusic.getAdapterItem(selectedItem);
+            fileSizeSum += parseSizeToBytes(fileSize.getSize());
+        }
+
+        return FileOperation.sizeCal(fileSizeSum);
+    }
+
+    public long parseSizeToBytes(String sizeStr) {
+
+        sizeStr = sizeStr.trim().toUpperCase();
+
+        try {
+            if (sizeStr.endsWith("KB")) {
+                return (long) (Double.parseDouble(sizeStr.replace("KB", "").trim()) * 1024);
+            } else if (sizeStr.endsWith("MB")) {
+                return (long) (Double.parseDouble(sizeStr.replace("MB", "").trim()) * 1024 * 1024);
+            } else if (sizeStr.endsWith("GB")) {
+                return (long) (Double.parseDouble(sizeStr.replace("GB", "").trim()) * 1024 * 1024 * 1024);
+            } else if (sizeStr.endsWith("B")) {
+                return Long.parseLong(sizeStr.replace("B", "").trim());
+            } else {
+                return Long.parseLong(sizeStr);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
     }
 
 
-    void loadUtils() {
-        //        MediaStoreHelper.loadFile(this, "audio", files -> {
-//            musicList.clear();
-//            musicList.addAll(files);
-//            itemAdapterMusic.setNewList(musicList);
-//            fastAdapterMusic.notifyDataSetChanged();
-//
-//        });
-//                MediaStoreHelper.fileOpenWith(v.getContext(), item.getUri(), item.getMineTypes());
-    }
+
+
+
 }
 
 

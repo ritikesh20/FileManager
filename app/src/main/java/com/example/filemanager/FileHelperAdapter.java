@@ -1,5 +1,6 @@
-package com.example.filemanager.document;
+package com.example.filemanager;
 
+import static com.example.filemanager.music.MusicActivity.isMusicView;
 import static com.example.filemanager.videolist.VideoActivity.isVideoView;
 
 import android.net.Uri;
@@ -9,7 +10,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.bumptech.glide.Glide;
-import com.example.filemanager.R;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.items.AbstractItem;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
@@ -25,16 +25,6 @@ public class FileHelperAdapter extends AbstractItem<FileHelperAdapter, FileHelpe
     String mineTypes;
     String docDate;
     String size;
-
-    private boolean isFavourite;
-
-    public boolean isFavourite() {
-        return isFavourite;
-    }
-
-    public void setFavourite(boolean favourite) {
-        isFavourite = favourite;
-    }
 
     public FileHelperAdapter() {
     }
@@ -81,28 +71,26 @@ public class FileHelperAdapter extends AbstractItem<FileHelperAdapter, FileHelpe
 
     @Override
     public int getLayoutRes() {
-        return isVideoView ? R.layout.istore_grid_item : R.layout.internal_storage_items;
+
+        if (isMusicView || isVideoView) {
+            return R.layout.istore_grid_item;
+        } else {
+            return R.layout.internal_storage_items;
+        }
+
+//        return isVideoView ? R.layout.istore_grid_item : R.layout.internal_storage_items;
 
     }
 
     public static class ViewHolder extends FastAdapter.ViewHolder<FileHelperAdapter> {
 
-//        private final ImageView fileIcons;
-
-//        private final IconicsImageView fileIcons;
-//        private final IconicsImageView fileFavIcon;
-//        private final IconicsImageView fileIconMusicVideo;
-//        private final TextView fileDate;
-//        private final TextView fileSize;
-//        private final IconicsImageView btnFileMenu;
-
-        private TextView fileName;
-        private IconicsImageView fileImage;
-        private TextView fileDate;
-        private TextView tvHeaderText;
-        private TextView fileSize;
-        IconicsImageView btnFileInfo;
-        private IconicsImageView fileTypeIcon;
+        TextView fileName;
+        IconicsImageView fileImage;
+        TextView fileDate;
+        TextView tvHeaderText;
+        TextView fileSize;
+        public IconicsImageView btnFileInfo;
+        IconicsImageView fileTypeIcon;
 
         public ViewHolder(View itemView) {
 
@@ -132,15 +120,15 @@ public class FileHelperAdapter extends AbstractItem<FileHelperAdapter, FileHelpe
                 } else if (mime.contains("pdf")) {
                     Glide.with(itemView.getContext()).load(item.uri).error(R.drawable.pdf).into(fileImage);
                 } else if (mime.contains("msword") || mime.contains("wordprocessingml")) {
-                    fileImage.setIcon(new IconicsDrawable(itemView.getContext(), GoogleMaterial.Icon.gmd_work));
+//                    fileImage.setIcon(new IconicsDrawable(itemView.getContext(), GoogleMaterial.Icon.gmd_doc));
+
                 } else if (mime.contains("audio/")) {
                     fileImage.setIcon(new IconicsDrawable(itemView.getContext(), GoogleMaterial.Icon.gmd_music_note).colorRes(R.color.purple).sizeDp(20));
                 } else {
-                    fileImage.setIcon(new IconicsDrawable(itemView.getContext(), GoogleMaterial.Icon.gmd_description));
+//                    fileImage.setIcon(new IconicsDrawable(itemView.getContext(), GoogleMaterial.Icon.));
                 }
 
             }
-
 
             fileName.setText(item.getName());
 
@@ -154,14 +142,17 @@ public class FileHelperAdapter extends AbstractItem<FileHelperAdapter, FileHelpe
                 btnFileInfo.setIcon(new IconicsDrawable(itemView.getContext(), GoogleMaterial.Icon.gmd_more_vert).actionBar());
             }
 
+            if (isVideoView) {
+                fileName.setVisibility(View.GONE);
+                fileTypeIcon.setIcon(new IconicsDrawable(itemView.getContext(), GoogleMaterial.Icon.gmd_play_circle_outline).actionBar());
+                if (itemView.isSelected()) {
+                    btnFileInfo.setVisibility(View.VISIBLE);
+                    btnFileInfo.setIcon(new IconicsDrawable(itemView.getContext(), GoogleMaterial.Icon.gmd_check_circle).actionBar());
 
-//            if (item.isFavourite) {
-//                fileFavIcon.setVisibility(View.VISIBLE);
-//                fileFavIcon.setIcon(new IconicsDrawable(itemView.getContext(), GoogleMaterial.Icon.gmd_star).actionBar());
-//            } else {
-//                fileFavIcon.setVisibility(View.GONE);
-//            }
-
+                } else {
+                    btnFileInfo.setVisibility(View.GONE);
+                }
+            }
 
 
         }
@@ -169,7 +160,7 @@ public class FileHelperAdapter extends AbstractItem<FileHelperAdapter, FileHelpe
         @Override
         public void unbindView(@NonNull FileHelperAdapter item) {
 
-            fileImage.setIcon(new IconicsDrawable(itemView.getContext(), GoogleMaterial.Icon.gmd_attach_file));
+            fileImage.setIcon(new IconicsDrawable(itemView.getContext(), GoogleMaterial.Icon.gmd_drafts));
             fileName.setText(null);
             fileDate.setText(null);
             fileSize.setText(null);

@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RadioGroup;
 
-import com.example.filemanager.document.FileHelperAdapter;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.adapters.ItemAdapter;
@@ -33,6 +32,7 @@ public class SortingHelper {
             String preferenceKey,
             OnSortedCallback callback
     ) {
+
         BottomSheetDialog sortingSheet = new BottomSheetDialog(context);
         View view = LayoutInflater.from(context).inflate(R.layout.bottomsheet_items, null);
         sortingSheet.setContentView(view);
@@ -40,10 +40,14 @@ public class SortingHelper {
         RadioGroup radioGroup = view.findViewById(R.id.btnRGImageSorting);
 
         int savedOption = sharedPreferences.getInt(preferenceKey, R.id.rbBtnNDF);
+
         radioGroup.check(savedOption);
 
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            sharedPreferences.edit().putInt(preferenceKey, checkedId).apply();
+
+            SharedPreferences.Editor sort = sharedPreferences.edit();
+            sort.putInt(preferenceKey,checkedId);
+            sort.apply();
 
             if (checkedId == R.id.rbBtnNDF) {
                 Collections.sort(fileList, (nfd, ofd) -> parseFileDate(ofd.getDocDate()).compareTo(parseFileDate(nfd.getDocDate())));
@@ -58,6 +62,7 @@ public class SortingHelper {
             } else if (checkedId == R.id.nameZA) {
                 Collections.sort(fileList, (name1, name2) -> name2.getName().compareTo(name1.getName()));
             }
+
             itemAdapterFile.setNewList(fileList);
             fastAdapterFile.notifyAdapterDataSetChanged();
             sortingSheet.dismiss();
@@ -80,7 +85,9 @@ public class SortingHelper {
     }
 
     private static long parseSizeToBytes(String sizeStr) {
+
         sizeStr = sizeStr.trim().toUpperCase();
+
         try {
             if (sizeStr.endsWith("KB")) {
                 return (long) (Double.parseDouble(sizeStr.replace("KB", "").trim()) * 1024);

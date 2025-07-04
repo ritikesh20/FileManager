@@ -10,14 +10,18 @@
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbarInternalStorage"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="55dp"
         android:background="#E2DDEF"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:subtitle="0 file 0 folder"
-        app:title="Internal Storage">
+        app:title="Internal Storage"
+        app:titleTextAppearance="@style/ToolbarTitleText"
+        app:subtitleTextAppearance="@style/ToolbarSubtitleText"
+
+        >
 
 
         <ImageView
@@ -31,19 +35,6 @@
 
     </androidx.appcompat.widget.Toolbar>
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbarSelected"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbarInternalStorage"
-        app:subtitle="5 mb"
-        app:title="0 Selected" />
-
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvPathHistory"
         android:layout_width="match_parent"
@@ -51,7 +42,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbarSelected" />
+        app:layout_constraintTop_toBottomOf="@id/toolbarInternalStorage" />
 
     <com.google.android.material.divider.MaterialDivider
         android:id="@+id/horizontalDivider"
@@ -113,6 +104,5 @@
     </Button>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
 
 

@@ -21,7 +21,6 @@
         android:id="@+id/ivNext"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_marginStart="10dp"
         android:contentDescription="@string/next"
         android:src="@drawable/next"
         />

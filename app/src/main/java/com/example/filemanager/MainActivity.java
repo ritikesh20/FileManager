@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
@@ -11,7 +12,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.StatFs;
 import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,9 +21,11 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.cardview.widget.CardView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -35,7 +37,8 @@ import com.example.filemanager.internalstorage.InternalStorageActivity;
 import com.example.filemanager.music.MusicActivity;
 import com.example.filemanager.music.NewSearchActivity;
 import com.example.filemanager.recentfiles.RecentFilesActivity;
-import com.example.filemanager.safefolder.SafeFolderActivity;
+import com.example.filemanager.safefolder.LogInActivity;
+import com.example.filemanager.trashbin.TrashActivity;
 import com.example.filemanager.videolist.HomeFileAdapter;
 import com.example.filemanager.videolist.VideoActivity;
 import com.google.android.material.navigation.NavigationView;
@@ -48,6 +51,7 @@ import com.mikepenz.iconics.view.IconicsImageView;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -59,14 +63,15 @@ public class MainActivity extends AppCompatActivity {
     CardView btnCVInternalStorage, btnImageView,
             btnCVDownload, btnVideo,
             btnShowAudioFile, btnCVDocument,
-            btnCVRecentFile, btnCVSDCard,
+            btnCVSDCard,
             btnCVApps, btnCvFavourite, btnCVSafeFolder;
 
     IconicsImageView btnHomeIconShowSideNav;
 
     TextView btnRecentFile;
     TextView etSearchingFile;
-    IconicsImageView homeIconDownload, homeIconImage, homeIconVideo, homeIconAudio,
+    IconicsImageView
+            homeIconDownload, homeIconImage, homeIconVideo, homeIconAudio,
             homeIconDoc, homeIconApps, homeIconStarred, homeIconSafeFolder,
             homeIconInternalStorage, homeIconSDCard, homeSideNav;
 
@@ -77,22 +82,21 @@ public class MainActivity extends AppCompatActivity {
     List<HomeFileAdapter> recentFileList = new ArrayList<>();
 
 
-//    long totalImageSize = 0;
-//    long totalVideoSize = 0;
-//    long totalAudioSize = 0;
-//    long totalDocSize = 0;
-//    long totalApkSize = 0;
-//
-//    TextView tvAudioSize;
-//    TextView tvVideoSize;
-//    TextView tvImageSize;
-//    TextView tvApkSize;
-//    TextView tvDocSize;
+    long totalImageSize = 0;
+    long totalVideoSize = 0;
+    long totalAudioSize = 0;
+    long totalDocSize = 0;
+    long totalApkSize = 0;
 
-//    ProgressBar pbFileLong;
+    TextView tvAudioSize;
+    TextView tvVideoSize;
+    TextView tvImageSize;
+    TextView tvDocSize;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        applyThemeMode();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -109,16 +113,10 @@ public class MainActivity extends AppCompatActivity {
 
         addIconHome();
 
-
-//        pbFileLong = findViewById(R.id.pbFileSize);
-
-//        tvAudioSize = findViewById(R.id.tvAudioFileSize);
-//        tvVideoSize = findViewById(R.id.tvVideoFileSize);
-//        tvImageSize = findViewById(R.id.tvImageFileSize);
-//        tvApkSize = findViewById(R.id.tvApkFileSize);
-//        tvDocSize = findViewById(R.id.tvDocFileSize);
-
-//        Toolbar homeToolbar = findViewById(R.id.toolbarHome);
+        tvAudioSize = findViewById(R.id.tvAudioFileSize);
+        tvVideoSize = findViewById(R.id.tvVideoFileSize);
+        tvImageSize = findViewById(R.id.tvImageFileSize);
+        tvDocSize = findViewById(R.id.tvDocFileSize);
 
         homeDrawerLayout = findViewById(R.id.homeDreawerLayout);
         navigationView = findViewById(R.id.home_nav_DL);
@@ -151,14 +149,13 @@ public class MainActivity extends AppCompatActivity {
         btnCVApps = findViewById(R.id.btnCVApps);
         btnCVSafeFolder = findViewById(R.id.btnSafe);
 
-
         etSearchingFile.setOnClickListener(v -> {
             Intent intent = new Intent(this, NewSearchActivity.class);
             startActivity(intent);
         });
 
         btnCVSafeFolder.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, SafeFolderActivity.class);
+            Intent intent = new Intent(MainActivity.this, LogInActivity.class);
             startActivity(intent);
         });
 
@@ -181,9 +178,11 @@ public class MainActivity extends AppCompatActivity {
             String path = Environment.getExternalStorageDirectory().getPath();
             Intent intent = new Intent(MainActivity.this, InternalStorageActivity.class);
             intent.putExtra("path", path);
+
             startActivity(intent);
 
         });
+
 
         btnCVDownload.setOnClickListener(v -> {
 
@@ -239,6 +238,7 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
+        getInternalStorageInfo();
     }
 
     private void loadRecentFiles() {
@@ -326,7 +326,7 @@ public class MainActivity extends AppCompatActivity {
 
         MenuInflater menuInflater = getMenuInflater();
 
-        menuInflater.inflate(R.menu.menu_home, menu);
+        menuInflater.inflate(R.menu.all_type, menu);
 
         return true;
     }
@@ -339,60 +339,6 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
-
-//    void loadHomeRecentFile() {
-//
-//        listRecentFile.clear();
-//
-//        Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-//
-//        String[] projection = {
-//                MediaStore.Files.FileColumns._ID,
-//                MediaStore.Files.FileColumns.DISPLAY_NAME,
-//                MediaStore.Files.FileColumns.RELATIVE_PATH,
-//                MediaStore.Files.FileColumns.MIME_TYPE
-//        };
-//
-//        ContentResolver contentResolver = getContentResolver();
-//        String sortOrder = MediaStore.Images.Media.DATE_MODIFIED + " DESC LIMIT 50";
-//        Cursor cursor = contentResolver.query(
-//                uri,
-//                projection,
-//                null,
-//                null,
-//                sortOrder
-//        );
-//
-//        // find the colum index
-//
-//        if (cursor != null) {
-//            int idColum = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID);
-//            int fileNameColum = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME);
-//            int filePathColum = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.RELATIVE_PATH);
-//            int mimeColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.MIME_TYPE);
-//
-//            while (cursor.moveToNext()) {
-//                long id = cursor.getLong(idColum);
-//                String fileName = cursor.getString(fileNameColum);
-//                String filePath = cursor.getString(filePathColum);
-//                String mime = cursor.getString(mimeColumn);
-//
-//
-//                Uri recentFileUri = ContentUris.withAppendedId(uri, id);
-//
-//                listRecentFile.add(new AdapterRecentFile(recentFileUri, fileName, filePath, mime));
-//
-//            }
-//            cursor.close();
-//        }
-//
-//        itemAdapterRecentFile.setNewList(listRecentFile);
-//        recyclerView.setAdapter(fastAdapterRecentFile);
-//        fastAdapterRecentFile.notifyAdapterDataSetChanged();
-//
-//    }
-
 
     private void addIconHome() {
 
@@ -410,13 +356,14 @@ public class MainActivity extends AppCompatActivity {
         homeIconInternalStorage = findViewById(R.id.homeIconInternalStorage);
         homeIconSDCard = findViewById(R.id.homeIconSDCard);
 
-
         homeIconDownload.setIcon(new IconicsDrawable(this, GoogleMaterial.Icon.gmd_file_download).sizeDp(20));
         homeIconImage.setIcon(new IconicsDrawable(this, GoogleMaterial.Icon.gmd_image));
 
-        homeIconVideo.setIcon(new IconicsDrawable(this, GoogleMaterial.Icon.gmd_movie).backgroundColor(Color.WHITE));
+        homeIconVideo.setIcon(new IconicsDrawable(this, GoogleMaterial.Icon.gmd_movie));
+
         homeIconAudio.setIcon(new IconicsDrawable(this, GoogleMaterial.Icon.gmd_music_note));
         homeIconDoc.setIcon(new IconicsDrawable(this, GoogleMaterial.Icon.gmd_drafts));
+
         homeIconApps.setIcon(new IconicsDrawable(this, GoogleMaterial.Icon.gmd_apps));
         homeIconStarred.setIcon(new IconicsDrawable(this, GoogleMaterial.Icon.gmd_star));
         homeIconSafeFolder.setIcon(new IconicsDrawable(this, GoogleMaterial.Icon.gmd_lock));
@@ -427,122 +374,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-    private void getInternalStorageInfo() {
-
-        File internalStorageDir = Environment.getDataDirectory();
-        StatFs statFs = new StatFs(internalStorageDir.getPath());
-
-        long blockSize, totalBlocks, availableBlocks;
-
-        blockSize = statFs.getBlockSizeLong();
-        totalBlocks = statFs.getBlockCountLong();
-        availableBlocks = statFs.getAvailableBlocksLong();
-
-        long totalSize = totalBlocks * blockSize;
-        long availableSize = availableBlocks * blockSize;
-        long usedSize = totalSize - availableSize;
-
-//        String tSize = formatSize(totalSize);
-//        String aSize = formatSize(availableSize);
-//        String uSize = formatSize(usedSize);
-//
-
-//        tvInternalStorage.setText("Available " + aSize);
-//        String calSize = uSize + " Used of " + tSize;
-//        tvTotalUsed.setText(calSize);
-//           ******************************
-        //    private void calFileSize(File dir) {
-//
-//        if (dir == null || !dir.exists() || !dir.isDirectory()) {
-//            return;
-//        }
-//
-//        File[] files = dir.listFiles();
-//
-//        if (files == null) {
-//            return;
-//        }
-//
-//        for (File file : files) {
-//            if (file.isDirectory()) {
-//                calFileSize(file);
-//            } else {
-//                String name = file.getName().toLowerCase(Locale.ROOT);
-//                long size = file.length();
-//
-//                if (name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png") || name.endsWith(".gif") || name.endsWith(".webp")) {
-//                    totalImageSize += size;
-//                } else if (name.endsWith(".mp4") || name.endsWith(".mkv") || name.endsWith(".avi") || name.endsWith(".3gp")) {
-//                    totalVideoSize += size;
-//                } else if (name.endsWith(".mp3") || name.endsWith(".wav") || name.endsWith(".aac") || name.endsWith(".m4a")) {
-//                    totalAudioSize += size;
-//                } else if (name.endsWith(".pdf") || name.endsWith(".doc") || name.endsWith(".docx") || name.endsWith(".ppt") || name.endsWith(".pptx") || name.endsWith(".txt")) {
-//                    totalDocSize += size;
-//                } else if (name.endsWith(".apk")) {
-//                    totalApkSize += size;
-//                }
-//
-//            }
-//        }
-//
-//    }
-
-//    private String formatSize(long sizeInBytes) {
-//
-//        float kb = sizeInBytes / 1024f;
-//        float mb = kb / 1024f;
-//        float gb = mb / 1024f;
-//
-//        if (gb >= 1) {
-//            return String.format("%.1f GB", gb);
-//        }
-//        else if (mb >= 1) {
-//            return String.format("%.1f MB", mb);
-//        }
-//        else {
-//            return String.format("%.1f KB", kb);
-//        }
-//
-//    }
-
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-
-        executorService.execute(new Runnable() {
-            @Override
-            public void run() {
-
-//                File root = Environment.getExternalStorageDirectory();
-//                calFileSize(root);
-
-//                String audioFileSize = formatSize(totalAudioSize);
-//                String videoFileSize = formatSize(totalVideoSize);
-//                String imageFileSize = formatSize(totalImageSize);
-//                String apkFileSize = formatSize(totalApkSize);
-//                String docFileSize = formatSize(totalDocSize);
-
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-
-//                        getInternalStorageInfo();
-//                        pbFileLong.setVisibility(View.GONE);
-//                        tvAudioSize.setText(audioFileSize);
-//                        tvVideoSize.setText(videoFileSize);
-//                        tvImageSize.setText(imageFileSize);
-//                        tvApkSize.setText(apkFileSize);
-//                        tvDocSize.setText(docFileSize);
-
-                    }
-                });
-
-            }
-        });
-
-    }
-
-
     void openNavOption() {
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -551,10 +382,13 @@ public class MainActivity extends AppCompatActivity {
                 int id = item.getItemId();
 
                 if (id == R.id.nav_Setting) {
-
                     Intent settingIntent = new Intent(MainActivity.this, SettingsActivity.class);
                     startActivity(settingIntent);
-
+                    return true;
+                } else if (id == R.id.nav_Trash) {
+                    Intent trashBin = new Intent(MainActivity.this, TrashActivity.class);
+                    startActivity(trashBin);
+                    return true;
                 }
 
                 homeDrawerLayout.closeDrawer(GravityCompat.START);
@@ -563,11 +397,92 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void getInternalStorageInfo() {
+
+        totalAudioSize = 0;
+        totalVideoSize = 0;
+        totalImageSize = 0;
+        totalApkSize = 0;
+        totalDocSize = 0;
+
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+
+                File root = Environment.getExternalStorageDirectory();
+                calFileSize(root);
+
+                String audioFileSize = FileOperation.sizeCal(totalAudioSize);
+                String videoFileSize = FileOperation.sizeCal(totalVideoSize);
+                String imageFileSize = FileOperation.sizeCal(totalImageSize);
+                String docFileSize = FileOperation.sizeCal(totalDocSize);
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        tvAudioSize.setText(audioFileSize);
+                        tvVideoSize.setText(videoFileSize);
+                        tvImageSize.setText(imageFileSize);
+                        tvDocSize.setText(docFileSize);
+                    }
+                });
+            }
+        });
+    }
+
+
+    private void calFileSize(File dir) {
+
+        if (dir == null || !dir.exists() || !dir.isDirectory()) return;
+
+        File[] files = dir.listFiles();
+
+        if (files == null) return;
+
+        for (File file : files) {
+            if (file.isDirectory()) {
+                calFileSize(file);
+            } else {
+                String name = file.getName().toLowerCase(Locale.ROOT);
+                long size = file.length();
+
+                if (name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png") || name.endsWith(".gif") || name.endsWith(".webp")) {
+                    totalImageSize += size;
+                } else if (name.endsWith(".mp4") || name.endsWith(".mkv") || name.endsWith(".avi") || name.endsWith(".3gp")) {
+                    totalVideoSize += size;
+                } else if (name.endsWith(".mp3") || name.endsWith(".wav") || name.endsWith(".aac") || name.endsWith(".m4a")) {
+                    totalAudioSize += size;
+                } else if (name.endsWith(".pdf") || name.endsWith(".doc") || name.endsWith(".docx") || name.endsWith(".ppt") || name.endsWith(".pptx") || name.endsWith(".txt")) {
+                    totalDocSize += size;
+                }
+            }
+        }
+    }
+
+
+    void applyThemeMode() {
+
+        SharedPreferences themeModePref = PreferenceManager.getDefaultSharedPreferences(this);
+        String theme = themeModePref.getString("app_mode", "defaultMode");
+
+        switch (theme) {
+            case "lightMode":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                break;
+            case "darkMode":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                break;
+            case "defaultMode":
+            default:
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                break;
+        }
+
+    }
+
 
 }
 
-/*
-//        List<HomeFileAdapter> recentFiles = getRecentFiles();
-//        itemAdapterRecentFile.setNewList(recentFiles);
-//        recyclerView.setAdapter(fastAdapterRecentFile);
- */
+

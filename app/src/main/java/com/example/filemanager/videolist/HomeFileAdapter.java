@@ -11,6 +11,9 @@ import com.bumptech.glide.Glide;
 import com.example.filemanager.R;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.items.AbstractItem;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.iconics.view.IconicsImageView;
 
 import java.util.List;
 
@@ -66,6 +69,7 @@ public class HomeFileAdapter extends AbstractItem<HomeFileAdapter, HomeFileAdapt
         ImageView recentFileImage;
         TextView recentFileName;
         TextView recentFolderName;
+        IconicsImageView recentHomeInfoIcon;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -73,6 +77,7 @@ public class HomeFileAdapter extends AbstractItem<HomeFileAdapter, HomeFileAdapt
             recentFileImage = itemView.findViewById(R.id.homeRecentImage);
             recentFileName = itemView.findViewById(R.id.homeRecentName);
             recentFolderName = itemView.findViewById(R.id.homeRecentFolderName);
+            recentHomeInfoIcon = itemView.findViewById(R.id.recentHomeInfoIcon);
         }
 
         @Override
@@ -104,7 +109,8 @@ public class HomeFileAdapter extends AbstractItem<HomeFileAdapter, HomeFileAdapt
 
             recentFileName.setText(item.getRecentFileName());
             recentFolderName.setText(item.getRecentFolderName());
-
+            recentHomeInfoIcon.setIcon(new IconicsDrawable(itemView.getContext(),
+                    GoogleMaterial.Icon.gmd_more_vert).colorRes(R.color.white).actionBar());
         }
 
         @Override

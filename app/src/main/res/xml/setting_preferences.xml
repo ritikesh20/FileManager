@@ -8,16 +8,20 @@
             android:defaultValue="50"
             android:entries="@array/RecentFile"
             android:entryValues="@array/RecentFile_values"
-            android:icon="@drawable/device"
+            android:icon="@drawable/filebackup"
             android:key="recentFile_size"
-            android:summary="Select recent file size"
-            android:title="My RecentFile size" />
+            android:summary="Limit Size of Recent File"
+            android:title="Recent List Limit" />
 
-
-        <SwitchPreference
-            android:key="dark_mode"
-            android:summary="Enable or disable dark Mode"
-            android:title="DarkMode" />
+        <ListPreference
+            android:defaultValue="x"
+            android:entries="@array/Mode"
+            android:entryValues="@array/Mode_values"
+            android:icon="@drawable/view"
+            android:key="app_mode"
+            android:title="Theme"
+            android:summary="Try Themes to get new look to your App Ui"
+            />
 
     </PreferenceCategory>
 

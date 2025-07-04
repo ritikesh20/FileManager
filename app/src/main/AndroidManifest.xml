@@ -26,6 +26,15 @@
         android:theme="@style/Theme.FileManager"
         tools:targetApi="31">
         <activity
+            android:name=".safefolder.LogInActivity"
+            android:exported="false" />
+        <activity
+            android:name=".safefolder.PasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".trashbin.TrashActivity"
+            android:exported="false" />
+        <activity
             android:name=".internalstorage.FileInfoActivity"
             android:exported="false" />
         <activity
@@ -45,9 +54,6 @@
             android:exported="false" />
         <activity
             android:name=".recentfiles.RecentFilesActivity"
-            android:exported="false" />
-        <activity
-            android:name=".DemoPage.HomeActivity"
             android:exported="false" />
         <activity
             android:name=".document.DocumentActivity"
@@ -78,9 +84,6 @@
             android:exported="false" />
         <activity
             android:name=".imagexview.ImageGalleryActivity"
-            android:exported="false" />
-        <activity
-            android:name=".imagexview.FileListActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

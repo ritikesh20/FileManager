@@ -17,10 +17,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.filemanager.document.FileHelperAdapter;
-import com.example.filemanager.favouritesection.AppDatabase;
-import com.example.filemanager.favouritesection.FavouriteDao;
-import com.example.filemanager.favouritesection.FavouriteItem;
 import com.example.filemanager.music.NewSearchActivity;
 import com.mikepenz.fastadapter.adapters.ItemAdapter;
 import com.mikepenz.fastadapter.select.SelectExtension;
@@ -31,9 +27,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.Locale;
 
 public class FileOperation {
 
@@ -47,18 +41,16 @@ public class FileOperation {
         activity.startActivity(searching);
     }
 
-
     //    selected
-    public static List<FileHelperAdapter> getSelectedFiles(
-
-            ItemAdapter<FileHelperAdapter> itemAdapter,
-            SelectExtension<FileHelperAdapter> selectExtension) {
+    public static List<FileHelperAdapter> getSelectedFiles(ItemAdapter<FileHelperAdapter> itemAdapter, SelectExtension<FileHelperAdapter> selectExtension) {
 
         List<FileHelperAdapter> selectedFiles = new ArrayList<>();
 
         for (int index : selectExtension.getSelections()) {
             FileHelperAdapter item = itemAdapter.getAdapterItem(index);
-            if (item != null) selectedFiles.add(item);
+            if (item != null) {
+                selectedFiles.add(item);
+            }
         }
 
         return selectedFiles;
@@ -84,11 +76,13 @@ public class FileOperation {
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
         activity.startActivity(Intent.createChooser(shareIntent, "Share files via"));
+
     }
 
     public static void fileOpenWith(Context context, Uri uri, String mimeType) {
 
         try {
+
             Intent intentOpenWith = new Intent(Intent.ACTION_VIEW);
             intentOpenWith.setDataAndType(uri, mimeType);
             intentOpenWith.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
@@ -110,47 +104,24 @@ public class FileOperation {
         ContentResolver resolver = context.getContentResolver();
         int rowFileNameUpdated = resolver.update(fileUri, values, null, null);
 
+        ContentValues values1 = new ContentValues();
+        values1.put(MediaStore.MediaColumns.DISPLAY_NAME, newFileName);
+
 
         return rowFileNameUpdated > 0;
 
     }
 
-    public static void sendToFavourite(Activity activity, SelectExtension<FileHelperAdapter> selectExtension) {
 
-        Set<FileHelperAdapter> selectedFavItem = selectExtension.getSelectedItems();
+    public static void shareFilesToGoogleDrive(
+            Activity activity,
+            ItemAdapter<FileHelperAdapter> itemAdapter,
+            SelectExtension<FileHelperAdapter> selectExtension) {
 
-        if (selectedFavItem.isEmpty()) {
-            Toast.makeText(activity, "No file selected", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        List<FileHelperAdapter> selectedFiles = getSelectedFiles(itemAdapter, selectExtension);
 
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-
-        executor.execute(() -> {
-            FavouriteDao dao = AppDatabase.getInstance(activity).favouriteVideoDao();
-
-            for (FileHelperAdapter fileHelperAdapter : selectedFavItem) {
-                FavouriteItem favouriteItem = new FavouriteItem(
-                        fileHelperAdapter.getUri().toString(),
-                        fileHelperAdapter.getName(),
-                        false,
-                        fileHelperAdapter.getDocDate(),
-                        fileHelperAdapter.getSize(),
-                        fileHelperAdapter.getMineTypes(),
-                        0
-                );
-                dao.insert(favouriteItem);
-            }
-
-            activity.runOnUiThread(() ->
-                    Toast.makeText(activity, "File Add to Favourite Successfully", Toast.LENGTH_SHORT).show()
-            );
-        });
-    }
-
-    public static void shareFilesToGoogleDrive(Context context, List<FileHelperAdapter> selectedFiles) {
-        if (selectedFiles == null || selectedFiles.isEmpty()) {
-            Toast.makeText(context, "No files selected", Toast.LENGTH_SHORT).show();
+        if (selectedFiles.isEmpty()) {
+            Toast.makeText(activity, "No files selected", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -169,13 +140,13 @@ public class FileOperation {
         }
 
         intent.setType("*/*");
-        intent.setPackage("com.google.android.apps.docs"); // Open only in Google Drive
+        intent.setPackage("com.google.android.apps.docs");
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
         try {
-            context.startActivity(Intent.createChooser(intent, "Upload to Google Drive"));
+            activity.startActivity(Intent.createChooser(intent, "Upload to Google Drive"));
         } catch (ActivityNotFoundException e) {
-            Toast.makeText(context, "Google Drive app is not installed", Toast.LENGTH_LONG).show();
+            Toast.makeText(activity, "Google Drive app is not installed", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -270,6 +241,48 @@ public class FileOperation {
         } else {
             return String.format("%.2f KB", kb);
         }
+    }
+
+    public static String convertFileSizeByteToString(long fileSizeInString) {
+
+        float kb = fileSizeInString / 1024f;
+        float mb = kb / 1024f;
+        float gb = mb / 1024f;
+
+        if (gb >= 1) {
+            return String.format(Locale.ROOT, "%.2f GB", gb);
+        } else if (mb > 1) {
+            return String.format(Locale.ROOT, "%.2f MB", mb);
+        } else {
+            return String.format(Locale.ROOT, "%.2f KB", kb);
+        }
+
+
+    }
+
+
+    static public long convertFileSizeStringToByte(String fileSize) {
+
+        fileSize = fileSize.toUpperCase().trim();
+
+        try {
+
+            if (fileSize.endsWith("KB")) {
+                return (long) (Double.parseDouble(fileSize.replace("KB", "").trim()) * 1024);
+            } else if (fileSize.endsWith("MB")) {
+                return (long) (Double.parseDouble(fileSize.replace("MB", "").trim()) * 1024 * 1024);
+            } else if (fileSize.endsWith("GB")) {
+                return (long) (Double.parseDouble(fileSize.replace("GB", "").trim()) * 1024 * 1024 * 1024);
+            } else if (fileSize.endsWith("B")) {
+                return Long.parseLong(fileSize.replace("B", "").trim());
+            } else {
+                return Long.parseLong(fileSize);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+
     }
 
 

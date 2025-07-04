@@ -54,7 +54,7 @@
                     android:layout_height="50dp"
                     android:layout_gravity="center"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/folderg" />
+                     />
 
                 <com.mikepenz.iconics.view.IconicsImageView
                     android:id="@+id/btnFileType"

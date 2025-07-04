@@ -20,7 +20,7 @@ import com.example.filemanager.R;
 public class SplashXScreenXActivity extends AppCompatActivity {
 
     Button btnWithPermission, btnWithOutPermission;
-
+    private static final int REQUEST_SD_CARD = 222;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

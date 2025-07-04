@@ -1,19 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <item
+        android:id="@+id/selOneFile"
+        android:icon="@drawable/check"
+        android:title="Select" />
 
     <item
         android:id="@+id/selShare"
         android:icon="@drawable/outline_share_24"
-        android:title="Share"
-        app:showAsAction="ifRoom" />
+        android:title="Share" />
+
+    <item
+        android:id="@+id/selOpenWith"
+        android:title="Open with" />
+
+    <item
+        android:id="@+id/selRename"
+        android:title="Rename" />
+
+    <item
+        android:id="@+id/selAddToStarred"
+        android:title="Add to starred" />
 
     <item
         android:id="@+id/selDelete"
-        android:icon="@drawable/outline_delete_24"
-        android:title="Delete"
-        app:showAsAction="always" />
+        android:title="Delete" />
+
 
     <item
         android:id="@+id/selAll"
@@ -21,37 +34,16 @@
         android:title="Select All" />
 
     <item
-        android:id="@+id/selOneFile"
-        android:icon="@drawable/check"
-        android:title="Select" />
-
-
-
-    <item
-        android:id="@+id/selOpenWith"
-        android:title="Open with" />
-
-
-    <item
         android:id="@+id/selMove"
         android:title="Move to" />
 
     <item
+        android:id="@+id/selFile_SafeFolder"
+        android:title="Move to safe Folder" />
+
+    <item
         android:id="@+id/selCopy"
         android:title="Copy to" />
-
-    <item
-        android:id="@+id/selRename"
-        android:title="Rename" />
-
-
-    <item
-        android:id="@+id/selAddToStarred"
-        android:title="Add to starred" />
-
-    <item
-        android:id="@+id/file_SafeFolder"
-        android:title="Move to safe Folder" />
 
     <item
         android:id="@+id/selBackToGoogleDrive"
@@ -61,5 +53,8 @@
         android:id="@+id/selFileInfo"
         android:title="File info" />
 
+    <item
+        android:id="@+id/selMoveToBin"
+        android:title="Trash" />
 
 </menu>

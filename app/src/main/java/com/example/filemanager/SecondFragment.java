@@ -11,14 +11,10 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.example.filemanager.databinding.FragmentSecondBinding;
 
 public class SecondFragment extends Fragment {
-
-private FragmentSecondBinding binding;
+    private FragmentSecondBinding binding;
 
     @Override
-    public View onCreateView(
-            @NonNull LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState
-    ) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
       binding = FragmentSecondBinding.inflate(inflater, container, false);
       return binding.getRoot();

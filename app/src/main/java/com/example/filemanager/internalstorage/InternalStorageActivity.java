@@ -170,7 +170,6 @@ public class InternalStorageActivity extends AppCompatActivity {
 
         sharedPreferencesIS = getSharedPreferences("Image_Prefs", MODE_PRIVATE);
 
-
         selectExtension = fastAdapter.getExtension(SelectExtension.class);
 
         if (selectExtension == null) {
@@ -195,7 +194,7 @@ public class InternalStorageActivity extends AppCompatActivity {
         });
 
         setLayout();
-//        fileLoading();
+//      fileLoading();
 
         String path = getIntent().getStringExtra("path");
 
@@ -684,7 +683,7 @@ public class InternalStorageActivity extends AppCompatActivity {
     }
 
 
-    void selectAllFile() {
+    private void selectAllFile() {
 
         runOnUiThread(new Runnable() {
             @Override
@@ -697,9 +696,6 @@ public class InternalStorageActivity extends AppCompatActivity {
 
                 isAllFileSelected = !isAllFileSelected;
 
-                Toast.makeText(InternalStorageActivity.this,
-                        isAllFileSelected ? "All file Selected" : "All file deSelected",
-                        Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -739,6 +735,7 @@ public class InternalStorageActivity extends AppCompatActivity {
                 return true;
             } else if (id == R.id.selOpenWith) {
 //                fileSelected();
+                selectExtension.toggleSelection(position);
                 openWith(item.getFile());
                 return true;
             } else if (id == R.id.selShare) {
@@ -956,10 +953,10 @@ public class InternalStorageActivity extends AppCompatActivity {
                         intent.setData(Uri.parse("package:" + getPackageName()));
                         permissionLauncher.launch(intent);
                     } else {
-                        installApk(clickedFile);
+                        installApk(apkFileToInstall);
                     }
                 } else {
-                    installApk(clickedFile);
+                    installApk(apkFileToInstall);
                 }
 
             }
@@ -1655,5 +1652,6 @@ public class InternalStorageActivity extends AppCompatActivity {
         });
 
     }
+
 
 }

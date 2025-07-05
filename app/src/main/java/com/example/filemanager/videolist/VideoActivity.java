@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,7 +20,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.documentfile.provider.DocumentFile;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -28,7 +29,6 @@ import com.example.filemanager.FileOperation;
 import com.example.filemanager.MediaStoreHelper;
 import com.example.filemanager.R;
 import com.example.filemanager.SortingHelper;
-import com.example.filemanager.internalstorage.InternalStorageActivity;
 import com.google.android.material.textfield.TextInputEditText;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.ISelectionListener;
@@ -38,16 +38,17 @@ import com.mikepenz.fastadapter.select.SelectExtension;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
-import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 public class VideoActivity extends AppCompatActivity {
 
     FileHelperAdapter item;
-    private SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferencesVideo;
+    String KEY_SORT_OPTION_VIDEO = "sort_option";
     public static boolean isVideoView = false;
     private Toolbar toolbarVideo;
     private RecyclerView recyclerViewVideo;
@@ -56,13 +57,12 @@ public class VideoActivity extends AppCompatActivity {
     private List<FileHelperAdapter> videoList = new ArrayList<>();
     private SelectExtension<FileHelperAdapter> selectExtension;
 
+    Handler mainHandler = new Handler(Looper.getMainLooper());
+
     private boolean isAllFileSelected = false;
 
-    private List<FileHelperAdapter> selectedFiles = new ArrayList<>();
+    private final List<FileHelperAdapter> selectedFiles = new ArrayList<>();
 
-
-    Button btnVideoPasting;
-    File currentDirectory = InternalStorageActivity.currentDirectory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,9 +70,8 @@ public class VideoActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_video);
 
-        btnVideoPasting = findViewById(R.id.btnVideoPasting);
         toolbarVideo = findViewById(R.id.toolbarVideo);
-        sharedPreferences = getSharedPreferences("MyViewPrefs", MODE_PRIVATE);
+        sharedPreferencesVideo = getSharedPreferences("MyViewPrefs", MODE_PRIVATE);
 
         setSupportActionBar(toolbarVideo);
 
@@ -103,7 +102,8 @@ public class VideoActivity extends AppCompatActivity {
         MediaStoreHelper.loadFile(this, "video", files -> {
             videoList.clear();
             videoList.addAll(files);
-            itemAdapterVideo.setNewList(files);
+            sortingPref();
+//            itemAdapterVideo.setNewList(files);
             fastAdapterVideo.notifyDataSetChanged();
 
         });
@@ -152,14 +152,28 @@ public class VideoActivity extends AppCompatActivity {
 
         for (int index : selectExtension.getSelections()) {
             FileHelperAdapter item = itemAdapterVideo.getAdapterItem(index);
-            if (item != null) selectedFiles.add(item);
+            if (item != null) {
+                selectedFiles.add(item);
+            }
         }
 
     }
 
-    // for selection
-    void shareFromUtils() {
-        FileOperation.getSelectedFiles(itemAdapterVideo, selectExtension);
+    private void newSorting() {
+        SortingHelper.sortingBy(this,
+                videoList,
+                fastAdapterVideo,
+                itemAdapterVideo,
+                sharedPreferencesVideo,
+                KEY_SORT_OPTION_VIDEO,
+                sortedList -> {
+                    Toast.makeText(VideoActivity.this, "List sorted", Toast.LENGTH_SHORT).show();
+                }
+        );
+    }
+
+    private void sortingPref() {
+        SortingHelper.applySorting(this, videoList, fastAdapterVideo, itemAdapterVideo, sharedPreferencesVideo, KEY_SORT_OPTION_VIDEO);
     }
 
 
@@ -294,22 +308,19 @@ public class VideoActivity extends AppCompatActivity {
             selectExtension.select();
             openSelectedFile();
             return true;
-        } else if (id == R.id.file_Move) {
-            moveVideo();
-        } else if (id == R.id.file_Copy) {
-            copyVideo();
         } else if (id == R.id.file_Rename) {
             selectedFiles();
             showRenameInputDialog();
             return true;
         } else if (id == R.id.file_AddToStarred) {
-
+            return true;
         } else if (id == R.id.file_SafeFolder) {
-
+            return true;
         } else if (id == R.id.file_BackToGoogleDrive) {
             addToDrive();
+            return true;
         } else if (id == R.id.file_FileInfo) {
-
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -360,7 +371,6 @@ public class VideoActivity extends AppCompatActivity {
     void openSearching() {
         FileOperation.searchingIntent(VideoActivity.this);
     }
-
 
     private void showRenameInputDialog() {
 
@@ -430,6 +440,7 @@ public class VideoActivity extends AppCompatActivity {
 
     }
 
+
     void fileLongClick() {
 
         fastAdapterVideo.withOnLongClickListener((v, adapter, item, position) -> {
@@ -444,8 +455,7 @@ public class VideoActivity extends AppCompatActivity {
 
                     if (count > 0) {
                         toolbarVideo.setTitle(count + " selected");
-                        toolbarVideo.setSubtitle(getSelectedFileSize());
-                        toolbarVideo.setSubtitle(getSelectedFileSize());
+                        toolbarVideo.setSubtitle(FileOperation.getSelectedFileSize(selectExtension, itemAdapterVideo));
                     } else {
                         toolbarVideo.setTitle("Video");
                         toolbarVideo.setSubtitle("");
@@ -460,176 +470,37 @@ public class VideoActivity extends AppCompatActivity {
         });
     }
 
-    private void copyVideo() {
-
-        List<Uri> selectedUris = new ArrayList<>();
-        for (FileHelperAdapter item : selectExtension.getSelectedItems()) {
-            selectedUris.add(item.getUri());
-        }
-        Toast.makeText(this, "Copied to clipboard", Toast.LENGTH_SHORT).show();
-        btnVideoPasting.setVisibility(View.VISIBLE);
-        MediaStoreHelper.goStorageTypes(this, "Copy From Video");
-    }
-
-    private void moveVideo() {
-
-        List<Uri> selectedUris = new ArrayList<>();
-        for (FileHelperAdapter item : selectExtension.getSelectedItems()) {
-            selectedUris.add(item.getUri());
-        }
-        Toast.makeText(this, "Cut to clipboard", Toast.LENGTH_SHORT).show();
-        btnVideoPasting.setVisibility(View.VISIBLE);
-
-    }
-
-    private void videoCutCopyPasting() {
-        btnVideoPasting.setOnClickListener(v -> {
-            if (!VideoClipboardHelper.hasData()) {
-                Toast.makeText(this, "Nothing to paste", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            for (Uri uri : VideoClipboardHelper.getCopiedUris()) {
-                String fileName = FileOperation.getFileNameFromUri(this, uri);
-                File destFile = new File(currentDirectory, fileName);
-
-                boolean success = FileOperation.copyFileFromUri(this, uri, destFile);
-
-                if (success) {
-                    Toast.makeText(this, "Copied: " + fileName, Toast.LENGTH_SHORT).show();
-
-                    if (VideoClipboardHelper.isCutMode()) {
-                        DocumentFile source = DocumentFile.fromSingleUri(this, uri);
-                        if (source != null && source.exists()) source.delete();
-                    }
-                } else {
-                    Toast.makeText(this, "Failed: " + fileName, Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            btnVideoPasting.setVisibility(View.GONE);
-        });
-    }
-
-    public String getSelectedFileSize() {
-
-        long fileSizeSum = 0;
-
-        for (Integer selectedItem : selectExtension.getSelections()) {
-            FileHelperAdapter fileSize = itemAdapterVideo.getAdapterItem(selectedItem);
-            fileSizeSum += parseSizeToBytes(fileSize.getSize());
-        }
-
-        return FileOperation.sizeCal(fileSizeSum);
-    }
-
-    public long parseSizeToBytes(String sizeStr) {
-
-        sizeStr = sizeStr.trim().toUpperCase();
-
-        try {
-            if (sizeStr.endsWith("KB")) {
-                return (long) (Double.parseDouble(sizeStr.replace("KB", "").trim()) * 1024);
-            } else if (sizeStr.endsWith("MB")) {
-                return (long) (Double.parseDouble(sizeStr.replace("MB", "").trim()) * 1024 * 1024);
-            } else if (sizeStr.endsWith("GB")) {
-                return (long) (Double.parseDouble(sizeStr.replace("GB", "").trim()) * 1024 * 1024 * 1024);
-            } else if (sizeStr.endsWith("B")) {
-                return Long.parseLong(sizeStr.replace("B", "").trim());
-            } else {
-                return Long.parseLong(sizeStr); // assume it's already in bytes
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return 0;
-        }
-    }
 
     private void addToDrive() {
         FileOperation.shareFilesToGoogleDrive(this, itemAdapterVideo, selectExtension);
     }
 
+        private void applySavedSorting() {
 
-    // sorting working
-    private void newSorting() {
-        SortingHelper.sortingBy(this,
-                videoList,
-                fastAdapterVideo,
-                itemAdapterVideo,
-                sharedPreferences,
-                "VIDEOSORTINGBY",
-                sortedList -> {
-                    Toast.makeText(VideoActivity.this, "List sorted", Toast.LENGTH_SHORT).show();
-                }
-        );
+        int checkedId = sharedPreferencesVideo.getInt(KEY_SORT_OPTION_VIDEO, R.id.nameAZ);
+
+        if (checkedId == R.id.rbBtnNDF) {
+            Collections.sort(videoList, (nfd, ofd) -> SortingHelper.dateConvertor(nfd.getDocDate()).compareTo(SortingHelper.dateConvertor(ofd.getDocDate())));
+        } else if (checkedId == R.id.rbBtnODF) {
+            Collections.sort(videoList, (nfd, ofd) -> SortingHelper.dateConvertor(ofd.getDocDate()).compareTo(SortingHelper.dateConvertor(nfd.getDocDate())));
+        } else if (checkedId == R.id.rbBtnLargeFirst) {
+            Collections.sort(videoList, (lff, sff) -> Long.compare(FileOperation.convertFileSizeStringToLong(lff.getSize()), FileOperation.convertFileSizeStringToLong(sff.getSize())));
+        } else if (checkedId == R.id.rbBtnSmallestFirst) {
+            Collections.sort(videoList, (lff, sff) -> Long.compare(FileOperation.convertFileSizeStringToLong(sff.getSize()), FileOperation.convertFileSizeStringToLong(lff.getSize())));
+        } else if (checkedId == R.id.nameAZ) {
+            Collections.sort(videoList, (name1, name2) -> name1.getName().compareTo(name2.getName()));
+        } else if (checkedId == R.id.nameZA) {
+            Collections.sort(videoList, (name1, name2) -> name2.getName().compareTo(name1.getName()));
+        }
+
+        fastAdapterVideo.notifyAdapterDataSetChanged();
+        itemAdapterVideo.setNewList(videoList);
+
+        mainHandler.post(() -> itemAdapterVideo.setNewList(videoList));
+
     }
 
-    private void sortBy() {
-//        BottomSheetDialog sortingSheet = new BottomSheetDialog(this);
-//
-//        View view = LayoutInflater.from(this).inflate(R.layout.bottomsheet_items, null);
-//        sortingSheet.setContentView(view);
-//
-//        RadioGroup radioGroup = view.findViewById(R.id.btnRGImageSorting);
-//
-//        int saveOption = sharedPreferences.getInt(VIDEOSORTINGBY, R.id.rbBtnNDF);
-//
-//        radioGroup.check(saveOption);
-//
-//        radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
-//
-//            SharedPreferences.Editor editor = sharedPreferences.edit();
-//            editor.putInt(VIDEOSORTINGBY, checkedId);
-//            editor.apply();
-//
-//            if (checkedId == R.id.rbBtnNDF) {
-//                Collections.sort(videoList, (nfd, ofd) -> parseFileDate(ofd.getDocDate()).compareTo(parseFileDate(nfd.getDocDate())));
-//            } else if (checkedId == R.id.rbBtnODF) {
-//                Collections.sort(videoList, (nfd, ofd) -> parseFileDate(nfd.getDocDate()).compareTo(parseFileDate(ofd.getDocDate())));
-//            } else if (checkedId == R.id.rbBtnLargeFirst) {
-//                Collections.sort(videoList, (largeFile, smallFile) -> Long.compare(parseSizeToBytes(smallFile.getSize()), parseSizeToBytes(largeFile.getSize())));
-//            } else if (checkedId == R.id.rbBtnSmallestFirst) {
-//                Collections.sort(videoList, (largeFile, smallFile) -> Long.compare(parseSizeToBytes(largeFile.getSize()), parseSizeToBytes(smallFile.getSize())));
-//            } else if (checkedId == R.id.nameAZ) {
-//                Collections.sort(videoList, (name1, name2) -> name1.getName().compareTo(name2.getName()));
-//            } else if (checkedId == R.id.nameZA) {
-//                Collections.sort(videoList, (name1, name2) -> name2.getName().compareTo(name1.getName()));
-//            }
-//
-//            itemAdapterVideo.setNewList(videoList);
-//            fastAdapterVideo.notifyAdapterDataSetChanged();
-//            sortingSheet.dismiss();
-//        });
-//
-//        sortingSheet.show();
-    }
 
-    private void saveSorting() {
-
-//        int saveOption = sharedPreferences.getInt(VIDEOSORTINGBY,R.id.rbBtnNDF);
-//
-//        if (saveOption == R.id.rbBtnNDF) {
-//            Collections.sort(videoList,(newFile, oldFile) -> Long.compare(oldFile.getFile().lastModified(), newFile.getFile().lastModified()));
-//        }
-//        else if (saveOption == R.id.rbBtnODF) {
-//            Collections.sort(videoList, Comparator.comparingLong(newFile -> newFile.getFile().lastModified()));
-//        }
-//        else if (saveOption == R.id.rbBtnLargeFirst) {
-//            Collections.sort(videoList, (largestFile, smallestFile) -> Long.compare(smallestFile.getFile().length(), largestFile.getFile().length()));
-//        }
-//        else if (saveOption == R.id.rbBtnSmallestFirst) {
-//            Collections.sort(videoList, (largestFile, smallestFile) -> Long.compare(largestFile.getFile().length(), smallestFile.getFile().length()));
-//        }
-//        else if (saveOption == R.id.nameAZ) {
-//            Collections.sort(videoList, (name1,name2) -> name1.getFile().getName().compareToIgnoreCase(name2.getFile().getName()));
-//        }
-//        else if (saveOption == R.id.nameZA) {
-//            Collections.sort(videoList, (name1,name2) -> name2.getFile().getName().compareToIgnoreCase(name1.getFile().getName()));
-//        }
-//
-//        itemAdapterVideo.setNewList(videoList);
-//        fastAdapterVideo.notifyAdapterDataSetChanged();
-    }
 
     private void openSelectedFile() {
 

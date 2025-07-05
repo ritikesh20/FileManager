@@ -149,7 +149,8 @@ public class ISAdapter extends AbstractItem<ISAdapter, ISAdapter.ViewHolder> {
 
             fileDate.setText(setDate);
 
-            fileSize.setText(FileOperation.sizeCal(sizeInBytes));
+//            fileSize.setText(FileOperation.sizeCal(sizeInBytes));
+            fileSize.setText(FileOperation.fileSizeCal(sizeInBytes));
 
             if (isGridView) {
                 if (name.endsWith(".mp4")) {

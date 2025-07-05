@@ -39,6 +39,7 @@ public class SortingHelper {
 
         RadioGroup radioGroup = view.findViewById(R.id.btnRGImageSorting);
 
+        //KEY_SORT_OPTION
         int savedOption = sharedPreferences.getInt(preferenceKey, R.id.rbBtnNDF);
 
         radioGroup.check(savedOption);
@@ -46,17 +47,17 @@ public class SortingHelper {
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
 
             SharedPreferences.Editor sort = sharedPreferences.edit();
-            sort.putInt(preferenceKey,checkedId);
+            sort.putInt(preferenceKey, checkedId);
             sort.apply();
 
             if (checkedId == R.id.rbBtnNDF) {
-                Collections.sort(fileList, (nfd, ofd) -> parseFileDate(ofd.getDocDate()).compareTo(parseFileDate(nfd.getDocDate())));
+                Collections.sort(fileList, (ndf, ofd) -> dateConvertor(ofd.docDate).compareTo(dateConvertor(ndf.docDate)));
             } else if (checkedId == R.id.rbBtnODF) {
-                Collections.sort(fileList, (nfd, ofd) -> parseFileDate(nfd.getDocDate()).compareTo(parseFileDate(ofd.getDocDate())));
+                Collections.sort(fileList, (nfd, ofd) -> dateConvertor(nfd.getDocDate()).compareTo(dateConvertor(ofd.getDocDate())));
             } else if (checkedId == R.id.rbBtnLargeFirst) {
-                Collections.sort(fileList, (largeFile, smallFile) -> Long.compare(parseSizeToBytes(smallFile.getSize()), parseSizeToBytes(largeFile.getSize())));
+                Collections.sort(fileList, (largeFile, smallFile) -> Long.compare(FileOperation.convertFileSizeStringToLong(smallFile.getSize()), FileOperation.convertFileSizeStringToLong(largeFile.getSize())));
             } else if (checkedId == R.id.rbBtnSmallestFirst) {
-                Collections.sort(fileList, (largeFile, smallFile) -> Long.compare(parseSizeToBytes(largeFile.getSize()), parseSizeToBytes(smallFile.getSize())));
+                Collections.sort(fileList, (largeFile, smallFile) -> Long.compare(FileOperation.convertFileSizeStringToLong(largeFile.getSize()), FileOperation.convertFileSizeStringToLong(smallFile.getSize())));
             } else if (checkedId == R.id.nameAZ) {
                 Collections.sort(fileList, (name1, name2) -> name1.getName().compareTo(name2.getName()));
             } else if (checkedId == R.id.nameZA) {
@@ -74,7 +75,7 @@ public class SortingHelper {
     }
 
 
-    private static Date parseFileDate(String dateStr) {
+    public static Date dateConvertor(String dateStr) {
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
         try {
             return sdf.parse(dateStr);
@@ -84,26 +85,39 @@ public class SortingHelper {
         }
     }
 
-    private static long parseSizeToBytes(String sizeStr) {
 
-        sizeStr = sizeStr.trim().toUpperCase();
+    public static void applySorting(
+            Context context,
+            List<FileHelperAdapter> fileList,
+            FastAdapter<FileHelperAdapter> fastAdapterFile,
+            ItemAdapter<FileHelperAdapter> itemAdapterFile,
+            SharedPreferences sharedPreferences,
+            String preferenceKeySortingPref
+    ) {
 
-        try {
-            if (sizeStr.endsWith("KB")) {
-                return (long) (Double.parseDouble(sizeStr.replace("KB", "").trim()) * 1024);
-            } else if (sizeStr.endsWith("MB")) {
-                return (long) (Double.parseDouble(sizeStr.replace("MB", "").trim()) * 1024 * 1024);
-            } else if (sizeStr.endsWith("GB")) {
-                return (long) (Double.parseDouble(sizeStr.replace("GB", "").trim()) * 1024 * 1024 * 1024);
-            } else if (sizeStr.endsWith("B")) {
-                return Long.parseLong(sizeStr.replace("B", "").trim());
-            } else {
-                return Long.parseLong(sizeStr);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return 0;
+        //KEY_SORT_OPTION
+        int checkedId = sharedPreferences.getInt(preferenceKeySortingPref, R.id.rbBtnNDF);
+
+        if (checkedId == R.id.rbBtnNDF) {
+            Collections.sort(fileList, (ndf, ofd) -> dateConvertor(ofd.docDate).compareTo(dateConvertor(ndf.docDate)));
+        } else if (checkedId == R.id.rbBtnODF) {
+            Collections.sort(fileList, (nfd, ofd) -> dateConvertor(nfd.getDocDate()).compareTo(dateConvertor(ofd.getDocDate())));
+        } else if (checkedId == R.id.rbBtnLargeFirst) {
+            Collections.sort(fileList, (largeFile, smallFile) -> Long.compare(FileOperation.convertFileSizeStringToLong(smallFile.getSize()), FileOperation.convertFileSizeStringToLong(largeFile.getSize())));
+        } else if (checkedId == R.id.rbBtnSmallestFirst) {
+            Collections.sort(fileList, (largeFile, smallFile) -> Long.compare(FileOperation.convertFileSizeStringToLong(largeFile.getSize()), FileOperation.convertFileSizeStringToLong(smallFile.getSize())));
+        } else if (checkedId == R.id.nameAZ) {
+            Collections.sort(fileList, (name1, name2) -> name1.getName().compareTo(name2.getName()));
+        } else if (checkedId == R.id.nameZA) {
+            Collections.sort(fileList, (name1, name2) -> name2.getName().compareTo(name1.getName()));
         }
+
+
+        itemAdapterFile.setNewList(fileList);
+
+        fastAdapterFile.notifyAdapterDataSetChanged();
+
+
     }
 
 

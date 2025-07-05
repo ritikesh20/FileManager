@@ -51,6 +51,7 @@ public class RecentFilesActivity extends AppCompatActivity {
     private boolean isAllFileSelected;
     private RecyclerView recyclerView;
     private SharedPreferences sharedPreferencesRecentFile;
+    private String KEY_OPTION_VIDEO_SORTING_TYPE = "sort_option_recentFile";
     private ItemAdapter<FileHelperAdapter> itemAdapterRecentFile;
     private FastAdapter<FileHelperAdapter> fastAdapterRecentFile;
     private File file;
@@ -128,7 +129,8 @@ public class RecentFilesActivity extends AppCompatActivity {
 
             recentFileList.clear();
             recentFileList.addAll(limitedList);
-            itemAdapterRecentFile.setNewList(recentFileList);
+            sortingPref();
+//            itemAdapterRecentFile.setNewList(recentFileList);
             progressBar.setVisibility(View.GONE);
             fastAdapterRecentFile.notifyDataSetChanged();
 
@@ -255,7 +257,7 @@ public class RecentFilesActivity extends AppCompatActivity {
 
                 if (count > 0) {
                     toolbarRecentFile.setTitle(count + " selected");
-                    toolbarRecentFile.setSubtitle(fileSizeCalculation());
+                    toolbarRecentFile.setSubtitle(FileOperation.getSelectedFileSize(selectExtension,itemAdapterRecentFile));
                 } else {
                     toolbarRecentFile.setTitle("Recent File");
                     toolbarRecentFile.setSubtitle("");
@@ -509,7 +511,7 @@ public class RecentFilesActivity extends AppCompatActivity {
                 fastAdapterRecentFile,
                 itemAdapterRecentFile,
                 sharedPreferencesRecentFile,
-                "VIDEOSORTINGBY",
+                KEY_OPTION_VIDEO_SORTING_TYPE,
                 sortedList -> {
                     Toast.makeText(RecentFilesActivity.this, "List sorted", Toast.LENGTH_SHORT).show();
                 }
@@ -545,17 +547,10 @@ public class RecentFilesActivity extends AppCompatActivity {
     }
 
 
-    public String fileSizeCalculation() {
-
-        long fileSize = 0;
-
-        for (Integer selectedFile : selectExtension.getSelections()) {
-            FileHelperAdapter size = itemAdapterRecentFile.getAdapterItem(selectedFile);
-            fileSize = fileSize + FileOperation.convertFileSizeStringToByte(size.getSize());
-        }
-
-        return FileOperation.convertFileSizeByteToString(fileSize);
+    private void sortingPref() {
+        SortingHelper.applySorting(this, recentFileList,fastAdapterRecentFile,itemAdapterRecentFile,sharedPreferencesRecentFile,KEY_OPTION_VIDEO_SORTING_TYPE);
     }
+
 
 
 }

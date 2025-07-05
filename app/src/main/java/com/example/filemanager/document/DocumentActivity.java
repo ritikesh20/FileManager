@@ -1,5 +1,7 @@
 package com.example.filemanager.document;
 
+import static com.example.filemanager.FileOperation.getSelectedFileSize;
+
 import android.app.AlertDialog;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -48,6 +50,7 @@ public class DocumentActivity extends AppCompatActivity {
     private RecyclerView recyclerViewDocument;
     private Toolbar toolbarDocument;
     private SharedPreferences sharedPreferencesDocument;
+    String KEY_SORT_OPTION_DOCUMENT = "sort_option_document";
     private ItemAdapter<FileHelperAdapter> itemAdapterDocument;
     private FastAdapter<FileHelperAdapter> fastAdapterDocument;
     private final List<FileHelperAdapter> listDocument = new ArrayList<>();
@@ -90,6 +93,7 @@ public class DocumentActivity extends AppCompatActivity {
             listDocument.clear();
             listDocument.addAll(files);
             itemAdapterDocument.setNewList(listDocument);
+            sortingPref();
             fastAdapterDocument.notifyDataSetChanged();
 
         });
@@ -155,8 +159,8 @@ public class DocumentActivity extends AppCompatActivity {
 
                 if (count > 0) {
                     toolbarDocument.setTitle(count + " selected");
-                    toolbarDocument.setSubtitle(getSelectedFileSize());
-                    toolbarDocument.setSubtitle(getSelectedFileSize());
+                    toolbarDocument.setSubtitle(getSelectedFileSize(selectExtension, itemAdapterDocument));
+                    toolbarDocument.setSubtitle(FileOperation.getSelectedFileSize(selectExtension, itemAdapterDocument));
                 } else {
                     toolbarDocument.setTitle("Document");
                     toolbarDocument.setSubtitle("");
@@ -427,7 +431,7 @@ public class DocumentActivity extends AppCompatActivity {
                 fastAdapterDocument,
                 itemAdapterDocument,
                 sharedPreferencesDocument,
-                "VIDEOSORTINGBY",
+                KEY_SORT_OPTION_DOCUMENT,
                 sortedList -> {
                     Toast.makeText(DocumentActivity.this, "List sorted", Toast.LENGTH_SHORT).show();
                 }
@@ -462,39 +466,9 @@ public class DocumentActivity extends AppCompatActivity {
 
     }
 
-    public String getSelectedFileSize() {
 
-        long fileSizeSum = 0;
-
-        for (Integer selectedItem : selectExtension.getSelections()) {
-            FileHelperAdapter fileSize = itemAdapterDocument.getAdapterItem(selectedItem);
-            fileSizeSum += parseSizeToBytes(fileSize.getSize());
-        }
-
-        return FileOperation.sizeCal(fileSizeSum);
+    private void sortingPref() {
+        SortingHelper.applySorting(this, listDocument, fastAdapterDocument, itemAdapterDocument, sharedPreferencesDocument, KEY_SORT_OPTION_DOCUMENT);
     }
-
-    public long parseSizeToBytes(String sizeStr) {
-
-        sizeStr = sizeStr.trim().toUpperCase();
-
-        try {
-            if (sizeStr.endsWith("KB")) {
-                return (long) (Double.parseDouble(sizeStr.replace("KB", "").trim()) * 1024);
-            } else if (sizeStr.endsWith("MB")) {
-                return (long) (Double.parseDouble(sizeStr.replace("MB", "").trim()) * 1024 * 1024);
-            } else if (sizeStr.endsWith("GB")) {
-                return (long) (Double.parseDouble(sizeStr.replace("GB", "").trim()) * 1024 * 1024 * 1024);
-            } else if (sizeStr.endsWith("B")) {
-                return Long.parseLong(sizeStr.replace("B", "").trim());
-            } else {
-                return Long.parseLong(sizeStr);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return 0;
-        }
-    }
-
 
 }

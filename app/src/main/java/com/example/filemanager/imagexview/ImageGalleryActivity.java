@@ -41,7 +41,6 @@ import com.mikepenz.iconics.IconicsDrawable;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -51,10 +50,11 @@ public class ImageGalleryActivity extends AppCompatActivity {
     private boolean isAllFileSelected = false;
     ProgressBar progressBarImage;
     private SharedPreferences sharedPreferencesImage;
-    public static final String KEY_SORT_OPTION = "sort_option";
+    public final String KEY_SORT_OPTION_IMAGE = "sort_option_image";
 
     private Toolbar toolbarImage;
     private RecyclerView recyclerView;
+
     FastAdapter<FileHelperAdapter> imageFastAdapter;
     ItemAdapter<FileHelperAdapter> imageItemAdapter;
     List<FileHelperAdapter> imageList = new ArrayList<>();
@@ -103,7 +103,7 @@ public class ImageGalleryActivity extends AppCompatActivity {
 
             imageList.clear();
             imageList.addAll(files);
-            applySavedSorting();
+            imageSortingPref();
             imageItemAdapter.setNewList(files);
             progressBarImage.setVisibility(View.GONE);
             imageFastAdapter.notifyDataSetChanged();
@@ -130,30 +130,42 @@ public class ImageGalleryActivity extends AppCompatActivity {
                 imageFastAdapter,
                 imageItemAdapter,
                 sharedPreferencesImage,
-                KEY_SORT_OPTION,
+                KEY_SORT_OPTION_IMAGE,
                 sortedList -> {
                     Toast.makeText(ImageGalleryActivity.this, "List sorted", Toast.LENGTH_SHORT).show();
                 }
         );
     }
 
-    private void applySavedSorting() {
+//    private void applySavedSorting() {
+//
+//        int checkedId = sharedPreferencesImage.getInt(KEY_SORT_OPTION, R.id.nameAZ);
+//
+//        if (checkedId == R.id.rbBtnNDF) {
+//            Collections.sort(imageList, (nfd, ofd) -> SortingHelper.dateConvertor(nfd.getDocDate()).compareTo(SortingHelper.dateConvertor(ofd.getDocDate())));
+//        } else if (checkedId == R.id.rbBtnODF) {
+//            Collections.sort(imageList, (nfd, ofd) -> SortingHelper.dateConvertor(ofd.getDocDate()).compareTo(SortingHelper.dateConvertor(nfd.getDocDate())));
+//        } else if (checkedId == R.id.rbBtnLargeFirst) {
+//            Collections.sort(imageList, (lff, sff) -> Long.compare(FileOperation.convertFileSizeStringToLong(lff.getSize()), FileOperation.convertFileSizeStringToLong(sff.getSize())));
+//        } else if (checkedId == R.id.rbBtnSmallestFirst) {
+//            Collections.sort(imageList, (lff, sff) -> Long.compare(FileOperation.convertFileSizeStringToLong(sff.getSize()), FileOperation.convertFileSizeStringToLong(lff.getSize())));
+//        } else if (checkedId == R.id.nameAZ) {
+//            Collections.sort(imageList, (name1, name2) -> name1.getName().compareTo(name2.getName()));
+//        } else if (checkedId == R.id.nameZA) {
+//            Collections.sort(imageList, (name1, name2) -> name2.getName().compareTo(name1.getName()));
+//        }
+//
+//        imageFastAdapter.notifyAdapterDataSetChanged();
+//        imageItemAdapter.setNewList(imageList);
+//
+//        mainHandler.post(() -> imageItemAdapter.setNewList(imageList));
+//
+//    }
 
-        int checkedId = sharedPreferencesImage.getInt(KEY_SORT_OPTION, R.id.nameAZ);
 
-        if (checkedId == R.id.nameAZ) {
-            Collections.sort(imageList, (name1, name2) -> name1.getName().compareToIgnoreCase(name2.getName()));
-        } else if (checkedId == R.id.nameZA) {
-            imageList.sort((name1, name2) -> name2.getName().compareToIgnoreCase(name1.getName()));
-        }
-
-        imageFastAdapter.notifyAdapterDataSetChanged();
-        imageItemAdapter.setNewList(imageList);
-
-        mainHandler.post(() -> imageItemAdapter.setNewList(imageList));
-
+    void imageSortingPref() {
+        SortingHelper.applySorting(this, imageList, imageFastAdapter, imageItemAdapter, sharedPreferencesImage, KEY_SORT_OPTION_IMAGE);
     }
-
 
     private void click() {
         imageFastAdapter.withOnClickListener(new OnClickListener<FileHelperAdapter>() {
@@ -209,8 +221,7 @@ public class ImageGalleryActivity extends AppCompatActivity {
 
                 if (count > 0) {
                     toolbarImage.setTitle(count + " selected");
-                    toolbarImage.setSubtitle(getSelectedFileSize());
-                    toolbarImage.setSubtitle(getSelectedFileSize());
+                    toolbarImage.setSubtitle(FileOperation.getSelectedFileSize(selectExtension, imageItemAdapter));
                 } else {
                     toolbarImage.setTitle("Image");
                     toolbarImage.setSubtitle("");
@@ -324,15 +335,6 @@ public class ImageGalleryActivity extends AppCompatActivity {
         } else if (id == R.id.file_ChangeView) {
 
         } else if (id == R.id.file_Selected) {
-            if (!isAllFileSelected) {
-                selectExtension.select();
-                Toast.makeText(ImageGalleryActivity.this, "All file Selected", Toast.LENGTH_SHORT).show();
-            } else {
-                selectExtension.deselect();
-                Toast.makeText(ImageGalleryActivity.this, "All file deSelected", Toast.LENGTH_SHORT).show();
-            }
-
-            isAllFileSelected = !isAllFileSelected;
 
             return true;
         } else if (id == R.id.file_Share) {
@@ -500,40 +502,6 @@ public class ImageGalleryActivity extends AppCompatActivity {
             Toast.makeText(this, "Failed to open file", Toast.LENGTH_SHORT).show();
         }
 
-    }
-
-    public String getSelectedFileSize() {
-
-        long fileSizeSum = 0;
-
-        for (Integer selectedItem : selectExtension.getSelections()) {
-            FileHelperAdapter fileSize = imageItemAdapter.getAdapterItem(selectedItem);
-            fileSizeSum += parseSizeToBytes(fileSize.getSize());
-        }
-
-        return FileOperation.sizeCal(fileSizeSum);
-    }
-
-    public long parseSizeToBytes(String sizeStr) {
-
-        sizeStr = sizeStr.trim().toUpperCase();
-
-        try {
-            if (sizeStr.endsWith("KB")) {
-                return (long) (Double.parseDouble(sizeStr.replace("KB", "").trim()) * 1024);
-            } else if (sizeStr.endsWith("MB")) {
-                return (long) (Double.parseDouble(sizeStr.replace("MB", "").trim()) * 1024 * 1024);
-            } else if (sizeStr.endsWith("GB")) {
-                return (long) (Double.parseDouble(sizeStr.replace("GB", "").trim()) * 1024 * 1024 * 1024);
-            } else if (sizeStr.endsWith("B")) {
-                return Long.parseLong(sizeStr.replace("B", "").trim());
-            } else {
-                return Long.parseLong(sizeStr); // assume it's already in bytes
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return 0;
-        }
     }
 
 

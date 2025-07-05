@@ -156,7 +156,8 @@ public class MediaStoreHelper {
 
                         String formattedDate = sdf.format(fileXdate);
 
-                        String newSize = FileOperation.sizeCal(size);
+//                        String newSize = FileOperation.sizeCal(size);
+                        String newSize = FileOperation.fileSizeCal(size);
 
                         Uri contentUri = ContentUris.withAppendedId(fileUri, id);
 

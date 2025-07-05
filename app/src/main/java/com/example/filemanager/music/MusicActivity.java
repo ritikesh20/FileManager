@@ -1,7 +1,6 @@
 package com.example.filemanager.music;
 
 import android.app.AlertDialog;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -22,7 +21,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -44,7 +42,6 @@ import com.mikepenz.iconics.IconicsDrawable;
 
 import java.io.File;
 import java.lang.reflect.Method;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -57,19 +54,20 @@ public class MusicActivity extends AppCompatActivity {
     public static boolean isMusicView = false;
     FileHelperAdapter item;
     private SharedPreferences sharedPreferencesMusic;
+    String KEY_OPTION_SORTING_TYPES_MUSIC = "sortingTypeMusic";
     private ItemAdapter<FileHelperAdapter> itemAdapterMusic;
     private FastAdapter<FileHelperAdapter> fastAdapterMusic;
     List<FileHelperAdapter> musicList = new ArrayList<>();
 
     SelectExtension<FileHelperAdapter> selectExtension;
 
+    Handler mainHandler = new Handler(Looper.getMainLooper());
     Button btnMusicCopy;
     Button btnMusicMove;
     Button btnMusicPasting;
 
     Toolbar toolbarMusic;
 
-    private List<String> selectedFile;
     private boolean isAllFileSelected = false;
 
 
@@ -112,7 +110,8 @@ public class MusicActivity extends AppCompatActivity {
         MediaStoreHelper.loadFile(this, "Audio", files -> {
             musicList.clear();
             musicList.addAll(files);
-            itemAdapterMusic.setNewList(files);
+            sortingPref();
+//            itemAdapterMusic.setNewList(files);
             fastAdapterMusic.notifyDataSetChanged();
         });
 
@@ -229,8 +228,7 @@ public class MusicActivity extends AppCompatActivity {
 
             if (count > 0) {
                 toolbarMusic.setTitle(count + " selected");
-                toolbarMusic.setSubtitle(getSelectedFileSize());
-                toolbarMusic.setSubtitle(getSelectedFileSize());
+                toolbarMusic.setSubtitle(FileOperation.getSelectedFileSize(selectExtension, itemAdapterMusic));
             } else {
                 toolbarMusic.setTitle("Music");
                 toolbarMusic.setSubtitle("");
@@ -487,7 +485,7 @@ public class MusicActivity extends AppCompatActivity {
                 fastAdapterMusic,
                 itemAdapterMusic,
                 sharedPreferencesMusic,
-                "MUSICSORTINGBY",
+                KEY_OPTION_SORTING_TYPES_MUSIC,
                 sortedList -> {
                     Toast.makeText(MusicActivity.this, "List sorted", Toast.LENGTH_SHORT).show();
                 }
@@ -522,43 +520,10 @@ public class MusicActivity extends AppCompatActivity {
 
     }
 
-    public String getSelectedFileSize() {
 
-        long fileSizeSum = 0;
-
-        for (Integer selectedItem : selectExtension.getSelections()) {
-            FileHelperAdapter fileSize = itemAdapterMusic.getAdapterItem(selectedItem);
-            fileSizeSum += parseSizeToBytes(fileSize.getSize());
-        }
-
-        return FileOperation.sizeCal(fileSizeSum);
+    private void sortingPref() {
+        SortingHelper.applySorting(this, musicList, fastAdapterMusic, itemAdapterMusic, sharedPreferencesMusic, KEY_OPTION_SORTING_TYPES_MUSIC);
     }
-
-    public long parseSizeToBytes(String sizeStr) {
-
-        sizeStr = sizeStr.trim().toUpperCase();
-
-        try {
-            if (sizeStr.endsWith("KB")) {
-                return (long) (Double.parseDouble(sizeStr.replace("KB", "").trim()) * 1024);
-            } else if (sizeStr.endsWith("MB")) {
-                return (long) (Double.parseDouble(sizeStr.replace("MB", "").trim()) * 1024 * 1024);
-            } else if (sizeStr.endsWith("GB")) {
-                return (long) (Double.parseDouble(sizeStr.replace("GB", "").trim()) * 1024 * 1024 * 1024);
-            } else if (sizeStr.endsWith("B")) {
-                return Long.parseLong(sizeStr.replace("B", "").trim());
-            } else {
-                return Long.parseLong(sizeStr);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return 0;
-        }
-    }
-
-
-
-
 
 }
 

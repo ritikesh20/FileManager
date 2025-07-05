@@ -107,8 +107,23 @@ public class HomeFileAdapter extends AbstractItem<HomeFileAdapter, HomeFileAdapt
                 }
             }
 
+            String folder = item.getRecentFolderName();
+
+            String removeLastIndex = folder.substring(0, folder.length() - 1);
+            String finalFolderName = "";
+
+            if (removeLastIndex.contains("/")) {
+                int index = removeLastIndex.lastIndexOf("/");
+                finalFolderName = removeLastIndex.substring(index + 1);
+            } else {
+                finalFolderName = removeLastIndex;
+            }
+
+            recentFolderName.setText(finalFolderName);
+
+
             recentFileName.setText(item.getRecentFileName());
-            recentFolderName.setText(item.getRecentFolderName());
+
             recentHomeInfoIcon.setIcon(new IconicsDrawable(itemView.getContext(),
                     GoogleMaterial.Icon.gmd_more_vert).colorRes(R.color.white).actionBar());
         }

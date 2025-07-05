@@ -7,10 +7,8 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.provider.OpenableColumns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -21,10 +19,6 @@ import com.example.filemanager.music.NewSearchActivity;
 import com.mikepenz.fastadapter.adapters.ItemAdapter;
 import com.mikepenz.fastadapter.select.SelectExtension;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -112,11 +106,7 @@ public class FileOperation {
 
     }
 
-
-    public static void shareFilesToGoogleDrive(
-            Activity activity,
-            ItemAdapter<FileHelperAdapter> itemAdapter,
-            SelectExtension<FileHelperAdapter> selectExtension) {
+    public static void shareFilesToGoogleDrive(Activity activity, ItemAdapter<FileHelperAdapter> itemAdapter, SelectExtension<FileHelperAdapter> selectExtension) {
 
         List<FileHelperAdapter> selectedFiles = getSelectedFiles(itemAdapter, selectExtension);
 
@@ -126,6 +116,7 @@ public class FileOperation {
         }
 
         ArrayList<Uri> uris = new ArrayList<>();
+
         for (FileHelperAdapter file : selectedFiles) {
             uris.add(file.getUri());
         }
@@ -196,7 +187,6 @@ public class FileOperation {
         alertDialog.show();
     }
 
-
     public static void showRenameDialog(Activity activity, ItemAdapter<FileHelperAdapter> itemAdapter, SelectExtension<FileHelperAdapter> selectExtension) {
 
         int index = selectExtension.getSelections().iterator().next();
@@ -228,22 +218,19 @@ public class FileOperation {
         builder.show();
     }
 
-    public static String sizeCal(long size) {
+    public static String getSelectedFileSize(SelectExtension<FileHelperAdapter> selectExtension, ItemAdapter<FileHelperAdapter> itemAdapter) {
 
-        float kb = size / 1024f;
-        float mb = kb / 1024f;
-        float gb = mb / 1024f;
+        long fileSizeSum = 0;
 
-        if (gb >= 1) {
-            return String.format("%.2f Gb", gb);
-        } else if (mb >= 1) {
-            return String.format("%.2f Mb", mb);
-        } else {
-            return String.format("%.2f KB", kb);
+        for (Integer selectedItem : selectExtension.getSelections()) {
+            FileHelperAdapter fileSize = itemAdapter.getAdapterItem(selectedItem);
+            fileSizeSum += convertFileSizeStringToLong(fileSize.getSize());
         }
+
+        return fileSizeCal(fileSizeSum);
     }
 
-    public static String convertFileSizeByteToString(long fileSizeInString) {
+    public static String fileSizeCal(long fileSizeInString) {
 
         float kb = fileSizeInString / 1024f;
         float mb = kb / 1024f;
@@ -260,8 +247,7 @@ public class FileOperation {
 
     }
 
-
-    static public long convertFileSizeStringToByte(String fileSize) {
+    static public long convertFileSizeStringToLong(String fileSize) {
 
         fileSize = fileSize.toUpperCase().trim();
 
@@ -285,91 +271,4 @@ public class FileOperation {
 
     }
 
-
-    public static boolean copyFileFromUri(Context context, Uri sourceUri, File destFile) {
-        try {
-            InputStream inputStream = context.getContentResolver().openInputStream(sourceUri);
-            if (inputStream == null) return false;
-
-            OutputStream outputStream = new FileOutputStream(destFile);
-            byte[] buffer = new byte[1024];
-            int length;
-
-            while ((length = inputStream.read(buffer)) > 0) {
-                outputStream.write(buffer, 0, length);
-            }
-
-            outputStream.flush();
-            inputStream.close();
-            outputStream.close();
-
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public static String getFileNameFromUri(Context context, Uri uri) {
-        Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
-        if (cursor != null && cursor.moveToFirst()) {
-            int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-            String name = cursor.getString(nameIndex);
-            cursor.close();
-            return name;
-        }
-        return "unknown_file";
-    }
-
 }
-
-/*
-    public static boolean copyFile(Context context, Uri sourceUri, Uri targetFolderUri, String newFileName) {
-        ContentResolver resolver = context.getContentResolver();
-
-        // Create new file in the destination folder
-        ContentValues values = new ContentValues();
-        values.put(MediaStore.MediaColumns.DISPLAY_NAME, newFileName);
-        values.put(MediaStore.MediaColumns.MIME_TYPE, resolver.getType(sourceUri));
-
-        Uri newFileUri = resolver.insert(targetFolderUri, values);
-        if (newFileUri == null) return false;
-
-        // Open streams and copy
-        try (InputStream in = resolver.openInputStream(sourceUri);
-             OutputStream out = resolver.openOutputStream(newFileUri)) {
-
-            if (in == null || out == null) return false;
-
-            byte[] buffer = new byte[4096];
-            int bytesRead;
-
-            while ((bytesRead = in.read(buffer)) != -1) {
-                out.write(buffer, 0, bytesRead);
-            }
-
-            out.flush();
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return true;
-
-    }
-
-    public static boolean moveFile(Context context, Uri sourceUri, Uri targetFolderUri, String newFileName) {
-        boolean copied = copyFile(context, sourceUri, targetFolderUri, newFileName);
-        if (!copied) return false;
-
-        try {
-            ContentResolver resolver = context.getContentResolver();
-            return resolver.delete(sourceUri, null, null) > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
- */

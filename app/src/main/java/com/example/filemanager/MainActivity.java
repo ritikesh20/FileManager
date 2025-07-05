@@ -6,12 +6,13 @@ import android.content.ContentUris;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.StatFs;
 import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -92,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
     TextView tvVideoSize;
     TextView tvImageSize;
     TextView tvDocSize;
+    TextView tvInternalStorageFreeSpace;
 
 
     @Override
@@ -117,6 +119,8 @@ public class MainActivity extends AppCompatActivity {
         tvVideoSize = findViewById(R.id.tvVideoFileSize);
         tvImageSize = findViewById(R.id.tvImageFileSize);
         tvDocSize = findViewById(R.id.tvDocFileSize);
+
+        tvInternalStorageFreeSpace = findViewById(R.id.tvInternalStorageFreeSpace);
 
         homeDrawerLayout = findViewById(R.id.homeDreawerLayout);
         navigationView = findViewById(R.id.home_nav_DL);
@@ -414,10 +418,22 @@ public class MainActivity extends AppCompatActivity {
                 File root = Environment.getExternalStorageDirectory();
                 calFileSize(root);
 
-                String audioFileSize = FileOperation.sizeCal(totalAudioSize);
-                String videoFileSize = FileOperation.sizeCal(totalVideoSize);
-                String imageFileSize = FileOperation.sizeCal(totalImageSize);
-                String docFileSize = FileOperation.sizeCal(totalDocSize);
+                StatFs stat = new StatFs(root.getPath());
+
+                long freeBytes;
+
+                freeBytes = stat.getAvailableBytes();
+
+
+                String finalFreeSize = FileOperation.fileSizeCal(freeBytes);
+
+
+
+
+                String audioFileSize = FileOperation.fileSizeCal(totalAudioSize);
+                String videoFileSize = FileOperation.fileSizeCal(totalVideoSize);
+                String imageFileSize = FileOperation.fileSizeCal(totalImageSize);
+                String docFileSize = FileOperation.fileSizeCal(totalDocSize);
 
                 runOnUiThread(new Runnable() {
                     @Override
@@ -426,12 +442,12 @@ public class MainActivity extends AppCompatActivity {
                         tvVideoSize.setText(videoFileSize);
                         tvImageSize.setText(imageFileSize);
                         tvDocSize.setText(docFileSize);
+                        tvInternalStorageFreeSpace.setText(finalFreeSize + " Free");
                     }
                 });
             }
         });
     }
-
 
     private void calFileSize(File dir) {
 
